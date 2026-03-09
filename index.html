@@ -102,12 +102,10 @@
     <script>
         const WEBHOOK_URL = "https://n8n-mzbmiib3etk4.kangkung.sumopod.my.id/webhook/ff-indonesia-api";
 
-        // Auto buka tab LOG PO saat web dimuat
         document.addEventListener('DOMContentLoaded', () => {
             switchTab('tab-log');
         });
 
-        // CORE API FUNCTION
         async function sendApi(payload) {
             try {
                 const response = await fetch(WEBHOOK_URL, {
@@ -125,22 +123,20 @@
             }
         }
 
-        // TAB SWITCHER
         function switchTab(tabId) {
             ['tab-po', 'tab-sales', 'tab-stock', 'tab-log'].forEach(id => {
+                const btn = document.getElementById('btn-' + id);
                 document.getElementById(id).classList.add('hide');
-                document.getElementById('btn-' + id).classList.replace('tab-active', 'tab-inactive');
+                if(btn) btn.classList.replace('tab-active', 'tab-inactive');
             });
             document.getElementById(tabId).classList.remove('hide');
             document.getElementById('btn-' + tabId).classList.replace('tab-inactive', 'tab-active');
         }
 
-        // FUNGSI UTAMA: LOAD LOG ADMIN
         async function loadLogData() {
             const container = document.getElementById('log-container');
             const btn = document.getElementById('btn-load-log');
             
-            // Ubah state tombol saat loading
             btn.innerHTML = `<span class="animate-spin text-xl">⏳</span> Sedang Menarik Data...`;
             btn.classList.add('opacity-70', 'pointer-events-none');
             container.innerHTML = '';
@@ -154,19 +150,16 @@
 
             const res = await sendApi(payload);
             
-            // Kembalikan state tombol
             btn.innerHTML = `<span class="text-xl">🗃️</span> Tarik Data LOG PO`;
             btn.classList.remove('opacity-70', 'pointer-events-none');
 
             if (res.status === "success" && res.data && res.data.length > 0) {
-                // Info jumlah data
                 const infoText = document.createElement('p');
                 infoText.className = "text-xs text-appgreen text-right mb-2";
-                infoText.innerText = `Menampilkan ${res.total_data} PO terbaru`;
+                infoText.innerText = `Menampilkan ${res.total_data || res.data.length} PO terbaru`;
                 container.appendChild(infoText);
 
                 res.data.forEach(item => {
-                    // Abaikan baris kosong atau PO yang batal
                     if(!item.ID || item["PO NKA"] === "[BATAL]") return;
 
                     const card = document.createElement('div');
@@ -202,16 +195,30 @@
             }
         }
 
-        // FUNGSI: DELETE/CANCEL PO
-        async function deleteRow(id) {
-            if(!confirm(`PERINGATAN: Anda yakin ingin membatalkan PO dengan ID: ${id}?`)) return;
+        // FUNGSI PERBAIKAN: DELETE/CANCEL PO
+        // Mengirim objek lengkap agar n8n bisa melakukan Match ID untuk Update
+        async function deleteRow(targetId) {
+            if(!confirm(`PERINGATAN: Anda yakin ingin membatalkan PO dengan ID: ${targetId}?`)) return;
             
             const btn = document.getElementById('btn-load-log');
-            btn.innerHTML = `<span class="animate-pulse text-xl">🗑️</span> Membatalkan...`;
+            const originalBtnHtml = btn.innerHTML;
             
-            const res = await sendApi({ action: "delete", id: id });
+            btn.innerHTML = `<span class="animate-pulse text-xl">🗑️</span> Membatalkan...`;
+            btn.classList.add('opacity-70', 'pointer-events-none');
+            
+            // Payload dikirim dengan key 'id' yang akan dicocokkan di Google Sheets n8n
+            const res = await sendApi({ 
+                action: "delete", 
+                id: targetId,
+                status_update: "[BATAL]" // Opsional: Anda bisa gunakan ini untuk mengisi kolom tertentu
+            });
+            
             alert(res.message);
-            if(res.status === "success") loadLogData(); // Refresh list jika berhasil
+            
+            btn.innerHTML = originalBtnHtml;
+            btn.classList.remove('opacity-70', 'pointer-events-none');
+            
+            if(res.status === "success") loadLogData(); 
         }
     </script>
 </body>
