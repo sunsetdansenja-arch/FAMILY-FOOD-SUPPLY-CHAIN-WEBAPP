@@ -18,23 +18,14 @@
                         appred: '#FF3B30'      
                     },
                     borderRadius: { '3xl': '1.25rem', '4xl': '2rem' },
-                    boxShadow: { 
-                        'glow-orange': '0 0 20px rgba(255, 133, 27, 0.3)', 
-                        'glow-blue': '0 0 20px rgba(43, 101, 246, 0.3)' 
-                    },
+                    boxShadow: { 'glow-orange': '0 0 20px rgba(255, 133, 27, 0.3)', 'glow-blue': '0 0 20px rgba(43, 101, 246, 0.3)' },
                     animation: {
                         'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
                         'shimmer': 'shimmer 1.5s infinite linear'
                     },
                     keyframes: {
-                        fadeInUp: { 
-                            '0%': { opacity: 0, transform: 'translateY(20px)' }, 
-                            '100%': { opacity: 1, transform: 'translateY(0)' } 
-                        },
-                        shimmer: { 
-                            '0%': { transform: 'translateX(-100%)' }, 
-                            '100%': { transform: 'translateX(100%)' } 
-                        }
+                        fadeInUp: { '0%': { opacity: 0, transform: 'translateY(20px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
+                        shimmer: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } }
                     }
                 }
             }
@@ -45,23 +36,18 @@
         .hide { display: none !important; }
         ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
         
-        /* Tactile Inputs */
-        input, select { background-color: #2C2C2E; border: 2px solid transparent; transition: all 0.2s; color: white; width: 100%; border-radius: 1rem; padding: 0.75rem 1rem; outline: none; font-weight: bold;}
+        input, select { background-color: #2C2C2E; border: 2px solid transparent; transition: all 0.2s; color: white; width: 100%; border-radius: 1rem; padding: 0.85rem 1.25rem; outline: none; font-weight: bold;}
         input:focus, select:focus { border-color: #FF851B; background-color: #1C1C1E; box-shadow: 0 0 15px rgba(255,133,27,0.2); }
         
-        /* Animations */
         .btn-tactile { transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .btn-tactile:active { transform: scale(0.95); opacity: 0.9; }
         
-        /* Accordion (Log PO) */
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s; opacity: 0; }
         .accordion-expanded { max-height: 800px; opacity: 1; border-top: 1px solid rgba(255,255,255,0.05); }
         
-        /* Toast Notification */
         #toast { transform: translateY(-150%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .toast-show { transform: translateY(0) !important; }
 
-        /* Skeleton Loading */
         .skeleton-box { position: relative; overflow: hidden; background-color: #1C1C1E; }
         .skeleton-box::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shimmer 1.5s infinite; }
     </style>
@@ -84,31 +70,24 @@
     <div id="app" class="w-full max-w-md bg-appbg min-h-screen relative overflow-x-hidden flex flex-col shadow-2xl">
         
         <div id="view-login" class="flex flex-col h-screen p-8 justify-center items-center relative z-40 bg-[#0A0A0A]">
-            <div class="w-full max-w-sm space-y-10 p-2">
-                <div class="text-center space-y-3 mb-10">
-                    <div class="w-16 h-16 bg-apporange rounded-2xl mx-auto flex items-center justify-center shadow-glow-orange mb-6">
-                        <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            <div class="w-full max-w-sm space-y-12">
+                <div class="text-center space-y-3">
+                    <div class="w-20 h-20 bg-apporange rounded-3xl mx-auto flex items-center justify-center shadow-glow-orange mb-6">
+                        <svg class="w-10 h-10 text-black" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     </div>
-                    <h1 class="text-3xl font-black text-white tracking-tighter italic">FAMILY<span class="text-apporange">FOOD</span></h1>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Secure Access Center</p>
+                    <h1 class="text-4xl font-black text-white tracking-tighter italic">FAMILY<span class="text-apporange">FOOD</span></h1>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-[0.3em] font-bold">Secure Access</p>
                 </div>
                 
                 <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-                    <div>
-                        <input type="text" id="login-user" placeholder="USER ID" required class="text-center text-sm font-black uppercase tracking-[0.2em] placeholder-gray-600 bg-appcard border border-white/5 !rounded-2xl !p-4 !w-full text-white">
-                    </div>
-                    <div>
-                        <input type="password" id="login-pass" placeholder="PASSWORD" required class="text-center text-sm font-black tracking-[0.2em] placeholder-gray-600 bg-appcard border border-white/5 !rounded-2xl !p-4 !w-full text-white">
-                    </div>
-                    <button type="submit" id="btn-login" class="w-full bg-apporange text-black font-black py-4 rounded-2xl shadow-glow-orange mt-6 uppercase tracking-widest text-sm btn-tactile hover:bg-orange-500 transition-colors">
-                        LOGIN SISTEM
-                    </button>
+                    <input type="text" id="login-user" placeholder="USER ID" required class="text-center font-black uppercase tracking-widest bg-appcard border-white/5">
+                    <input type="password" id="login-pass" placeholder="PASSWORD" required class="text-center font-black tracking-widest bg-appcard border-white/5">
+                    <button type="submit" id="btn-login" class="w-full bg-apporange text-black font-black py-4 rounded-2xl shadow-glow-orange mt-4 uppercase tracking-widest text-sm btn-tactile">MASUK SISTEM</button>
                 </form>
             </div>
         </div>
 
         <div id="view-main" class="hide flex-col h-full">
-            
             <div class="px-6 py-4 sticky top-0 bg-[#0A0A0A]/90 backdrop-blur-xl z-20 flex justify-between items-center border-b border-white/5">
                 <div>
                     <h2 class="text-xl font-black text-white tracking-tighter italic leading-none">FAMILY<span class="text-apporange">FOOD</span></h2>
@@ -117,20 +96,19 @@
                         <p id="header-username" class="text-[9px] text-gray-400 uppercase font-bold tracking-widest">USER</p>
                     </div>
                 </div>
-                <button onclick="logout()" class="bg-white/5 px-3 py-2 rounded-xl text-gray-400 btn-tactile border border-white/5 text-[10px] font-bold uppercase hover:bg-white/10 hover:text-white transition-colors">Logout</button>
+                <button onclick="logout()" class="bg-white/5 px-3 py-2 rounded-xl text-gray-400 btn-tactile border border-white/5 text-[10px] font-bold uppercase">Logout</button>
             </div>
 
             <div class="flex-1 overflow-y-auto pb-32">
-                
                 <div id="tab-analytics" class="p-6 space-y-8">
                     <div class="flex gap-3">
-                        <div class="flex-1 bg-appcard border border-white/5 p-4 rounded-3xl flex flex-col justify-between relative overflow-hidden">
-                            <p class="text-[8px] uppercase font-bold text-gray-500 tracking-widest relative z-10">Total SKU</p>
-                            <p id="stat-sku" class="text-3xl font-black text-white relative z-10 mt-1 ticker">0</p>
+                        <div class="flex-1 bg-appcard border border-white/5 p-4 rounded-3xl flex flex-col justify-between">
+                            <p class="text-[8px] uppercase font-bold text-gray-500 tracking-widest">Total SKU</p>
+                            <p id="stat-sku" class="text-3xl font-black text-white mt-1 ticker">0</p>
                         </div>
-                        <div class="flex-1 bg-appcard border border-white/5 p-4 rounded-3xl flex flex-col justify-between relative overflow-hidden">
-                            <p class="text-[8px] uppercase font-bold text-gray-500 tracking-widest relative z-10">DC Terpantau</p>
-                            <p id="stat-dc" class="text-3xl font-black text-appblue relative z-10 mt-1 ticker">0</p>
+                        <div class="flex-1 bg-appcard border border-white/5 p-4 rounded-3xl flex flex-col justify-between">
+                            <p class="text-[8px] uppercase font-bold text-gray-500 tracking-widest">DC Monitor</p>
+                            <p id="stat-dc" class="text-3xl font-black text-appblue mt-1 ticker">0</p>
                         </div>
                     </div>
 
@@ -138,118 +116,82 @@
                         <span>🔄</span> SYNC ANALYTIC DATA
                     </button>
 
-                    <div class="space-y-4">
-                        <div class="bg-appcard rounded-[2rem] border border-apporange/30 shadow-[0_0_20px_rgba(255,133,27,0.05)] overflow-hidden relative">
-                            <div class="bg-apporange/10 px-5 py-4 border-b border-apporange/20">
-                                <h4 class="text-sm font-black text-apporange uppercase tracking-widest flex items-center gap-2">
-                                    <span class="text-lg">📦</span> INVENTORY HEALTH
-                                </h4>
-                            </div>
-                            <div class="p-2">
-                                <div class="grid grid-cols-5 gap-1 items-end px-3 py-2 text-[8px] text-gray-500 font-bold uppercase tracking-widest border-b border-white/5 text-center">
+                    <div class="bg-appcard rounded-[2rem] border border-apporange/30 shadow-[0_0_20px_rgba(255,133,27,0.05)] overflow-hidden">
+                        <div class="bg-apporange/10 px-5 py-4 border-b border-apporange/20 flex justify-between items-center">
+                            <h4 class="text-sm font-black text-apporange uppercase tracking-widest">📦 INVENTORY HEALTH</h4>
+                        </div>
+                        <div class="p-2 overflow-x-auto">
+                            <div class="min-w-[340px]">
+                                <div class="grid grid-cols-5 gap-1 px-3 py-2 text-[8px] text-gray-500 font-bold uppercase tracking-widest border-b border-white/5 text-center">
                                     <div class="text-left">NAMA SKU</div>
-                                    <div>AVG<br>3 BLN</div>
-                                    <div id="th-forecast" class="text-appblue">FORECAST<br>(DEPAN)</div>
-                                    <div id="th-buffer" class="text-apporange">BUFFER<br>(INI)</div>
+                                    <div>AVG 3 BLN</div>
+                                    <div id="th-forecast" class="text-appblue italic">FORECAST</div>
+                                    <div id="th-buffer" class="text-apporange italic">BUFFER</div>
                                     <div>STATUS</div>
                                 </div>
                                 <div id="forecast-container" class="px-2 pb-2">
-                                    <div class="py-10 text-center opacity-30 italic text-xs">Tekan Sync Data...</div>
+                                    <div class="py-10 text-center opacity-30 italic text-xs">Tekan Sync...</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="space-y-4 pt-2">
-                        <div class="flex justify-between items-end px-2 border-b border-white/10 pb-2">
-                            <h4 class="text-xs font-black text-appblue uppercase tracking-[0.2em]">DC Diagnose</h4>
-                        </div>
-                        <div id="diagnosa-container" class="space-y-3">
-                            <div class="py-10 text-center opacity-30 italic text-xs bg-appcard rounded-[2rem] border border-white/5">Tekan Sync Data...</div>
-                        </div>
+                        <h4 class="text-xs font-black text-appblue uppercase tracking-[0.2em] px-2">DC Diagnose</h4>
+                        <div id="diagnosa-container" class="grid gap-4"></div>
                     </div>
                 </div>
 
                 <div id="tab-log" class="hide p-6 space-y-6">
                     <div class="sticky top-[68px] bg-[#0A0A0A]/95 backdrop-blur-xl z-10 pt-2 pb-4 border-b border-white/5">
-                        <button onclick="loadLogPO()" id="btn-sync-log" class="w-full bg-appblue text-white font-black py-4 rounded-2xl btn-tactile shadow-glow-blue flex justify-center items-center gap-2 uppercase tracking-widest text-xs mb-4">
-                            TARIK DATABASE PO
-                        </button>
+                        <button onclick="loadLogPO()" id="btn-sync-log" class="w-full bg-appblue text-white font-black py-4 rounded-2xl btn-tactile shadow-glow-blue flex justify-center items-center gap-2 uppercase tracking-widest text-xs mb-4">TARIK DATABASE PO</button>
                         <input type="text" id="search-po" placeholder="Cari ID PO atau DC..." class="text-sm bg-appcard border border-white/10" onkeyup="filterLogLocal()">
                     </div>
                     <div id="log-container" class="space-y-4"></div>
                 </div>
 
                 <div id="tab-forms" class="hide p-6 space-y-6">
-                    <div class="flex bg-appcard p-1.5 rounded-2xl border border-white/5 relative shadow-xl">
-                        <button onclick="switchForm('po')" id="btn-form-po" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-apporange text-black">New PO</button>
+                    <div class="flex bg-appcard p-1.5 rounded-2xl border border-white/5 shadow-xl">
+                        <button onclick="switchForm('po')" id="btn-form-po" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-apporange text-black shadow-glow-orange">New PO</button>
                         <button onclick="switchForm('sales')" id="btn-form-sales" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500">Sales</button>
                         <button onclick="switchForm('stock')" id="btn-form-stock" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500">Stock</button>
                     </div>
 
                     <form id="form-po" onsubmit="submitAction(event, 'insert_po')" class="space-y-5 bg-appcard p-5 rounded-[2rem] border border-white/5">
-                        <div class="space-y-3">
-                            <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase bg-[#121212] px-4 py-3">
-                            <div class="grid grid-cols-2 gap-3">
-                                <input type="text" id="po-tanggal" placeholder="Tgl PO (DD/MM/YYYY)" required class="bg-[#121212] px-4 py-3">
-                                <input type="text" id="po-exp" placeholder="Tgl EXP (DD/MM/YYYY)" required class="bg-[#121212] px-4 py-3">
-                            </div>
-                            <div class="relative cursor-pointer btn-tactile" onclick="openDCModal('po-dc')">
-                                <input type="text" id="po-dc" placeholder="PILIH NAMA DC" required readonly class="pointer-events-none uppercase bg-appblue/10 border border-appblue/30 text-appblue px-4 py-3">
-                                <div class="absolute right-4 top-1/2 -translate-y-1/2 text-appblue">🔍</div>
-                            </div>
+                        <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase">
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" id="po-tanggal" placeholder="Tgl PO (DD/MM/YYYY)" required>
+                            <input type="text" id="po-exp" placeholder="Tgl EXP (DD/MM/YYYY)" required>
                         </div>
-                        <div class="pt-4 border-t border-white/5">
-                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Kuantitas PO (Ctn)</p>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NKA</label><input type="number" id="po-nka" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NDLH</label><input type="number" id="po-ndlh" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NRD</label><input type="number" id="po-nrd" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NARR</label><input type="number" id="po-narr" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                            </div>
+                        <div class="relative cursor-pointer btn-tactile" onclick="openDCModal('po-dc')">
+                            <input type="text" id="po-dc" placeholder="PILIH NAMA DC" required readonly class="pointer-events-none uppercase bg-appblue/10 border border-appblue/30 text-appblue">
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-appblue">🔍</div>
                         </div>
-                        <button type="submit" class="w-full bg-apporange text-black font-black py-4 rounded-2xl btn-tactile shadow-glow-orange tracking-widest">SUBMIT PO BARU</button>
+                        <div class="pt-4 border-t border-white/5 grid grid-cols-2 gap-3">
+                            <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold">NKA</label><input type="number" id="po-nka" value="0" required class="bg-transparent border-none mt-1"></div>
+                            <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold">NDLH</label><input type="number" id="po-ndlh" value="0" required class="bg-transparent border-none mt-1"></div>
+                            <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold">NRD</label><input type="number" id="po-nrd" value="0" required class="bg-transparent border-none mt-1"></div>
+                            <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold">NARR</label><input type="number" id="po-narr" value="0" required class="bg-transparent border-none mt-1"></div>
+                        </div>
+                        <button type="submit" class="w-full bg-apporange text-black font-black py-4 rounded-2xl btn-tactile shadow-glow-orange tracking-widest uppercase">SUBMIT PO</button>
                     </form>
 
                     <form id="form-sales" onsubmit="submitAction(event, 'insert_sales')" class="hide space-y-5 bg-appcard p-5 rounded-[2rem] border border-white/5">
-                        <div class="space-y-3">
-                            <input type="text" id="sls-id" placeholder="ID PO (Harus Sesuai Database)" required class="uppercase bg-[#121212] px-4 py-3">
-                            <div class="relative cursor-pointer btn-tactile" onclick="openDCModal('sls-dc')">
-                                <input type="text" id="sls-dc" placeholder="PILIH DC (OPSIONAL)" readonly class="pointer-events-none uppercase bg-appblue/10 border border-appblue/30 text-appblue px-4 py-3">
-                            </div>
+                        <input type="text" id="sls-id" placeholder="ID PO (Sesuai Database)" required class="uppercase">
+                        <div class="pt-4 border-t border-white/5 grid grid-cols-2 gap-3">
+                            <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold">NKA</label><input type="number" id="sls-nka" value="0" class="bg-transparent border-none mt-1"></div>
+                            <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold">NDLH</label><input type="number" id="sls-ndlh" value="0" class="bg-transparent border-none mt-1"></div>
+                            <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold">NRD</label><input type="number" id="sls-nrd" value="0" class="bg-transparent border-none mt-1"></div>
+                            <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold">NARR</label><input type="number" id="sls-narr" value="0" class="bg-transparent border-none mt-1"></div>
+                            <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold">NKACH</label><input type="number" id="sls-nkach" value="0" class="bg-transparent border-none mt-1"></div>
                         </div>
-                        <div class="pt-4 border-t border-white/5">
-                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Realisasi Sales (Ctn)</p>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NKA</label><input type="number" id="sls-nka" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NDLH</label><input type="number" id="sls-ndlh" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NRD</label><input type="number" id="sls-nrd" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NARR</label><input type="number" id="sls-narr" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NKACH</label><input type="number" id="sls-nkach" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                            </div>
-                        </div>
-                        <button type="submit" class="w-full bg-appblue text-white font-black py-4 rounded-2xl btn-tactile shadow-glow-blue tracking-widest">UPDATE SALES</button>
-                    </form>
-
-                    <form id="form-stock" onsubmit="submitAction(event, 'insert_stock')" class="hide space-y-5 bg-appcard p-5 rounded-[2rem] border border-white/5">
-                        <input type="text" id="stk-tanggal" placeholder="Tanggal (DD/MM/YYYY)" required class="bg-[#121212] px-4 py-3">
-                        <div class="pt-2 border-t border-white/5 mt-2">
-                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3 mt-2">Mutasi Fisik Stock (Ctn)</p>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NKA</label><input type="number" id="stk-nka" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NDLH</label><input type="number" id="stk-ndlh" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NRD</label><input type="number" id="stk-nrd" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NARR</label><input type="number" id="stk-narr" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NKACH</label><input type="number" id="stk-nkach" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                            </div>
-                        </div>
-                        <button type="submit" class="w-full bg-appgreen text-black font-black py-4 rounded-2xl btn-tactile tracking-widest shadow-[0_0_20px_rgba(52,199,89,0.2)]">UPDATE STOCK</button>
+                        <button type="submit" class="w-full bg-appblue text-white font-black py-4 rounded-2xl btn-tactile shadow-glow-blue tracking-widest uppercase">UPDATE SALES</button>
                     </form>
                 </div>
             </div>
 
             <div class="fixed bottom-0 w-full max-w-md bg-[#0A0A0A]/95 backdrop-blur-xl border-t border-white/5 pt-3 pb-6 px-6 flex justify-between items-center z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-                <button onclick="switchMainTab('tab-analytics', this)" class="nav-item flex-1 flex flex-col items-center gap-1.5 text-apporange transition-colors btn-tactile">
+                <button onclick="switchMainTab('tab-analytics', this)" class="nav-item flex-1 flex flex-col items-center gap-1 text-apporange transition-colors btn-tactile">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     <span class="text-[8px] mt-0.5 font-black uppercase tracking-widest">Analytic</span>
                 </button>
@@ -273,12 +215,11 @@
 
         const DC_LIST = ["BANDUNG", "BALARAJA", "BEKASI", "BOGOR", "BREBEK", "CIANJUR", "CILEUNGSI", "CIKOKOL", "CILACAP", "JEMBER", "KARAWANG", "KLATEN", "MADIUN", "MALANG", "PARUNG", "PLUMBON", "REMBANG", "SEMARANG", "SERANG", "SIDOARJO", "TEGAL", "BALI", "BANJARMASIN", "BATAM", "GORONTALO", "JAMBI", "SUKABUMI", "LAMPUNG", "LOMBOK", "LUWU", "MAKASSAR", "MANADO", "MEDAN", "PALEMBANG", "PEKANBARU", "PONTIANAK"];
 
-        // --- UTILITIES ---
         function updateMonthHeaders() {
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
             const d = new Date();
-            document.getElementById('th-buffer').innerHTML = `BUFFER<br>(${months[d.getMonth()]})`;
-            document.getElementById('th-forecast').innerHTML = `FORECAST<br>(${months[(d.getMonth() + 1) % 12]})`;
+            document.getElementById('th-buffer').innerText = `BUFFER (${months[d.getMonth()]})`;
+            document.getElementById('th-forecast').innerText = `FORECAST (${months[(d.getMonth() + 1) % 12]})`;
         }
 
         function getSkeletonHTML(count, isList = false) {
@@ -302,12 +243,12 @@
             const t = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
             document.getElementById('toast-icon').innerText = isError ? '❌' : '✅';
-            t.className = `fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-full font-black text-sm flex items-center gap-3 w-max max-w-[90%] transition-transform duration-300 border-2 ${isError ? 'bg-[#3A0000] border-appred text-appred shadow-[0_0_20px_rgba(255,59,48,0.4)]' : 'bg-appcard border-appblue text-white shadow-glow-blue'}`;
+            t.className = `fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-full font-black text-sm flex items-center gap-3 w-max max-w-[90%] transition-transform duration-300 border-2 ${isError ? 'bg-[#3A0000] border-appred text-appred shadow-[0_0_20px_rgba(255,59,48,0.4)]' : 'bg-appcard border-apporange text-white shadow-glow-orange'}`;
             t.classList.add('toast-show');
             setTimeout(() => t.classList.remove('toast-show'), 3000);
         }
 
-        // ================= MESIN KONEKSI ORI DARI ANDA (100% SAMA) =================
+        // ================= CORE CONNECTION (Original proven logic) =================
         async function sendApi(payload, btnElement = null, originalText = "") {
             if(btnElement) { btnElement.innerHTML = `<span class="animate-spin">⏳</span>`; btnElement.classList.add('opacity-50', 'pointer-events-none'); }
             try {
@@ -327,153 +268,106 @@
             const btn = document.getElementById('btn-login');
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
-            
             const res = await sendApi({ action: "login", user_id: user, password: pass }, btn, "LOGIN SISTEM");
             if (res && res.status === "success") {
                 showToast("Akses Diberikan!");
                 document.getElementById('view-login').classList.add('hide');
                 document.getElementById('view-main').classList.remove('hide');
                 document.getElementById('header-username').innerText = res.user_id || user;
-                
-                // Trigger fitur UI baru setelah berhasil
-                updateMonthHeaders();
-                initDCPicker();
-                loadAnalytics(); 
-            } else {
-                showToast(res ? res.message : "Akses Ditolak", true);
-            }
+                updateMonthHeaders(); initDCPicker(); loadAnalytics(); 
+            } else showToast(res ? res.message : "Akses Ditolak", true);
         }
-        // ================= BATAS MESIN KONEKSI =================
 
         function logout() { location.reload(); }
 
         // --- DC MODAL PICKER ---
         function initDCPicker() {
-            const grid = document.getElementById('dc-grid');
-            DC_LIST.forEach(dc => {
-                grid.innerHTML += `<button type="button" onclick="selectDC('${dc}')" class="bg-appcard border border-white/10 text-white text-[10px] font-bold py-3 rounded-2xl btn-tactile hover:border-apporange hover:text-apporange transition-colors uppercase tracking-wider">${dc}</button>`;
-            });
+            document.getElementById('dc-grid').innerHTML = DC_LIST.map(dc => `<button type="button" onclick="selectDC('${dc}')" class="bg-appcard border border-white/10 text-white text-[10px] font-bold py-3 rounded-2xl btn-tactile hover:border-apporange hover:text-apporange transition-colors uppercase tracking-wider">${dc}</button>`).join('');
         }
-        function openDCModal(inputId) {
-            targetDCInput = inputId;
-            document.getElementById('modal-dc').classList.remove('hide');
-        }
+        function openDCModal(id) { targetDCInput = id; document.getElementById('modal-dc').classList.remove('hide'); }
         function closeDCModal() { document.getElementById('modal-dc').classList.add('hide'); }
-        function selectDC(dcName) {
-            document.getElementById(targetDCInput).value = dcName;
-            closeDCModal();
-        }
+        function selectDC(dc) { document.getElementById(targetDCInput).value = dc; closeDCModal(); }
 
         // --- NAVIGATION ---
         function switchMainTab(tabId, element) {
             ['tab-analytics', 'tab-log', 'tab-forms'].forEach(id => document.getElementById(id).classList.add('hide'));
             document.getElementById(tabId).classList.remove('hide');
-            
             document.querySelectorAll('.nav-item').forEach(el => {
-                if(el.classList.contains('w-16')) return; // skip FAB
+                if(el.classList.contains('w-16')) return; 
                 el.classList.replace('text-apporange', 'text-gray-600');
                 el.classList.replace('text-appblue', 'text-gray-600');
             });
-            if(element && !element.classList.contains('w-16')) {
-                element.classList.replace('text-gray-600', tabId === 'tab-analytics' ? 'text-apporange' : 'text-appblue');
-            }
+            if(element && !element.classList.contains('w-16')) element.classList.replace('text-gray-600', tabId === 'tab-analytics' ? 'text-apporange' : 'text-appblue');
         }
 
         function switchForm(formType) {
-            ['form-po', 'form-sales', 'form-stock'].forEach(id => document.getElementById(id).classList.add('hide'));
+            ['form-po', 'form-sales'].forEach(id => document.getElementById('form-' + id).classList.add('hide'));
             document.getElementById('form-' + formType).classList.remove('hide');
-            
-            ['btn-form-po', 'btn-form-sales', 'btn-form-stock'].forEach(id => {
-                document.getElementById(id).className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500 bg-transparent"; 
-            });
-            
-            const activeBtn = document.getElementById('btn-form-' + formType);
-            if(formType === 'po') activeBtn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-apporange text-black shadow-glow-orange";
-            if(formType === 'sales') activeBtn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-appblue text-white shadow-glow-blue";
-            if(formType === 'stock') activeBtn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-appgreen text-black shadow-[0_0_15px_rgba(52,199,89,0.3)]";
+            ['btn-form-po', 'btn-form-sales', 'btn-form-stock'].forEach(id => document.getElementById(id).className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500 bg-transparent");
+            document.getElementById('btn-form-' + formType).className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-apporange text-black shadow-glow-orange";
         }
 
-        // --- 1. ANALYTICS VIEW ---
+        // --- ANALYTICS ---
         async function loadAnalytics() {
             const fCont = document.getElementById('forecast-container');
             const dCont = document.getElementById('diagnosa-container');
             const btn = document.getElementById('btn-sync-analytics');
-            
-            fCont.innerHTML = getSkeletonHTML(5, false); 
-            dCont.innerHTML = getSkeletonHTML(4, true);
+            fCont.innerHTML = getSkeletonHTML(5, false); dCont.innerHTML = getSkeletonHTML(4, true);
 
+            // Karena n8n dipisah jalurnya, kita panggil secara paralel
             const res = await sendApi({ action: "load_owner" }, btn, "<span>🔄</span> SYNC ANALYTIC DATA");
             
             if (res && res.status === "success" && res.data) {
                 runTicker(document.getElementById('stat-sku'), res.total_sku || 0);
-
-                // INVENTORY HEALTH (TABLE)
                 fCont.innerHTML = '';
                 res.data.forecast.forEach((item, idx) => {
-                    const isCrit = String(item.status).includes("CRITICAL");
-                    const dot = isCrit ? '<span class="h-2.5 w-2.5 rounded-full bg-appred shadow-[0_0_8px_#FF3B30] inline-block animate-pulse"></span>' : '<span class="h-2.5 w-2.5 rounded-full bg-appgreen shadow-[0_0_8px_#34C759] inline-block"></span>';
-                    
-                    fCont.innerHTML += `
-                        <div class="grid grid-cols-5 gap-1 items-center py-2.5 border-b border-white/5 text-[10px] text-center animate-fade-in-up" style="animation-delay: ${idx * 50}ms; opacity: 0;">
-                            <div class="font-black text-left text-white px-2">${item.sku_name}</div>
-                            <div class="text-gray-400 font-bold">${item.avg_demand || 0}</div>
-                            <div class="text-white font-black">${item.forecast_po || 0}</div>
-                            <div class="text-white font-black">${item.buffer || 0}</div>
-                            <div class="flex justify-center items-center">${dot}</div>
-                        </div>`;
+                    const dot = String(item.status).includes("CRITICAL") ? '<span class="h-2.5 w-2.5 rounded-full bg-appred shadow-[0_0_8px_#FF3B30] inline-block animate-pulse"></span>' : '<span class="h-2.5 w-2.5 rounded-full bg-appgreen shadow-[0_0_8px_#34C759] inline-block"></span>';
+                    fCont.innerHTML += `<div class="grid grid-cols-5 gap-1 items-center py-2.5 border-b border-white/5 text-[10px] text-center animate-fade-in-up" style="animation-delay: ${idx * 50}ms; opacity:0">
+                        <div class="font-black text-left text-white px-1">${item.sku_name}</div>
+                        <div class="text-gray-400 font-bold">${item.avg_demand || 0}</div>
+                        <div class="text-white font-black">${item.forecast_po || 0}</div>
+                        <div class="text-white font-black">${item.buffer || 0}</div>
+                        <div class="flex justify-center">${dot}</div>
+                    </div>`;
                 });
 
-                // DC DIAGNOSE (PERCENTAGE)
                 dCont.innerHTML = '';
-                let diagData = res.data.diagnosa.sort((a,b) => {
-                    return (Number(b.warehouse_failure) + Number(b.under_moq)) - (Number(a.warehouse_failure) + Number(a.under_moq)); 
-                });
-
-                let dcIssueCount = 0;
-                diagData.forEach((item, idx) => {
-                    const failCount = Number(item.warehouse_failure);
-                    const moqCount = Number(item.under_moq);
-                    const total = failCount + moqCount;
-                    if(total > 0) dcIssueCount++;
-                    
-                    const failPct = total > 0 ? Math.round((failCount / total) * 100) : 0;
-                    const moqPct = total > 0 ? Math.round((moqCount / total) * 100) : 0;
+                let dcCount = 0;
+                res.data.diagnosa.forEach((item, idx) => {
+                    const fail = Number(item.warehouse_failure) || 0;
+                    const moq = Number(item.under_moq) || 0;
+                    const total = fail + moq;
+                    if(total > 0) dcCount++;
+                    const failPct = total > 0 ? Math.round((fail/total)*100) : 0;
+                    const moqPct = total > 0 ? Math.round((moq/total)*100) : 0;
                     const resStr = String(item.diagnose_result || "").toUpperCase();
 
-                    dCont.innerHTML += `
-                        <div class="bg-appcard p-4 rounded-[2rem] border border-white/5 animate-fade-in-up" style="animation-delay: ${idx * 50}ms; opacity: 0;">
-                            <div class="mb-3">
-                                <h4 class="text-xs font-black text-white uppercase tracking-tighter">${item.dc_name}</h4>
-                                <p class="text-[9px] font-bold mt-1 ${resStr.includes('FAILURE') ? 'text-appred' : 'text-apporange'} tracking-widest bg-white/5 inline-block px-2 py-1 rounded">⚠️ ${resStr}</p>
-                            </div>
-                            <div class="flex justify-between items-center text-[10px] font-bold bg-black/40 p-2.5 rounded-xl border border-white/5">
-                                <div class="text-center flex-1 border-r border-white/10"><p class="text-gray-600 uppercase mb-0.5 text-[8px] tracking-widest">WH Failure</p><p class="text-appred font-black text-sm">${failPct}%</p></div>
-                                <div class="text-center flex-1 border-r border-white/10"><p class="text-gray-600 uppercase mb-0.5 text-[8px] tracking-widest">Under MOQ</p><p class="text-apporange font-black text-sm">${moqPct}%</p></div>
-                                <div class="text-center flex-1"><p class="text-gray-600 uppercase mb-0.5 text-[8px] tracking-widest">Above MOQ</p><p class="text-appgreen font-black text-sm">0%</p></div>
-                            </div>
-                        </div>`;
+                    dCont.innerHTML += `<div class="bg-appcard p-4 rounded-[2rem] border border-white/5 animate-fade-in-up" style="animation-delay: ${idx * 50}ms; opacity:0">
+                        <h4 class="text-xs font-black text-white uppercase tracking-tighter mb-2">${item.dc_name}</h4>
+                        <div class="grid grid-cols-3 gap-1 text-[9px] font-bold bg-black/40 p-2 rounded-xl text-center border border-white/5">
+                            <div><p class="text-gray-500 text-[7px] mb-1">FAILURE</p><p class="text-appred font-black text-xs">${failPct}%</p></div>
+                            <div class="border-x border-white/10"><p class="text-gray-500 text-[7px] mb-1">UNDER MOQ</p><p class="text-apporange font-black text-xs">${moqPct}%</p></div>
+                            <div><p class="text-gray-500 text-[7px] mb-1">ABOVE MOQ</p><p class="text-appgreen font-black text-xs">0%</p></div>
+                        </div>
+                        <p class="text-[8px] font-bold mt-2 ${resStr.includes('FAILURE') ? 'text-appred' : 'text-apporange'} tracking-widest text-center">⚠️ ${resStr}</p>
+                    </div>`;
                 });
-                runTicker(document.getElementById('stat-dc'), dcIssueCount);
+                runTicker(document.getElementById('stat-dc'), dcCount);
             }
         }
 
-        // --- 2. LOG PO (85% Logic) ---
+        // --- LOG PO ---
         async function loadLogPO() {
-            const btn = document.getElementById('btn-sync-log');
             const cont = document.getElementById('log-container');
+            const btn = document.getElementById('btn-sync-log');
             cont.innerHTML = getSkeletonHTML(5, true);
-
             const res = await sendApi({ action: "load_admin" }, btn, "TARIK DATABASE PO");
-            if (res && res.status === "success") {
-                activeLogData = res.data;
-                renderLogs(activeLogData);
-            }
+            if (res && res.status === "success") { activeLogData = res.data; renderLogs(activeLogData); }
         }
 
         function filterLogLocal() {
             const q = document.getElementById('search-po').value.toLowerCase();
-            const filtered = activeLogData.filter(i => (i.ID && i.ID.toLowerCase().includes(q)) || (i.DC && i.DC.toLowerCase().includes(q)));
-            renderLogs(filtered);
+            renderLogs(activeLogData.filter(i => (i.ID && i.ID.toLowerCase().includes(q)) || (i.DC && i.DC.toLowerCase().includes(q))));
         }
 
         function renderLogs(data) {
@@ -481,123 +375,48 @@
             cont.innerHTML = '';
             data.forEach((item, idx) => {
                 if(!item.ID || String(item["PO NKA"]).includes("BATAL")) return;
-                
                 const poQty = Number(item["TOTAL PO ctn"]) || 0;
                 const salesQty = Number(item["Qty Terpenuhi (Kirim)"]) || 0;
-                
-                let borderCol = "", textCol = "", bgCol = "";
-                if (salesQty === 0) { 
-                    borderCol = "border-appred/40"; textCol = "text-appred"; bgCol = "shadow-[0_0_15px_rgba(255,59,48,0.1)]"; 
-                } else if (salesQty < (poQty * 0.85)) { 
-                    borderCol = "border-apporange/40"; textCol = "text-apporange"; bgCol = "shadow-[0_0_15px_rgba(255,133,27,0.1)]"; 
-                } else { 
-                    borderCol = "border-appgreen/40"; textCol = "text-appgreen"; bgCol = "shadow-[0_0_15px_rgba(52,199,89,0.05)]"; 
-                }
+                let borderCol = "border-appred/40", textCol = "text-appred";
+                if(salesQty >= (poQty * 0.85)) { borderCol = "border-appgreen/40"; textCol = "text-appgreen"; }
+                else if(salesQty > 0) { borderCol = "border-apporange/40"; textCol = "text-apporange"; }
 
-                // HTML Expandable Card (PO vs Sales)
-                cont.innerHTML += `
-                    <div class="bg-appcard rounded-3xl border ${borderCol} ${bgCol} overflow-hidden transition-all duration-300 animate-fade-in-up" style="animation-delay: ${idx * 30}ms; opacity: 0;">
-                        <div class="p-5 flex items-center justify-between cursor-pointer btn-tactile" onclick="toggleCard('${item.ID}')">
-                            <div>
-                                <h4 class="font-black text-sm text-white uppercase tracking-tight">${item.ID}</h4>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">${item.DC} • ${item["Tanggal PO"]}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[8px] text-gray-500 uppercase font-bold tracking-widest mb-0.5">PO / SALES</p>
-                                <p class="text-sm font-black ${textCol} leading-none">${poQty} <span class="text-gray-500 mx-0.5">/</span> ${salesQty}</p>
-                            </div>
+                cont.innerHTML += `<div class="bg-appcard rounded-3xl border ${borderCol} overflow-hidden animate-fade-in-up" style="animation-delay: ${idx * 30}ms; opacity:0">
+                    <div class="p-5 flex items-center justify-between cursor-pointer btn-tactile" onclick="toggleCard('${item.ID}')">
+                        <div>
+                            <h4 class="font-black text-sm text-white uppercase tracking-tight">${item.ID}</h4>
+                            <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">${item.DC} • ${item["Tanggal PO"]}</p>
                         </div>
-                        
-                        <div id="det-${item.ID}" class="accordion-content bg-black/50">
-                            <div class="p-5 pt-2 space-y-3 border-t border-white/5 mt-1">
-                                <div class="flex text-[8px] text-gray-500 font-bold uppercase tracking-widest px-2 mb-1">
-                                    <span class="w-12">SKU</span>
-                                    <span class="flex-1 text-center">PO</span>
-                                    <span class="flex-1 text-center">SALES</span>
-                                </div>
-                                <div class="space-y-1.5 text-[10px] font-black uppercase text-white">
-                                    <div class="flex items-center bg-white/5 py-2 px-3 rounded-xl"><span class="w-12 text-gray-400">NKA</span><span class="flex-1 text-center text-gray-300">${item["PO NKA"] || 0}</span><span class="flex-1 text-center text-appblue">${item["NKA"] || 0}</span></div>
-                                    <div class="flex items-center bg-white/5 py-2 px-3 rounded-xl"><span class="w-12 text-gray-400">NDLH</span><span class="flex-1 text-center text-gray-300">${item["PO NDLH"] || 0}</span><span class="flex-1 text-center text-appblue">${item["NDLH"] || 0}</span></div>
-                                    <div class="flex items-center bg-white/5 py-2 px-3 rounded-xl"><span class="w-12 text-gray-400">NRD</span><span class="flex-1 text-center text-gray-300">${item["PO NRD"] || 0}</span><span class="flex-1 text-center text-appblue">${item["NRD"] || 0}</span></div>
-                                    <div class="flex items-center bg-white/5 py-2 px-3 rounded-xl"><span class="w-12 text-gray-400">NARR</span><span class="flex-1 text-center text-gray-300">${item["PO NARR"] || 0}</span><span class="flex-1 text-center text-appblue">${item["NARR"] || 0}</span></div>
-                                </div>
-                                <div class="flex justify-between items-center border-t border-white/10 pt-4 mt-2">
-                                    <div>
-                                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">GAP Pengiriman</p>
-                                        <p class="text-base font-black ${item["GAP"] == 0 ? 'text-appgreen' : 'text-appred'}">${item["GAP"] || 0} CTN</p>
-                                    </div>
-                                    <button onclick="deletePO('${item.ID}')" class="bg-appred/10 text-appred border border-appred/30 font-bold text-[10px] py-2.5 px-4 rounded-xl btn-tactile hover:bg-appred hover:text-white transition-colors uppercase tracking-widest">
-                                        BATAL PO
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="text-right">
+                            <p class="text-[8px] text-gray-500 uppercase font-bold tracking-widest mb-0.5">PO / SALES</p>
+                            <p class="text-sm font-black ${textCol} leading-none">${poQty} / ${salesQty}</p>
                         </div>
-                    </div>`;
+                    </div>
+                    <div id="det-${item.ID}" class="accordion-content bg-black/50 p-5 space-y-3">
+                        <div class="space-y-1.5 text-[10px] font-black uppercase text-white">
+                            <div class="flex items-center justify-between bg-white/5 py-2 px-3 rounded-xl"><span>NKA</span><div class="space-x-3"><span class="text-gray-400">P:${item["PO NKA"] || 0}</span><span class="text-appblue">S:${item["NKA"] || 0}</span></div></div>
+                            <div class="flex items-center justify-between bg-white/5 py-2 px-3 rounded-xl"><span>NDLH</span><div class="space-x-3"><span class="text-gray-400">P:${item["PO NDLH"] || 0}</span><span class="text-appblue">S:${item["NDLH"] || 0}</span></div></div>
+                            <div class="flex items-center justify-between bg-white/5 py-2 px-3 rounded-xl"><span>NRD</span><div class="space-x-3"><span class="text-gray-400">P:${item["PO NRD"] || 0}</span><span class="text-appblue">S:${item["NRD"] || 0}</span></div></div>
+                        </div>
+                        <div class="flex justify-between items-center pt-4 border-t border-white/10 mt-2">
+                            <div><p class="text-[9px] text-gray-500 uppercase font-bold">GAP Qty</p><p class="text-sm font-black ${item["GAP"] == 0 ? 'text-appgreen' : 'text-appred'}">${item["GAP"] || 0}</p></div>
+                            <button onclick="deletePO('${item.ID}')" class="bg-appred/10 text-appred border border-appred/30 font-bold text-[10px] py-2 px-4 rounded-xl btn-tactile">BATAL PO</button>
+                        </div>
+                    </div>
+                </div>`;
             });
         }
+        function toggleCard(id) { document.getElementById('det-' + id).classList.toggle('accordion-expanded'); }
 
-        function toggleCard(id) {
-            const el = document.getElementById('det-' + id);
-            el.classList.toggle('accordion-expanded');
-        }
-
-        async function deletePO(id) {
-            if(!confirm(`PERINGATAN: Batalkan PO ${id}?`)) return;
-            const res = await sendApi({ action: "delete", id: id });
-            if(res && res.status === "success") {
-                showToast(`PO ${id} Dibatalkan`);
-                loadLogPO();
-            } else showToast("Gagal membatalkan PO", true);
-        }
-
-        // --- 3. FORMS INPUT ---
-        async function submitAction(e, actionType) {
+        async function submitAction(e, act) {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
-            let payload = { action: actionType };
-
-            if(actionType === 'insert_po') {
-                payload = { ...payload, 
-                    id: document.getElementById('po-id').value.toUpperCase(),
-                    tanggal_po: document.getElementById('po-tanggal').value,
-                    tanggal_exp: document.getElementById('po-exp').value,
-                    dc: document.getElementById('po-dc').value.toUpperCase(),
-                    po_nka: document.getElementById('po-nka').value,
-                    po_ndlh: document.getElementById('po-ndlh').value,
-                    po_nrd: document.getElementById('po-nrd').value,
-                    po_narr: document.getElementById('po-narr').value,
-                    po_nkach: "0" 
-                };
-            } 
-            else if(actionType === 'insert_sales') {
-                payload = { ...payload, 
-                    id: document.getElementById('sls-id').value.toUpperCase(),
-                    dc: document.getElementById('sls-dc').value.toUpperCase(), 
-                    nka: document.getElementById('sls-nka').value,
-                    ndlh: document.getElementById('sls-ndlh').value,
-                    nrd: document.getElementById('sls-nrd').value,
-                    narr: document.getElementById('sls-narr').value,
-                    nkach: document.getElementById('sls-nkach').value
-                };
-            }
-            else if(actionType === 'insert_stock') {
-                payload = { ...payload, 
-                    tanggal: document.getElementById('stk-tanggal').value,
-                    nka: document.getElementById('stk-nka').value,
-                    ndlh: document.getElementById('stk-ndlh').value,
-                    nrd: document.getElementById('stk-nrd').value,
-                    narr: document.getElementById('stk-narr').value,
-                    nkach: document.getElementById('stk-nkach').value
-                };
-            }
-
+            let payload = { action: act };
+            const getVal = (id) => document.getElementById(id).value;
+            if(act === 'insert_po') payload = { ...payload, id: getVal('po-id'), tanggal_po: getVal('po-tanggal'), tanggal_exp: getVal('po-exp'), dc: getVal('po-dc'), po_nka: getVal('po-nka'), po_ndlh: getVal('po-ndlh'), po_nrd: getVal('po-nrd'), po_narr: getVal('po-narr'), po_nkach: "0" };
+            else payload = { ...payload, id: getVal('sls-id'), nka: getVal('sls-nka'), ndlh: getVal('sls-ndlh'), nrd: getVal('sls-nrd'), narr: getVal('sls-narr'), nkach: getVal('sls-nkach') };
             const res = await sendApi(payload, btn, btn.innerHTML);
-            if(res && res.status === "success") {
-                showToast(res.message || "Data Tersimpan!");
-                e.target.reset();
-            } else {
-                showToast("Gagal menyimpan data", true);
-            }
+            if(res && res.status === "success") { showToast("Data Tersimpan!"); e.target.reset(); } else showToast("Gagal menyimpan", true);
         }
     </script>
 </body>
