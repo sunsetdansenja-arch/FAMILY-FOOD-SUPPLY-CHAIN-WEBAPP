@@ -3,228 +3,501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FamilyFood SC Tracker (Owner Final)</title>
+    <title>FamilyFood SC App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        appbg: '#121212',      
-                        appcard: '#1E1E1E',    
-                        appyellow: '#F4D160',  
-                        appgreen: '#4ADE80',   
-                        appred: '#FB7185'
+                        appbg: '#0A0A0A',      
+                        appcard: '#1C1C1E',    
+                        apporange: '#FF851B',  /* From reference */
+                        appblue: '#2B65F6',    /* From reference */
+                        appgreen: '#34C759',   
+                        appred: '#FF3B30'      
                     },
-                    borderRadius: { '3xl': '1.25rem', '4xl': '2rem' }
+                    borderRadius: { '3xl': '1.25rem', '4xl': '2rem' },
+                    boxShadow: { 'glow': '0 0 20px rgba(255, 133, 27, 0.3)', 'glow-blue': '0 0 20px rgba(43, 101, 246, 0.3)' }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #000; color: #fff; font-family: ui-sans-serif, system-ui, sans-serif; }
+        body { background-color: #0A0A0A; color: #fff; font-family: ui-sans-serif, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
         .hide { display: none !important; }
         ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
-        .tab-btn { transition: all 0.2s ease; font-weight: 600; }
-        .tab-active { background-color: #F4D160; color: #000; }
-        .tab-inactive { background-color: #1E1E1E; color: #A1A1AA; }
-        .status-glow-red { box-shadow: 0 0 20px rgba(251, 113, 133, 0.15); border: 1px solid rgba(251, 113, 133, 0.4); }
-        .status-glow-green { border: 1px solid rgba(74, 222, 128, 0.2); }
+        
+        /* Tactile Inputs */
+        input, select { background-color: #2C2C2E; border: 2px solid transparent; transition: all 0.2s; color: white; width: 100%; border-radius: 1rem; padding: 0.75rem 1rem; outline: none; }
+        input:focus, select:focus { border-color: #2B65F6; background-color: #1C1C1E; box-shadow: 0 0 15px rgba(43,101,246,0.2); }
+        
+        /* Animations */
+        .btn-tactile { transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-tactile:active { transform: scale(0.95); opacity: 0.9; }
+        
+        /* Expandable Accordion */
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s; opacity: 0; }
+        .accordion-expanded { max-height: 800px; opacity: 1; }
+        
+        /* Toast */
+        #toast { transform: translateY(-150%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .toast-show { transform: translateY(0) !important; }
     </style>
 </head>
 <body class="flex justify-center antialiased">
 
-    <div id="app" class="w-full max-w-md bg-appbg min-h-screen relative overflow-x-hidden flex flex-col">
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-appcard border-2 border-apporange text-white px-6 py-3 rounded-full shadow-glow font-bold text-sm flex items-center gap-3 w-max max-w-[90%] pointer-events-none">
+        <span id="toast-icon">✅</span>
+        <span id="toast-msg">Success</span>
+    </div>
+
+    <div id="app" class="w-full max-w-md bg-appbg min-h-screen relative overflow-x-hidden flex flex-col shadow-2xl">
         
-        <div class="p-6 pb-2 sticky top-0 bg-appbg/90 backdrop-blur-xl z-20">
-            <div class="flex justify-between items-center mb-1">
-                <h2 class="text-2xl font-black text-appyellow tracking-tighter italic">FAMILYFOOD</h2>
-                <div class="flex gap-2">
-                     <span class="bg-appgreen/10 text-appgreen px-2 py-0.5 rounded text-[8px] font-bold border border-appgreen/20 uppercase">Online</span>
+        <div id="view-login" class="flex flex-col h-screen p-8 justify-center items-center bg-appbg relative z-40">
+            <div class="w-full max-w-sm space-y-8 bg-appcard p-8 rounded-4xl border border-white/5 shadow-2xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-appblue"></div>
+                <div class="text-center space-y-2">
+                    <h1 class="text-4xl font-black text-white tracking-tighter italic">FAMILY<span class="text-apporange">FOOD</span></h1>
+                    <p class="text-xs text-gray-500 uppercase tracking-widest font-bold">Control Center</p>
                 </div>
+                <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div><input type="text" id="login-user" placeholder="User ID" required class="text-center font-bold text-lg uppercase tracking-wider"></div>
+                    <div><input type="password" id="login-pass" placeholder="Password" required class="text-center font-bold text-lg tracking-widest"></div>
+                    <button type="submit" id="btn-login" class="w-full bg-appblue text-white font-black py-4 rounded-2xl btn-tactile shadow-glow-blue mt-2 uppercase tracking-widest">Login</button>
+                </form>
             </div>
-            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Supply Chain Control Center</p>
         </div>
 
-        <div class="flex px-6 py-4 gap-2 sticky top-[75px] bg-appbg/90 backdrop-blur-xl z-20">
-            <button onclick="switchTab('tab-owner')" id="btn-tab-owner" class="tab-btn tab-active flex-1 py-3.5 rounded-2xl text-[10px] uppercase tracking-widest">Owner Analytics</button>
-            <button onclick="switchTab('tab-log')" id="btn-tab-log" class="tab-btn tab-inactive flex-1 py-3.5 rounded-2xl text-[10px] uppercase tracking-widest">Log PO</button>
-        </div>
-
-        <div class="p-6 pt-2 pb-32 space-y-10">
+        <div id="view-main" class="hide flex-col h-full">
             
-            <div id="tab-owner" class="space-y-10">
-                <button onclick="loadOwnerData()" id="btn-load-owner" class="w-full bg-white text-black font-black py-4.5 rounded-3xl shadow-2xl flex justify-center items-center gap-3 active:scale-95 transition-all">
-                    <span class="text-lg">🔄</span> SYNC DATA ANALYTICS
-                </button>
-
-                <div class="space-y-5">
-                    <div class="flex justify-between items-end px-1">
-                        <h4 class="text-[11px] font-black text-white uppercase tracking-[0.2em]">Inventory Health (Hybrid)</h4>
-                        <span id="stat-sku" class="text-[9px] text-gray-500 font-bold">0 SKU</span>
-                    </div>
-                    <div id="forecast-container" class="space-y-5">
-                        <div class="py-20 text-center opacity-30 italic text-xs">Menunggu Sinkronisasi...</div>
-                    </div>
+            <div class="px-6 py-5 sticky top-0 bg-appbg/90 backdrop-blur-xl z-20 flex justify-between items-center border-b border-white/5">
+                <div>
+                    <h2 class="text-xl font-black text-white tracking-tighter italic leading-none">FAMILY<span class="text-appblue">FOOD</span></h2>
+                    <p id="header-username" class="text-[10px] text-gray-500 uppercase font-bold tracking-widest mt-1">USER</p>
                 </div>
+                <button onclick="logout()" class="bg-white/5 p-2 rounded-xl text-gray-400 btn-tactile hover:text-white border border-white/10">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </button>
+            </div>
 
-                <div class="space-y-5">
-                    <div class="flex justify-between items-end px-1">
-                        <h4 class="text-[11px] font-black text-white uppercase tracking-[0.2em]">DC Diagnose (Percentage)</h4>
-                        <span id="stat-dc" class="text-[9px] text-gray-500 font-bold">0 DC</span>
-                    </div>
-                    <div id="diagnosa-container" class="bg-appcard rounded-[2.5rem] p-3 border border-white/5 divide-y divide-white/5">
+            <div class="flex-1 overflow-y-auto pb-32">
+                
+                <div id="tab-analytics" class="p-6 space-y-8">
+                    <div class="flex gap-3">
+                        <div class="flex-1 bg-appblue text-white p-4 rounded-3xl shadow-glow-blue flex flex-col justify-between relative overflow-hidden">
+                            <p class="text-[9px] uppercase font-bold opacity-80 tracking-widest relative z-10">Critical SKU</p>
+                            <p id="stat-sku" class="text-4xl font-black relative z-10 mt-1">0</p>
+                            <div class="absolute -bottom-4 -right-4 text-7xl opacity-20">📦</div>
                         </div>
+                        <div class="flex-1 bg-apporange text-white p-4 rounded-3xl shadow-glow flex flex-col justify-between relative overflow-hidden">
+                            <p class="text-[9px] uppercase font-bold opacity-80 tracking-widest relative z-10">DC Issues</p>
+                            <p id="stat-dc" class="text-4xl font-black relative z-10 mt-1">0</p>
+                            <div class="absolute -bottom-4 -right-4 text-7xl opacity-20">🏗️</div>
+                        </div>
+                    </div>
+
+                    <button onclick="loadAnalytics()" id="btn-sync-analytics" class="w-full bg-appcard border border-white/10 text-white font-bold py-3.5 rounded-2xl btn-tactile flex justify-center items-center gap-2 text-xs uppercase tracking-widest">
+                        <span>🔄</span> Sync Live Data
+                    </button>
+
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-black text-gray-500 uppercase tracking-[0.2em] pl-1">Inventory Health</h4>
+                        <div id="forecast-container" class="space-y-4"><p class="text-center text-gray-600 text-xs py-10">Sync to load data</p></div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-black text-gray-500 uppercase tracking-[0.2em] pl-1">DC Diagnose</h4>
+                        <div id="diagnosa-container" class="space-y-3"></div>
+                    </div>
+                </div>
+
+                <div id="tab-log" class="hide p-6 space-y-6">
+                    <div class="sticky top-0 bg-appbg z-10 pb-4">
+                        <button onclick="loadLogPO()" id="btn-sync-log" class="w-full bg-appblue text-white font-bold py-4 rounded-2xl btn-tactile shadow-glow-blue flex justify-center items-center gap-2 uppercase tracking-widest text-sm mb-4">
+                            Tarik Log Database
+                        </button>
+                        <div class="flex gap-2">
+                            <input type="text" id="search-po" placeholder="Cari ID PO..." class="text-sm bg-appcard border border-white/10" onkeyup="filterLogLocal()">
+                        </div>
+                    </div>
+                    <div id="log-container" class="space-y-3"></div>
+                </div>
+
+                <div id="tab-forms" class="hide p-6 space-y-6">
+                    <div class="flex bg-appcard p-1 rounded-2xl border border-white/5 relative">
+                        <button onclick="switchForm('po')" id="btn-form-po" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-apporange text-black">New PO</button>
+                        <button onclick="switchForm('sales')" id="btn-form-sales" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all text-gray-400">Sales</button>
+                        <button onclick="switchForm('stock')" id="btn-form-stock" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all text-gray-400">Stock</button>
+                    </div>
+
+                    <form id="form-po" onsubmit="submitAction(event, 'insert_po')" class="space-y-5 bg-appcard p-5 rounded-3xl border border-white/5">
+                        <h3 class="text-lg font-black text-apporange italic">CREATE PO</h3>
+                        <div class="space-y-3">
+                            <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required uppercase>
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="text" id="po-tanggal" placeholder="Tgl PO (DD/MM/YYYY)" required>
+                                <input type="text" id="po-exp" placeholder="Tgl EXP (DD/MM/YYYY)" required>
+                            </div>
+                            <input type="text" id="po-dc" placeholder="NAMA DC" required uppercase>
+                        </div>
+                        <div class="pt-4 border-t border-white/5">
+                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Kuantitas SKU (Ctn)</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="text-[9px] text-gray-400 ml-2">NKA</label><input type="number" id="po-nka" value="0" required></div>
+                                <div><label class="text-[9px] text-gray-400 ml-2">NDLH</label><input type="number" id="po-ndlh" value="0" required></div>
+                                <div><label class="text-[9px] text-gray-400 ml-2">NRD</label><input type="number" id="po-nrd" value="0" required></div>
+                                <div><label class="text-[9px] text-gray-400 ml-2">NARR</label><input type="number" id="po-narr" value="0" required></div>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-apporange text-black font-black py-4 rounded-2xl btn-tactile shadow-glow">SUBMIT PO</button>
+                    </form>
+
+                    <form id="form-sales" onsubmit="submitAction(event, 'insert_sales')" class="hide space-y-5 bg-appcard p-5 rounded-3xl border border-white/5">
+                        <h3 class="text-lg font-black text-appblue italic">UPDATE SALES</h3>
+                        <input type="text" id="sls-id" placeholder="ID PO" required uppercase>
+                        <div class="pt-2">
+                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Realisasi SKU (Ctn)</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="text-[9px] text-gray-400 ml-2">NKA</label><input type="number" id="sls-nka" value="0" required></div>
+                                <div><label class="text-[9px] text-gray-400 ml-2">NDLH</label><input type="number" id="sls-ndlh" value="0" required></div>
+                                <div><label class="text-[9px] text-gray-400 ml-2">NRD</label><input type="number" id="sls-nrd" value="0" required></div>
+                                <div><label class="text-[9px] text-gray-400 ml-2">NARR</label><input type="number" id="sls-narr" value="0" required></div>
+                                <div class="col-span-2"><label class="text-[9px] text-gray-400 ml-2">NKACH</label><input type="number" id="sls-nkach" value="0" required></div>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-appblue text-white font-black py-4 rounded-2xl btn-tactile shadow-glow-blue">UPDATE SALES</button>
+                    </form>
+
+                    <form id="form-stock" onsubmit="submitAction(event, 'insert_stock')" class="hide space-y-5 bg-appcard p-5 rounded-3xl border border-white/5">
+                        <h3 class="text-lg font-black text-appgreen italic">DAILY STOCK</h3>
+                        <input type="text" id="stk-tanggal" placeholder="Tanggal (DD/MM/YYYY)" required>
+                        <div class="pt-2">
+                            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Stock Fisik SKU (Ctn)</p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="text-[9px] text-gray-400 ml-2">NKA</label><input type="number" id="stk-nka" value="0" required></div>
+                                <div><label class="text-[9px] text-gray-400 ml-2">NDLH</label><input type="number" id="stk-ndlh" value="0" required></div>
+                                <div><label class="text-[9px] text-gray-400 ml-2">NRD</label><input type="number" id="stk-nrd" value="0" required></div>
+                                <div><label class="text-[9px] text-gray-400 ml-2">NARR</label><input type="number" id="stk-narr" value="0" required></div>
+                                <div class="col-span-2"><label class="text-[9px] text-gray-400 ml-2">NKACH</label><input type="number" id="stk-nkach" value="0" required></div>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-appgreen text-black font-black py-4 rounded-2xl btn-tactile" style="box-shadow: 0 0 20px rgba(52, 199, 89, 0.3);">UPDATE STOCK</button>
+                    </form>
                 </div>
             </div>
 
-            <div id="tab-log" class="hide space-y-4">
-                <button onclick="loadLogData()" id="btn-load-log" class="w-full bg-appyellow text-black font-black py-4 rounded-3xl shadow-lg flex justify-center items-center gap-2">
-                    📦 TARIK LOG PO TERBARU
+            <div class="fixed bottom-0 w-full max-w-md bg-[#121212]/90 backdrop-blur-xl border-t border-white/10 pb-safe pt-2 px-6 flex justify-between items-center z-50 pb-6 rounded-t-3xl">
+                <button onclick="switchMainTab('tab-analytics', this)" class="nav-item flex-1 flex flex-col items-center gap-1 text-apporange transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <span class="text-[9px] font-bold uppercase tracking-wider">Analytic</span>
                 </button>
-                <div id="log-container" class="space-y-3"></div>
-            </div>
+                
+                <div class="relative -top-6">
+                    <button onclick="switchMainTab('tab-forms', this)" class="nav-item bg-apporange text-black h-16 w-16 rounded-full flex justify-center items-center shadow-glow btn-tactile border-4 border-appbg">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                    </button>
+                </div>
 
+                <button onclick="switchMainTab('tab-log', this)" class="nav-item flex-1 flex flex-col items-center gap-1 text-gray-500 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                    <span class="text-[9px] font-bold uppercase tracking-wider">Database</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
         const WEBHOOK_URL = "https://n8n-mzbmiib3etk4.kangkung.sumopod.my.id/webhook/ff-indonesia-api";
+        let activeLogData = [];
 
-        async function sendApi(payload) {
+        // --- UTILITIES ---
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            document.getElementById('toast-icon').innerText = isError ? '❌' : '✅';
+            t.className = `fixed top-5 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-full font-bold text-sm flex items-center gap-3 w-max max-w-[90%] transition-transform duration-300 border-2 shadow-glow ${isError ? 'bg-[#3A0000] border-appred text-appred' : 'bg-appcard border-appblue text-white'}`;
+            t.classList.add('toast-show');
+            setTimeout(() => t.classList.remove('toast-show'), 3000);
+        }
+
+        async function sendApi(payload, btnElement = null, originalText = "") {
+            if(btnElement) { btnElement.innerHTML = `<span class="animate-spin">⏳</span>`; btnElement.classList.add('opacity-50', 'pointer-events-none'); }
             try {
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST', mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                return await response.json();
-            } catch (e) { return { status: "error" }; }
-        }
-
-        function switchTab(tabId) {
-            ['tab-log', 'tab-owner'].forEach(id => {
-                document.getElementById(id).classList.add('hide');
-                document.getElementById('btn-' + id).classList.replace('tab-active', 'tab-inactive');
-            });
-            document.getElementById(tabId).classList.remove('hide');
-            document.getElementById('btn-' + tabId).classList.replace('tab-inactive', 'tab-active');
-        }
-
-        async function loadOwnerData() {
-            const fContainer = document.getElementById('forecast-container');
-            const dContainer = document.getElementById('diagnosa-container');
-            const btn = document.getElementById('btn-load-owner');
-            
-            btn.innerHTML = `<span class="animate-spin">⏳</span> ANALYZING SHEET...`;
-            btn.classList.add('opacity-50', 'pointer-events-none');
-
-            let raw = await sendApi({ action: "load_owner" });
-            let res = Array.isArray(raw) ? raw[0] : raw;
-
-            btn.innerHTML = `<span class="text-lg">🔄</span> SYNC DATA ANALYTICS`;
-            btn.classList.remove('opacity-50', 'pointer-events-none');
-
-            if (res && res.status === "success") {
-                document.getElementById('stat-sku').innerText = `${res.total_sku} SKU AKTIF`;
-                document.getElementById('stat-dc').innerText = `${res.total_dc} DC TERPANTAU`;
-
-                // Render Hybrid Forecast
-                fContainer.innerHTML = '';
-                res.data.forecast.forEach(item => {
-                    const isCritical = String(item.status).includes("CRITICAL");
-                    const card = document.createElement('div');
-                    card.className = `bg-appcard p-6 rounded-[2.5rem] ${isCritical ? 'status-glow-red' : 'status-glow-green'}`;
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-6">
-                            <div class="max-w-[60%]">
-                                <h3 class="text-2xl font-black text-white tracking-tighter leading-none mb-2">${item.sku_name}</h3>
-                                <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${isCritical ? 'bg-appred text-black' : 'bg-appgreen text-black'} tracking-widest italic">${item.status}</span>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-1">Forecast PO</p>
-                                <div class="text-2xl font-black text-white leading-none">${item.forecast_po}<span class="text-[10px] text-gray-600 ml-1">CTN</span></div>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 mb-6">
-                            <div class="bg-black/30 p-4 rounded-3xl border border-white/5">
-                                <p class="text-[8px] text-gray-600 font-bold uppercase mb-1">Avg Demand</p>
-                                <p class="text-sm font-black text-gray-300">${item.avg_demand || '0'}</p>
-                            </div>
-                            <div class="bg-black/30 p-4 rounded-3xl border border-white/5">
-                                <p class="text-[8px] text-gray-600 font-bold uppercase mb-1">Stock Buffer</p>
-                                <p class="text-sm font-black text-gray-300">${item.buffer || '0'}</p>
-                            </div>
-                        </div>
-                        <div class="space-y-2 pt-4 border-t border-white/5">
-                             <div class="flex justify-between text-[9px] font-black uppercase tracking-tighter">
-                                <span class="${isCritical ? 'text-appred' : 'text-gray-500'}">${isCritical ? '⚠️ UNDER STOCK' : 'SAFE'}</span>
-                                <span class="text-white">${isCritical ? item.under_stock : item.over_stock} CTN</span>
-                             </div>
-                             <div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                                <div class="h-full ${isCritical ? 'bg-appred shadow-[0_0_10px_rgba(251,113,133,0.5)]' : 'bg-appgreen'}" style="width: ${isCritical ? '100%' : '40%'}"></div>
-                             </div>
-                        </div>`;
-                    fContainer.appendChild(card);
-                });
-
-                // Render Percentage Diagnose
-                dContainer.innerHTML = '';
-                res.data.diagnosa.forEach(item => {
-                    const failCount = Number(item.warehouse_failure);
-                    const moqCount = Number(item.under_moq);
-                    const total = failCount + moqCount;
-                    
-                    // Logic Persentase (hanya front-end)
-                    const failPct = total > 0 ? Math.round((failCount / total) * 100) : 0;
-                    const moqPct = total > 0 ? Math.round((moqCount / total) * 100) : 0;
-
-                    const itemEl = document.createElement('div');
-                    itemEl.className = "flex items-center gap-4 p-5";
-                    itemEl.innerHTML = `
-                        <div class="shrink-0 w-12 text-center">
-                            <p class="text-xl font-black text-white">${total}</p>
-                            <p class="text-[7px] text-gray-600 font-bold uppercase">Issues</p>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="text-[11px] font-black text-white uppercase truncate mb-1.5 tracking-tight">${item.dc_name}</h4>
-                            <div class="flex gap-1 h-1.5 rounded-full overflow-hidden bg-white/5">
-                                <div class="bg-appred h-full" style="width: ${failPct}%"></div>
-                                <div class="bg-appyellow h-full" style="width: ${moqPct}%"></div>
-                            </div>
-                        </div>
-                        <div class="text-right shrink-0">
-                             <p class="text-[10px] font-black text-appred leading-none">${failPct}%</p>
-                             <p class="text-[10px] font-black text-appyellow mt-1 leading-none">${moqPct}%</p>
-                        </div>`;
-                    dContainer.appendChild(itemEl);
-                });
+                const res = await fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const data = await res.json();
+                if(btnElement) { btnElement.innerHTML = originalText; btnElement.classList.remove('opacity-50', 'pointer-events-none'); }
+                return Array.isArray(data) ? data[0] : data;
+            } catch (e) {
+                if(btnElement) { btnElement.innerHTML = originalText; btnElement.classList.remove('opacity-50', 'pointer-events-none'); }
+                showToast("Koneksi Server Gagal", true);
+                return null;
             }
         }
 
-        async function loadLogData() {
-            const container = document.getElementById('log-container');
-            const btn = document.getElementById('btn-load-log');
-            btn.innerHTML = `<span>⏳</span> FETCHING LOGS...`;
-            container.innerHTML = '';
-            let raw = await sendApi({ action: "load_admin" });
-            let res = Array.isArray(raw) ? raw[0] : raw;
-            btn.innerHTML = `📦 TARIK LOG PO TERBARU`;
-            if (res.status === "success" && res.data) {
-                res.data.forEach(item => {
-                    if(!item.ID || String(item["PO NKA"]).includes("BATAL")) return;
-                    const card = document.createElement('div');
-                    card.className = "bg-appcard p-4 rounded-3xl border-l-4 border-l-appyellow flex justify-between items-center";
-                    card.innerHTML = `
-                        <div>
-                            <p class="text-[10px] font-black text-white uppercase tracking-tight">${item.ID}</p>
-                            <p class="text-[8px] text-gray-500 font-bold uppercase mt-0.5">${item.DC || "-"}</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-xs font-black text-appyellow">${item["TOTAL PO ctn"] || 0} CTN</span>
+        // --- NAVIGATION ---
+        function switchMainTab(tabId, element) {
+            ['tab-analytics', 'tab-log', 'tab-forms'].forEach(id => document.getElementById(id).classList.add('hide'));
+            document.getElementById(tabId).classList.remove('hide');
+            
+            // Update icons color
+            document.querySelectorAll('.nav-item').forEach(el => {
+                if(el.classList.contains('text-gray-500')) return; // skip FAB
+                el.classList.replace('text-appblue', 'text-gray-500');
+                el.classList.replace('text-apporange', 'text-gray-500');
+            });
+            if(element && !element.classList.contains('h-16')) { // If not FAB
+                element.classList.replace('text-gray-500', tabId === 'tab-analytics' ? 'text-apporange' : 'text-appblue');
+            }
+        }
+
+        function switchForm(formType) {
+            ['form-po', 'form-sales', 'form-stock'].forEach(id => document.getElementById(id).classList.add('hide'));
+            document.getElementById('form-' + formType).classList.remove('hide');
+            
+            ['btn-form-po', 'btn-form-sales', 'btn-form-stock'].forEach(id => {
+                const el = document.getElementById(id);
+                el.className = "flex-1 py-2 rounded-xl text-xs font-bold transition-all text-gray-400"; // reset
+            });
+            
+            const activeBtn = document.getElementById('btn-form-' + formType);
+            if(formType === 'po') activeBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-apporange text-black";
+            if(formType === 'sales') activeBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-appblue text-white shadow-glow-blue";
+            if(formType === 'stock') activeBtn.className = "flex-1 py-2 rounded-xl text-xs font-bold transition-all bg-appgreen text-black" + ' shadow-[0_0_15px_rgba(52,199,89,0.3)]';
+        }
+
+        // --- LOGIN & AUTH ---
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login');
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+            
+            const res = await sendApi({ action: "login", user_id: user, password: pass }, btn, "LOGIN");
+            if (res && res.status === "success") {
+                showToast("Login Berhasil!");
+                document.getElementById('view-login').classList.add('hide');
+                document.getElementById('view-main').classList.remove('hide');
+                document.getElementById('header-username').innerText = res.user_id || user;
+                loadAnalytics(); // Auto load dashboard
+            } else {
+                showToast(res ? res.message : "Login Gagal", true);
+            }
+        }
+
+        function logout() {
+            document.getElementById('view-main').classList.add('hide');
+            document.getElementById('view-login').classList.remove('hide');
+            document.getElementById('login-pass').value = '';
+        }
+
+        // --- 1. ANALYTICS VIEW ---
+        async function loadAnalytics() {
+            const btn = document.getElementById('btn-sync-analytics');
+            const res = await sendApi({ action: "load_owner" }, btn, "<span>🔄</span> Sync Live Data");
+            
+            if (res && res.status === "success" && res.data) {
+                let critCount = 0;
+                
+                // Forecast (Hybrid)
+                const fCont = document.getElementById('forecast-container');
+                fCont.innerHTML = '';
+                res.data.forecast.forEach(item => {
+                    const isCrit = String(item.status).includes("CRITICAL");
+                    if(isCrit) critCount++;
+                    
+                    const pct = item.buffer > 0 ? Math.min(100, Math.round((item.forecast_po / item.buffer) * 100)) : (isCrit ? 100 : 0);
+                    
+                    fCont.innerHTML += `
+                        <div class="bg-appcard p-5 rounded-3xl border ${isCrit ? 'border-appred/30 shadow-[0_0_15px_rgba(251,113,133,0.1)]' : 'border-white/5'}">
+                            <div class="flex justify-between items-center mb-4">
+                                <div>
+                                    <h3 class="text-xl font-black text-white italic tracking-tight">${item.sku_name}</h3>
+                                    <span class="text-[9px] font-black uppercase ${isCrit ? 'text-appred' : 'text-appgreen'} tracking-widest">${item.status}</span>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[8px] text-gray-500 uppercase font-bold tracking-widest">FC PO</p>
+                                    <p class="text-xl font-black text-white leading-none">${item.forecast_po}</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-[10px] font-bold uppercase tracking-tight mb-1">
+                                <span class="text-gray-400">Buffer: ${item.buffer}</span>
+                                <span class="${isCrit ? 'text-appred' : 'text-gray-500'}">${isCrit ? 'UNDER: '+item.under_stock : 'OVER: '+item.over_stock}</span>
+                            </div>
+                            <div class="h-1.5 w-full bg-black rounded-full overflow-hidden">
+                                <div class="h-full ${isCrit ? 'bg-appred' : 'bg-appgreen'}" style="width: ${pct}%"></div>
+                            </div>
                         </div>`;
-                    container.appendChild(card);
                 });
+                document.getElementById('stat-sku').innerText = critCount;
+
+                // Diagnose (Percentage + Auto Sort)
+                const dCont = document.getElementById('diagnosa-container');
+                dCont.innerHTML = '';
+                
+                // Sort: Yang ada kegagalan naik ke atas
+                let diagData = res.data.diagnosa.sort((a,b) => {
+                    const tA = Number(a.warehouse_failure) + Number(a.under_moq);
+                    const tB = Number(b.warehouse_failure) + Number(b.under_moq);
+                    return tB - tA; 
+                });
+
+                let dcIssueCount = 0;
+                diagData.forEach(item => {
+                    const fail = Number(item.warehouse_failure) || 0;
+                    const moq = Number(item.under_moq) || 0;
+                    const total = fail + moq;
+                    if(total > 0) dcIssueCount++;
+
+                    const failPct = total > 0 ? Math.round((fail/total)*100) : 0;
+                    const moqPct = total > 0 ? Math.round((moq/total)*100) : 0;
+                    const resStr = String(item.diagnose_result || "");
+
+                    dCont.innerHTML += `
+                        <div class="bg-appcard p-4 rounded-3xl border border-white/5 flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-2xl bg-black flex items-center justify-center text-sm font-black border border-white/10 ${total > 0 ? 'text-apporange' : 'text-gray-600'}">${total}</div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="text-xs font-black text-white uppercase truncate">${item.dc_name}</h4>
+                                <div class="flex h-1.5 rounded-full overflow-hidden bg-black mt-1.5 w-full">
+                                    <div class="bg-appred h-full" style="width: ${failPct}%"></div>
+                                    <div class="bg-appyellow h-full" style="width: ${moqPct}%"></div>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <p class="text-[9px] font-black text-appred">${failPct}% Fail</p>
+                                <p class="text-[9px] font-black text-appyellow">${moqPct}% MOQ</p>
+                            </div>
+                        </div>`;
+                });
+                document.getElementById('stat-dc').innerText = dcIssueCount;
+            }
+        }
+
+        // --- 2. LOG PO (DATABASE) ---
+        async function loadLogPO() {
+            const btn = document.getElementById('btn-sync-log');
+            const res = await sendApi({ action: "load_admin" }, btn, "Tarik Log Database");
+            if (res && res.status === "success") {
+                activeLogData = res.data;
+                renderLogs(activeLogData);
+            }
+        }
+
+        function filterLogLocal() {
+            const q = document.getElementById('search-po').value.toLowerCase();
+            const filtered = activeLogData.filter(i => (i.ID && i.ID.toLowerCase().includes(q)) || (i.DC && i.DC.toLowerCase().includes(q)));
+            renderLogs(filtered);
+        }
+
+        function renderLogs(data) {
+            const cont = document.getElementById('log-container');
+            cont.innerHTML = '';
+            data.forEach(item => {
+                if(!item.ID || String(item["PO NKA"]).includes("BATAL")) return;
+                const safe = item["GAP"] == 0 || item["Status Supply Chain (SSC)"] === "SAFE";
+                
+                // HTML Expandable Card
+                cont.innerHTML += `
+                    <div class="bg-appcard rounded-3xl border border-white/5 overflow-hidden transition-all duration-300">
+                        <div class="p-4 flex items-center justify-between cursor-pointer" onclick="toggleCard('${item.ID}')">
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-10 rounded-full ${safe ? 'bg-appblue' : 'bg-appred'}"></div>
+                                <div>
+                                    <h4 class="font-black text-sm text-white uppercase">${item.ID}</h4>
+                                    <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">${item.DC} • ${item["Tanggal PO"]}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs font-black text-white">${item["TOTAL PO ctn"]} <span class="text-[8px] text-gray-500">CTN</span></p>
+                            </div>
+                        </div>
+                        
+                        <div id="det-${item.ID}" class="accordion-content bg-black/40">
+                            <div class="p-5 space-y-4">
+                                <div class="grid grid-cols-2 gap-2 text-[10px]">
+                                    <div class="bg-appbg p-2 rounded-xl border border-white/5"><span class="text-gray-500 font-bold">NKA:</span> <span class="text-white font-black float-right">${item["PO NKA"] || 0}</span></div>
+                                    <div class="bg-appbg p-2 rounded-xl border border-white/5"><span class="text-gray-500 font-bold">NDLH:</span> <span class="text-white font-black float-right">${item["PO NDLH"] || 0}</span></div>
+                                    <div class="bg-appbg p-2 rounded-xl border border-white/5"><span class="text-gray-500 font-bold">NRD:</span> <span class="text-white font-black float-right">${item["PO NRD"] || 0}</span></div>
+                                    <div class="bg-appbg p-2 rounded-xl border border-white/5"><span class="text-gray-500 font-bold">NARR:</span> <span class="text-white font-black float-right">${item["PO NARR"] || 0}</span></div>
+                                </div>
+                                <div class="flex justify-between items-center border-t border-white/10 pt-3">
+                                    <div>
+                                        <p class="text-[9px] text-gray-500 font-bold uppercase">GAP Kirim</p>
+                                        <p class="text-sm font-black ${safe ? 'text-appblue' : 'text-appred'}">${item["GAP"] || 0}</p>
+                                    </div>
+                                    <button onclick="deletePO('${item.ID}')" class="bg-appred/10 text-appred border border-appred/20 font-bold text-xs py-2 px-4 rounded-xl btn-tactile hover:bg-appred hover:text-white transition-colors">
+                                        Batalkan PO
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function toggleCard(id) {
+            const el = document.getElementById('det-' + id);
+            el.classList.toggle('accordion-expanded');
+        }
+
+        async function deletePO(id) {
+            if(!confirm(`Batal PO ${id}?`)) return;
+            showToast("Memproses pembatalan...");
+            const res = await sendApi({ action: "delete", id: id });
+            if(res && res.status === "success") {
+                showToast(`PO ${id} Dibatalkan`);
+                loadLogPO();
+            } else {
+                showToast("Gagal membatalkan PO", true);
+            }
+        }
+
+        // --- 3. FORMS INPUT (PO, SALES, STOCK) ---
+        async function submitAction(e, actionType) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            let payload = { action: actionType };
+
+            if(actionType === 'insert_po') {
+                payload = { ...payload, 
+                    id: document.getElementById('po-id').value.toUpperCase(),
+                    tanggal_po: document.getElementById('po-tanggal').value,
+                    tanggal_exp: document.getElementById('po-exp').value,
+                    dc: document.getElementById('po-dc').value.toUpperCase(),
+                    po_nka: document.getElementById('po-nka').value,
+                    po_ndlh: document.getElementById('po-ndlh').value,
+                    po_nrd: document.getElementById('po-nrd').value,
+                    po_narr: document.getElementById('po-narr').value,
+                    po_nkach: "0" // Default if missing in design
+                };
+            } 
+            else if(actionType === 'insert_sales') {
+                payload = { ...payload, 
+                    id: document.getElementById('sls-id').value.toUpperCase(),
+                    nka: document.getElementById('sls-nka').value,
+                    ndlh: document.getElementById('sls-ndlh').value,
+                    nrd: document.getElementById('sls-nrd').value,
+                    narr: document.getElementById('sls-narr').value,
+                    nkach: document.getElementById('sls-nkach').value
+                };
+            }
+            else if(actionType === 'insert_stock') {
+                payload = { ...payload, 
+                    tanggal: document.getElementById('stk-tanggal').value,
+                    nka: document.getElementById('stk-nka').value,
+                    ndlh: document.getElementById('stk-ndlh').value,
+                    nrd: document.getElementById('stk-nrd').value,
+                    narr: document.getElementById('stk-narr').value,
+                    nkach: document.getElementById('stk-nkach').value
+                };
+            }
+
+            const res = await sendApi(payload, btn, btn.innerHTML);
+            if(res && res.status === "success") {
+                showToast(res.message || "Data Tersimpan!");
+                e.target.reset(); // Clear form
+            } else {
+                showToast("Gagal menyimpan data", true);
             }
         }
     </script>
