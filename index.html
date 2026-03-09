@@ -43,12 +43,13 @@
         <div id="view-admin" class="flex-col h-full">
             <div class="p-6 pb-2 flex justify-between items-center sticky top-0 bg-appbg z-10 border-b border-white/10">
                 <div>
-                    <h2 class="text-2xl font-bold text-appyellow">Admin Panel</h2>
-                    <p class="text-xs text-white opacity-70">Fokus Testing: LOG PO</p>
+                    <h2 class="text-2xl font-bold text-appyellow">FamilyFood</h2>
+                    <p class="text-xs text-white opacity-70">Fokus Testing: LOAD OWNER & LOG PO</p>
                 </div>
             </div>
 
             <div class="flex overflow-x-auto px-6 py-4 gap-3 sticky top-[75px] bg-appbg z-10 border-b border-white/5">
+                <button onclick="switchTab('tab-owner')" id="btn-tab-owner" class="tab-btn tab-inactive px-5 py-2.5 rounded-full text-sm">Owner Data</button>
                 <button onclick="switchTab('tab-po')" id="btn-tab-po" class="tab-btn tab-inactive px-5 py-2.5 rounded-full text-sm">Input PO</button>
                 <button onclick="switchTab('tab-sales')" id="btn-tab-sales" class="tab-btn tab-inactive px-5 py-2.5 rounded-full text-sm">Sales</button>
                 <button onclick="switchTab('tab-stock')" id="btn-tab-stock" class="tab-btn tab-inactive px-5 py-2.5 rounded-full text-sm">Stock</button>
@@ -57,6 +58,15 @@
 
             <div class="p-6 overflow-y-auto pb-24">
                 
+                <div id="tab-owner" class="hide space-y-4">
+                    <button onclick="loadOwnerData()" id="btn-load-owner" class="w-full bg-appgreen text-black font-bold rounded-2xl px-5 py-4 shadow-lg hover:opacity-90 transition flex justify-center items-center gap-2">
+                        <span class="text-xl">👤</span> Tarik Data Saya (Owner)
+                    </button>
+                    <div id="owner-container" class="mt-6 space-y-4">
+                        <p class="text-center text-gray-500 text-sm mt-10">Data spesifik owner akan muncul di sini.</p>
+                    </div>
+                </div>
+
                 <form id="tab-po" class="hide space-y-4">
                     <p class="text-center text-gray-500 text-sm mt-10">Buka Tab LOG PO untuk testing saat ini.</p>
                 </form>
@@ -102,12 +112,10 @@
     <script>
         const WEBHOOK_URL = "https://n8n-mzbmiib3etk4.kangkung.sumopod.my.id/webhook/ff-indonesia-api";
 
-        // Auto buka tab LOG PO saat web dimuat
         document.addEventListener('DOMContentLoaded', () => {
             switchTab('tab-log');
         });
 
-        // CORE API FUNCTION
         async function sendApi(payload) {
             try {
                 const response = await fetch(WEBHOOK_URL, {
@@ -116,7 +124,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 return await response.json();
             } catch (error) {
@@ -125,22 +132,43 @@
             }
         }
 
-        // TAB SWITCHER
         function switchTab(tabId) {
-            ['tab-po', 'tab-sales', 'tab-stock', 'tab-log'].forEach(id => {
-                document.getElementById(id).classList.add('hide');
-                document.getElementById('btn-' + id).classList.replace('tab-active', 'tab-inactive');
+            ['tab-po', 'tab-sales', 'tab-stock', 'tab-log', 'tab-owner'].forEach(id => {
+                const el = document.getElementById(id);
+                const btn = document.getElementById('btn-' + id);
+                if(el) el.classList.add('hide');
+                if(btn) btn.classList.replace('tab-active', 'tab-inactive');
             });
             document.getElementById(tabId).classList.remove('hide');
             document.getElementById('btn-' + tabId).classList.replace('tab-inactive', 'tab-active');
         }
 
-        // FUNGSI UTAMA: LOAD LOG ADMIN
+        // FUNGSI BARU: LOAD OWNER
+        async function loadOwnerData() {
+            const container = document.getElementById('owner-container');
+            const btn = document.getElementById('btn-load-owner');
+            
+            btn.innerHTML = `<span class="animate-spin text-xl">⏳</span> Memuat Data Owner...`;
+            btn.classList.add('opacity-70', 'pointer-events-none');
+            container.innerHTML = '';
+
+            const res = await sendApi({ action: "load_owner" });
+            
+            btn.innerHTML = `<span class="text-xl">👤</span> Tarik Data Saya (Owner)`;
+            btn.classList.remove('opacity-70', 'pointer-events-none');
+
+            if (res.status === "success" && res.data) {
+                // Gunakan fungsi yang sama dengan log data untuk render jika format datanya mirip
+                renderCards(res.data, container);
+            } else {
+                container.innerHTML = `<p class="text-center text-appred text-sm">Data owner tidak ditemukan atau gagal dimuat.</p>`;
+            }
+        }
+
         async function loadLogData() {
             const container = document.getElementById('log-container');
             const btn = document.getElementById('btn-load-log');
             
-            // Ubah state tombol saat loading
             btn.innerHTML = `<span class="animate-spin text-xl">⏳</span> Sedang Menarik Data...`;
             btn.classList.add('opacity-70', 'pointer-events-none');
             container.innerHTML = '';
@@ -154,66 +182,52 @@
 
             const res = await sendApi(payload);
             
-            // Kembalikan state tombol
             btn.innerHTML = `<span class="text-xl">🗃️</span> Tarik Data LOG PO`;
             btn.classList.remove('opacity-70', 'pointer-events-none');
 
-            if (res.status === "success" && res.data && res.data.length > 0) {
-                // Info jumlah data
-                const infoText = document.createElement('p');
-                infoText.className = "text-xs text-appgreen text-right mb-2";
-                infoText.innerText = `Menampilkan ${res.total_data} PO terbaru`;
-                container.appendChild(infoText);
-
-                res.data.forEach(item => {
-                    // Abaikan baris kosong atau PO yang batal
-                    if(!item.ID || item["PO NKA"] === "[BATAL]") return;
-
-                    const card = document.createElement('div');
-                    card.className = "bg-appcard rounded-3xl p-5 relative shadow-lg border border-white/5";
-                    card.innerHTML = `
-                        <div class="pr-12">
-                            <h3 class="font-bold text-lg text-white mb-1">${item.ID}</h3>
-                            <p class="text-[11px] text-gray-400 mb-3">PO: ${item["Tanggal PO"] || "-"} | EXP: ${item["Tanggal EXP"] || "-"} | DC: ${item.DC || "-"}</p>
-                            
-                            <div class="grid grid-cols-2 gap-2 bg-[#1C1C1E] p-3 rounded-2xl">
-                                <div>
-                                    <p class="text-[9px] text-gray-500 uppercase font-bold">Total PO</p>
-                                    <p class="text-sm font-bold text-gray-300 mt-1">${item["TOTAL PO ctn"] || 0} Ctn</p>
-                                </div>
-                                <div class="border-l border-white/5 pl-2">
-                                    <p class="text-[9px] text-appyellow uppercase font-bold">Terkirim</p>
-                                    <p class="text-sm font-bold text-appyellow mt-1">${item["Qty Terpenuhi (Kirim)"] || 0} Ctn</p>
-                                </div>
-                            </div>
-                        </div>
-                        <button onclick="deleteRow('${item.ID}')" title="Batalkan PO" class="absolute top-5 right-4 h-10 w-10 bg-appred/10 text-appred rounded-full flex justify-center items-center text-lg hover:bg-appred hover:text-white transition">
-                            ✕
-                        </button>
-                    `;
-                    container.appendChild(card);
-                });
+            if (res.status === "success" && res.data) {
+                renderCards(res.data, container, res.total_data);
             } else {
-                container.innerHTML = `
-                    <div class="border border-dashed border-appred/50 rounded-3xl p-8 text-center bg-appred/10">
-                        <p class="text-appred font-bold mb-1">Data Tidak Ditemukan</p>
-                        <p class="text-xs text-gray-400">Pastikan ID atau filter bulan/tahun sudah benar.</p>
-                    </div>`;
+                container.innerHTML = `<div class="border border-dashed border-appred/50 rounded-3xl p-8 text-center bg-appred/10"><p class="text-appred font-bold">Data Tidak Ditemukan</p></div>`;
             }
         }
 
-        // FUNGSI: DELETE/CANCEL PO (Hanya bagian ini yang disesuaikan parameternya)
+        // Helper untuk merender card agar kode tidak duplikat
+        function renderCards(data, container, total = null) {
+            if(total) {
+                const infoText = document.createElement('p');
+                infoText.className = "text-xs text-appgreen text-right mb-2";
+                infoText.innerText = `Menampilkan ${total} data terbaru`;
+                container.appendChild(infoText);
+            }
+
+            data.forEach(item => {
+                if(!item.ID || item["PO NKA"] === "[BATAL]") return;
+                const card = document.createElement('div');
+                card.className = "bg-appcard rounded-3xl p-5 relative shadow-lg border border-white/5";
+                card.innerHTML = `
+                    <div class="pr-12">
+                        <h3 class="font-bold text-lg text-white mb-1">${item.ID}</h3>
+                        <p class="text-[11px] text-gray-400 mb-3">PO: ${item["Tanggal PO"] || "-"} | EXP: ${item["Tanggal EXP"] || "-"} | DC: ${item.DC || "-"}</p>
+                        <div class="grid grid-cols-2 gap-2 bg-[#1C1C1E] p-3 rounded-2xl">
+                            <div><p class="text-[9px] text-gray-500 uppercase font-bold">Total PO</p><p class="text-sm font-bold text-gray-300 mt-1">${item["TOTAL PO ctn"] || 0} Ctn</p></div>
+                            <div class="border-l border-white/5 pl-2"><p class="text-[9px] text-appyellow uppercase font-bold">Terkirim</p><p class="text-sm font-bold text-appyellow mt-1">${item["Qty Terpenuhi (Kirim)"] || 0} Ctn</p></div>
+                        </div>
+                    </div>
+                    <button onclick="deleteRow('${item.ID}')" class="absolute top-5 right-4 h-10 w-10 bg-appred/10 text-appred rounded-full flex justify-center items-center text-lg hover:bg-appred hover:text-white transition">✕</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
         async function deleteRow(id) {
             if(!confirm(`PERINGATAN: Anda yakin ingin membatalkan PO dengan ID: ${id}?`)) return;
-            
-            const btn = document.getElementById('btn-load-log');
-            btn.innerHTML = `<span class="animate-pulse text-xl">🗑️</span> Membatalkan...`;
-            
-            // Perbaikan: Mengirimkan parameter id dalam objek agar bisa di-match di n8n
             const res = await sendApi({ action: "delete", id: id });
-            
             alert(res.message);
-            if(res.status === "success") loadLogData(); // Refresh list jika berhasil
+            if(res.status === "success") {
+                if(!document.getElementById('tab-owner').classList.contains('hide')) loadOwnerData();
+                else loadLogData();
+            }
         }
     </script>
 </body>
