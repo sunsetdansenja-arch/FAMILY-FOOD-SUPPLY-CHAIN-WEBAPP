@@ -96,7 +96,7 @@
                     <div>
                         <input type="password" id="login-pass" placeholder="PASSWORD" required class="text-center text-sm font-black tracking-[0.2em] placeholder-gray-600">
                     </div>
-                    <button type="submit" id="btn-login" class="w-full bg-apporange text-black font-black py-4 rounded-2xl shadow-glow-orange mt-6 uppercase tracking-widest text-sm btn-tactile hover:bg-orange-500 transition-colors">
+                    <button type="submit" id="btn-login" class="w-full bg-apporange text-black font-black py-4 rounded-2xl shadow-glow-orange mt-6 uppercase tracking-widest text-sm btn-tactile transition-colors">
                         MASUK SISTEM
                     </button>
                 </form>
@@ -304,48 +304,7 @@
             setTimeout(() => t.classList.remove('toast-show'), 3000);
         }
 
-        // --- FUNGSI LOGIN (Independen & Anti-Nyangkut) ---
-        async function handleLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-login');
-            const user = document.getElementById('login-user').value.trim();
-            const pass = document.getElementById('login-pass').value.trim();
-            
-            btn.innerHTML = `<span class="animate-pulse">⏳ AUTHENTICATING...</span>`;
-            btn.style.pointerEvents = 'none';
-
-            try {
-                const req = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: "login", user_id: user, password: pass })
-                });
-                
-                let res = await req.json();
-                if(Array.isArray(res)) res = res[0]; // Handle standar n8n
-
-                if (res && res.status === "success") {
-                    showToast("Login Berhasil!");
-                    document.getElementById('view-login').classList.add('hide');
-                    document.getElementById('view-main').classList.remove('hide');
-                    document.getElementById('header-username').innerText = res.user_id || user;
-                    
-                    updateMonthHeaders();
-                    initDCPicker();
-                    loadAnalytics(); 
-                } else {
-                    showToast(res ? res.message : "ID atau Password Salah", true);
-                }
-            } catch (error) {
-                showToast("Gagal terhubung ke Server", true);
-            } finally {
-                btn.innerHTML = "MASUK SISTEM";
-                btn.style.pointerEvents = 'auto';
-            }
-        }
-        function logout() { location.reload(); }
-
-        // Core API sender untuk Menu Lain
+        // --- CORE API SENDER ---
         async function sendApi(payload, btnElement = null, originalText = "") {
             if(btnElement) { btnElement.innerHTML = `<span class="animate-spin">⏳</span>`; btnElement.classList.add('opacity-50', 'pointer-events-none'); }
             try {
@@ -359,13 +318,39 @@
             }
         }
 
+        // --- LOGIN (KEMBALI KE VERSI YANG BEKERJA SEBELUMNYA) ---
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login');
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+            
+            // Kita gunakan sendApi seperti awal karena itu yang terbukti cocok dengan n8n Anda
+            const res = await sendApi({ action: "login", user_id: user, password: pass }, btn, "MASUK SISTEM");
+            
+            if (res && res.status === "success") {
+                showToast("Akses Diberikan!");
+                document.getElementById('view-login').classList.add('hide');
+                document.getElementById('view-main').classList.remove('hide');
+                document.getElementById('header-username').innerText = res.user_id || user;
+                updateMonthHeaders();
+                initDCPicker();
+                loadAnalytics(); 
+            } else {
+                showToast(res ? res.message : "Akses Ditolak", true);
+            }
+        }
+        function logout() { location.reload(); }
+
+        // Modal Picker
         function initDCPicker() {
-            document.getElementById('dc-grid').innerHTML = DC_LIST.map(dc => `<button onclick="selectDC('${dc}')" class="bg-appcard border border-white/5 text-gray-300 text-[9px] font-black py-4 rounded-2xl btn-tactile hover:border-apporange hover:text-apporange transition-colors uppercase tracking-wider">${dc}</button>`).join('');
+            document.getElementById('dc-grid').innerHTML = DC_LIST.map(dc => `<button type="button" onclick="selectDC('${dc}')" class="bg-appcard border border-white/5 text-gray-300 text-[9px] font-black py-4 rounded-2xl btn-tactile hover:border-apporange hover:text-apporange transition-colors uppercase tracking-wider">${dc}</button>`).join('');
         }
         function openDCModal(id) { targetDCInput = id; document.getElementById('modal-dc').classList.remove('hide'); }
         function closeDCModal() { document.getElementById('modal-dc').classList.add('hide'); }
         function selectDC(dc) { document.getElementById(targetDCInput).value = dc; closeDCModal(); }
 
+        // Navigation
         function switchMainTab(tabId, element) {
             ['tab-analytics', 'tab-log', 'tab-forms'].forEach(id => document.getElementById(id).classList.add('hide'));
             document.getElementById(tabId).classList.remove('hide');
@@ -445,7 +430,7 @@
             }
         }
 
-        // --- 2. LOG PO (85% Logic) ---
+        // --- 2. LOG PO ---
         async function loadLogPO() {
             const cont = document.getElementById('log-container');
             const btn = document.getElementById('btn-sync-log');
