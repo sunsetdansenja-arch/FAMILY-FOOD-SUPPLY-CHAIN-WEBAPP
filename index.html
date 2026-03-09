@@ -16,10 +16,7 @@
                         appgreen: '#D4E08B',   
                         appred: '#E86A58'      
                     },
-                    borderRadius: {
-                        '3xl': '1.5rem',
-                        '4xl': '2rem'
-                    }
+                    borderRadius: { '3xl': '1.5rem', '4xl': '2rem' }
                 }
             }
         }
@@ -28,7 +25,6 @@
         body { background-color: #000; color: #fff; font-family: ui-sans-serif, system-ui, sans-serif; }
         .hide { display: none !important; }
         ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
-        input:focus, select:focus { outline: none; border-color: #F4D160; }
         .tab-btn { transition: all 0.2s ease; white-space: nowrap; }
         .tab-active { background-color: #F4D160; color: #000; font-weight: 600; }
         .tab-inactive { background-color: #2C2C2E; color: #A1A1AA; }
@@ -47,9 +43,8 @@
             </div>
 
             <div class="flex overflow-x-auto px-6 py-4 gap-3 sticky top-[75px] bg-appbg z-10 border-b border-white/5">
-                <button onclick="switchTab('tab-owner')" id="btn-tab-owner" class="tab-btn tab-inactive px-5 py-2.5 rounded-full text-sm">Owner Analytics</button>
+                <button onclick="switchTab('tab-owner')" id="btn-tab-owner" class="tab-btn tab-active px-5 py-2.5 rounded-full text-sm">Owner Analytics</button>
                 <button onclick="switchTab('tab-log')" id="btn-tab-log" class="tab-btn tab-inactive px-5 py-2.5 rounded-full text-sm">LOG PO</button>
-                <button onclick="switchTab('tab-po')" id="btn-tab-po" class="tab-btn tab-inactive px-5 py-2.5 rounded-full text-sm">Input PO</button>
             </div>
 
             <div class="p-6 overflow-y-auto pb-24">
@@ -73,7 +68,7 @@
                     <div class="space-y-3">
                         <h4 class="text-sm font-bold text-gray-400 px-1">Inventory & Forecast</h4>
                         <div id="forecast-container" class="space-y-4">
-                             <p class="text-center text-gray-500 text-xs py-10">Data belum dimuat.</p>
+                             <p class="text-center text-gray-500 text-xs py-10">Tekan tombol di atas untuk sinkronisasi.</p>
                         </div>
                     </div>
 
@@ -84,15 +79,11 @@
                 </div>
 
                 <div id="tab-log" class="hide space-y-4">
-                    <button onclick="loadLogData()" id="btn-load-log" class="w-full bg-appyellow text-black font-bold rounded-2xl px-5 py-4 mt-2 shadow-lg flex justify-center items-center gap-2">
+                    <button onclick="loadLogData()" id="btn-load-log" class="w-full bg-appyellow text-black font-bold rounded-2xl px-5 py-4 shadow-lg flex justify-center items-center gap-2">
                         <span class="text-xl">🗃️</span> Tarik Data LOG PO
                     </button>
                     <div id="log-container" class="mt-6 space-y-4"></div>
                 </div>
-
-                <form id="tab-po" class="hide space-y-4">
-                    <p class="text-center text-gray-500 text-sm mt-10">Fitur Input PO dalam pengembangan.</p>
-                </form>
 
             </div>
         </div>
@@ -100,10 +91,6 @@
 
     <script>
         const WEBHOOK_URL = "https://n8n-mzbmiib3etk4.kangkung.sumopod.my.id/webhook/ff-indonesia-api";
-
-        document.addEventListener('DOMContentLoaded', () => {
-            switchTab('tab-owner');
-        });
 
         async function sendApi(payload) {
             try {
@@ -120,7 +107,7 @@
         }
 
         function switchTab(tabId) {
-            ['tab-po', 'tab-log', 'tab-owner'].forEach(id => {
+            ['tab-log', 'tab-owner'].forEach(id => {
                 document.getElementById(id).classList.add('hide');
                 document.getElementById('btn-' + id).classList.replace('tab-active', 'tab-inactive');
             });
@@ -146,84 +133,45 @@
                 document.getElementById('stat-sku').innerText = res.total_sku;
                 document.getElementById('stat-dc').innerText = res.total_dc;
 
-                // Render Forecast cards
+                // Render Forecast
                 fContainer.innerHTML = '';
-                res.data.forecast.forEach(item => {
-                    const isSafe = item.status.includes("SAFE");
-                    const card = document.createElement('div');
-                    card.className = `bg-appcard rounded-3xl p-5 border ${isSafe ? 'border-appgreen/20' : 'border-appred/20'} shadow-lg`;
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="font-bold text-white text-lg">${item.sku_name}</h3>
-                                <span class="px-3 py-1 rounded-full text-[10px] font-bold ${isSafe ? 'bg-appgreen/10 text-appgreen' : 'bg-appred/10 text-appred'}">
-                                    ${item.status}
-                                </span>
+                if(res.data.forecast.length === 0) {
+                    fContainer.innerHTML = `<p class="text-center text-appred text-xs py-5">⚠️ Data Forecast tidak ditemukan di database.</p>`;
+                } else {
+                    res.data.forecast.forEach(item => {
+                        const isSafe = item.status.includes("SAFE");
+                        const card = document.createElement('div');
+                        card.className = `bg-appcard rounded-3xl p-5 border ${isSafe ? 'border-appgreen/20' : 'border-appred/20'} shadow-lg`;
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start mb-4">
+                                <div><h3 class="font-bold text-white text-lg">${item.sku_name}</h3><span class="px-3 py-1 rounded-full text-[10px] font-bold ${isSafe ? 'bg-appgreen/10 text-appgreen' : 'bg-appred/10 text-appred'}">${item.status}</span></div>
+                                <div class="text-right"><p class="text-[10px] text-gray-500 uppercase font-bold">Forecast</p><p class="text-lg font-bold text-white">${item.forecast_po} <span class="text-xs font-normal opacity-50">Ctn</span></p></div>
                             </div>
-                            <div class="text-right">
-                                <p class="text-[10px] text-gray-500 uppercase font-bold">Forecast</p>
-                                <p class="text-lg font-bold text-white">${item.forecast_po} <span class="text-xs font-normal opacity-50 text-gray-400">Ctn</span></p>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 pt-3 border-t border-white/5">
-                            <div><p class="text-[9px] text-gray-500 uppercase">Avg Demand</p><p class="text-xs font-bold text-gray-300">${item.avg_demand}</p></div>
-                            <div><p class="text-[9px] text-gray-500 uppercase">Buffer</p><p class="text-xs font-bold text-gray-300">${item.buffer}</p></div>
-                            <div class="text-right"><p class="text-[9px] text-gray-500 uppercase">Under Stock</p><p class="text-xs font-bold text-appred">${item.under_stock}</p></div>
-                        </div>
-                    `;
-                    fContainer.appendChild(card);
-                });
+                            <div class="grid grid-cols-3 gap-2 pt-3 border-t border-white/5">
+                                <div><p class="text-[9px] text-gray-500 uppercase">Demand</p><p class="text-xs font-bold text-gray-300">${item.avg_demand}</p></div>
+                                <div><p class="text-[9px] text-gray-500 uppercase">Buffer</p><p class="text-xs font-bold text-gray-300">${item.buffer}</p></div>
+                                <div class="text-right"><p class="text-[9px] text-gray-500 uppercase">Under</p><p class="text-xs font-bold text-appred">${item.under_stock}</p></div>
+                            </div>`;
+                        fContainer.appendChild(card);
+                    });
+                }
 
-                // Render Diagnosa cards
+                // Render Diagnosa
                 dContainer.innerHTML = '';
-                res.data.diagnosa.forEach(item => {
-                    const isMoq = item.diagnose_result.includes("MOQ");
-                    const card = document.createElement('div');
-                    card.className = "bg-[#1C1C1E] rounded-2xl p-4 border border-white/5 flex items-center gap-4";
-                    card.innerHTML = `
-                        <div class="h-12 w-12 rounded-full bg-appcard flex items-center justify-center text-lg shadow-inner">
-                            ${isMoq ? '📦' : '🏗️'}
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-white text-sm uppercase">${item.dc_name}</h4>
-                            <p class="text-[11px] text-appyellow font-medium">${item.diagnose_result}</p>
-                        </div>
-                        <div class="text-right border-l border-white/10 pl-4">
-                            <p class="text-[9px] text-gray-500 uppercase font-bold">Failure</p>
-                            <p class="text-sm font-bold text-appred">${item.warehouse_failure + item.under_moq}</p>
-                        </div>
-                    `;
-                    dContainer.appendChild(card);
-                });
-            }
-        }
-
-        async function loadLogData() {
-            const container = document.getElementById('log-container');
-            const btn = document.getElementById('btn-load-log');
-            btn.innerHTML = `<span class="animate-spin text-xl">⏳</span> Menarik Data...`;
-            container.innerHTML = '';
-
-            const res = await sendApi({ action: "load_admin" });
-            btn.innerHTML = `<span class="text-xl">🗃️</span> Tarik Data LOG PO`;
-
-            if (res.status === "success" && res.data) {
-                res.data.forEach(item => {
-                    if(!item.ID || item["PO NKA"] === "[BATAL]") return;
-                    const card = document.createElement('div');
-                    card.className = "bg-appcard rounded-3xl p-5 relative shadow-lg border border-white/5";
-                    card.innerHTML = `
-                        <div class="pr-12">
-                            <h3 class="font-bold text-lg text-white mb-1">${item.ID}</h3>
-                            <p class="text-[11px] text-gray-400 mb-3">DC: ${item.DC || "-"}</p>
-                            <div class="grid grid-cols-2 gap-2 bg-[#1C1C1E] p-3 rounded-2xl">
-                                <div><p class="text-[9px] text-gray-500 uppercase font-bold">Total PO</p><p class="text-sm font-bold text-gray-300">${item["TOTAL PO ctn"] || 0} Ctn</p></div>
-                                <div class="border-l border-white/5 pl-2"><p class="text-[9px] text-appyellow uppercase font-bold">Terkirim</p><p class="text-sm font-bold text-appyellow">${item["Qty Terpenuhi (Kirim)"] || 0} Ctn</p></div>
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
+                if(res.data.diagnosa.length === 0) {
+                    dContainer.innerHTML = `<p class="text-center text-gray-500 text-xs py-5">Tidak ada diagnosa DC.</p>`;
+                } else {
+                    res.data.diagnosa.forEach(item => {
+                        const isMoq = item.diagnose_result.includes("MOQ");
+                        const card = document.createElement('div');
+                        card.className = "bg-[#1C1C1E] rounded-2xl p-4 border border-white/5 flex items-center gap-4";
+                        card.innerHTML = `
+                            <div class="h-10 w-10 rounded-full bg-appcard flex items-center justify-center text-lg">${isMoq ? '📦' : '🏗️'}</div>
+                            <div class="flex-1"><h4 class="font-bold text-white text-xs uppercase">${item.dc_name}</h4><p class="text-[10px] text-appyellow font-medium">${item.diagnose_result}</p></div>
+                            <div class="text-right border-l border-white/10 pl-4"><p class="text-[8px] text-gray-500 uppercase font-bold">Fail</p><p class="text-xs font-bold text-appred">${item.warehouse_failure + item.under_moq}</p></div>`;
+                        dContainer.appendChild(card);
+                    });
+                }
             }
         }
     </script>
