@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FamilyFood SC Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        appbg: '#1C1C1E',      
+                        appcard: '#2C2C2E',    
+                        appyellow: '#F4D160',  
+                        appgreen: '#D4E08B',   
+                        appred: '#E86A58'      
+                    },
+                    borderRadius: {
+                        '3xl': '1.5rem',
+                        '4xl': '2rem'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #000; color: #fff; font-family: ui-sans-serif, system-ui, sans-serif; }
+        .hide { display: none !important; }
+        ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
+        input:focus, select:focus { outline: none; border-color: #F4D160; }
+        .tab-btn { transition: all 0.2s ease; white-space: nowrap; }
+        .tab-active { background-color: #F4D160; color: #000; font-weight: 600; }
+        .tab-inactive { background-color: #2C2C2E; color: #A1A1AA; }
+    </style>
+</head>
+<body class="flex justify-center antialiased">
+
+    <div id="app" class="w-full max-w-md bg-appbg min-h-screen relative overflow-x-hidden shadow-2xl flex flex-col">
+        
+        <div id="view-login" class="flex flex-col h-screen p-8 justify-center">
+            <div class="mb-10 text-center">
+                <div class="h-24 w-24 bg-appcard rounded-full mx-auto mb-6 flex items-center justify-center text-4xl">🥦</div>
+                <h1 class="text-3xl font-bold text-white mb-2">Family Food</h1>
+                <p class="text-gray-400 text-sm">Supply Chain Tracker</p>
+            </div>
+
+            <form id="form-login" class="space-y-4">
+                <div>
+                    <input type="text" id="login-user" placeholder="USER ID" required autocomplete="off"
+                        class="w-full bg-appcard text-white rounded-2xl px-5 py-4 focus:ring-1 focus:ring-appyellow">
+                </div>
+                <div>
+                    <input type="password" id="login-pass" placeholder="PASSWORD" required
+                        class="w-full bg-appcard text-white rounded-2xl px-5 py-4 focus:ring-1 focus:ring-appyellow">
+                </div>
+                <button type="submit" id="btn-login" class="w-full bg-appyellow text-black font-bold rounded-full px-5 py-4 mt-4 flex justify-between items-center">
+                    <span>Masuk ke Sistem</span>
+                    <span class="bg-black/10 rounded-full h-8 w-8 flex items-center justify-center">➔</span>
+                </button>
+            </form>
+        </div>
+
+        <div id="view-admin" class="hide flex-col h-full">
+            <div class="p-6 pb-2 flex justify-between items-center sticky top-0 bg-appbg z-10">
+                <div>
+                    <h2 class="text-2xl font-bold">Admin Panel</h2>
+                    <p class="text-xs text-gray-400" id="admin-user-display">Welcome, Admin</p>
+                </div>
+                <button onclick="logout()" class="bg-appcard text-xs text-white px-4 py-2 rounded-full">Keluar</button>
+            </div>
+
+            <div class="flex overflow-x-auto px-6 py-4 gap-3 sticky top-[72px] bg-appbg z-10 border-b border-white/10">
+                <button onclick="switchTab('tab-po')" id="btn-tab-po" class="tab-btn tab-active px-5 py-2.5 rounded-full text-sm">Input PO</button>
+                <button onclick="switchTab('tab-sales')" id="btn-tab-sales" class="tab-btn tab-inactive px-5 py-2.5 rounded-full text-sm">Realisasi Sales</button>
+                <button onclick="switchTab('tab-stock')" id="btn-tab-stock" class="tab-btn tab-inactive px-5 py-2.5 rounded-full text-sm">Daily Stock</button>
+                <button onclick="switchTab('tab-log')" id="btn-tab-log" class="tab-btn tab-inactive px-5 py-2.5 rounded-full text-sm">Log Data</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto pb-24">
+                
+                <form id="tab-po" class="space-y-4">
+                    <input type="text" id="po-id" placeholder="ID PO (Misal: 2JZ1PO...)" required class="w-full bg-appcard text-white rounded-2xl px-4 py-3">
+                    <div class="flex gap-4">
+                        <div class="w-1/2">
+                            <label class="text-xs text-gray-400 ml-2">Tgl PO (DD/MM/YYYY)</label>
+                            <input type="text" id="po-tgl" placeholder="Misal: 20/02/2026" required class="w-full bg-appcard text-white rounded-2xl px-4 py-3 mt-1">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="text-xs text-gray-400 ml-2">Tgl EXP (DD/MM/YYYY)</label>
+                            <input type="text" id="po-exp" placeholder="Misal: 27/02/2026" required class="w-full bg-appcard text-white rounded-2xl px-4 py-3 mt-1">
+                        </div>
+                    </div>
+                    <select id="po-dc" required class="w-full bg-appcard text-white rounded-2xl px-4 py-3 appearance-none">
+                        <option value="" disabled selected>Pilih Distribution Center (DC)</option>
+                        <option value="CIANJUR">CIANJUR</option>
+                        <option value="JAMBI">JAMBI</option>
+                        <option value="BANDUNG">BANDUNG</option>
+                        <option value="BALI">BALI</option>
+                        <option value="PALEMBANG">PALEMBANG</option>
+                        <option value="BREBEK">BREBEK</option>
+                        <option value="CILACAP">CILACAP</option>
+                        <option value="JEMBER">JEMBER</option>
+                        <option value="LOMBOK">LOMBOK</option>
+                        <option value="PLUMBON">PLUMBON</option>
+                        <option value="MALANG">MALANG</option>
+                        <option value="MADIUN">MADIUN</option>
+                        <option value="SIDOARJO">SIDOARJO</option>
+                        <option value="TEGAL">TEGAL</option>
+                        <option value="BANJARMASIN">BANJARMASIN</option>
+                    </select>
+                    
+                    <div class="bg-[#242426] p-4 rounded-3xl mt-4 border border-white/5">
+                        <p class="text-xs text-appyellow font-bold mb-3">QUANTITY PO (CARTON)</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="number" id="po-nka" placeholder="NKA" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm">
+                            <input type="number" id="po-ndlh" placeholder="NDLH" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm">
+                            <input type="number" id="po-nrd" placeholder="NRD" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm">
+                            <input type="number" id="po-narr" placeholder="NARR" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm">
+                            <input type="number" id="po-nkach" placeholder="NKACH" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm col-span-2">
+                        </div>
+                    </div>
+                    <button type="submit" id="btn-po" class="w-full bg-appyellow text-black font-bold rounded-full px-5 py-4 mt-6">Simpan PO Baru</button>
+                </form>
+
+                <form id="tab-sales" class="hide space-y-4">
+                    <input type="text" id="sales-id" placeholder="Cari ID PO yang ada..." required class="w-full bg-appcard text-white rounded-2xl px-4 py-3">
+                    <div class="bg-[#242426] p-4 rounded-3xl mt-4 border border-white/5">
+                        <p class="text-xs text-appyellow font-bold mb-3">REALISASI TERKIRIM (CARTON)</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="number" id="sales-nka" placeholder="NKA" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm">
+                            <input type="number" id="sales-ndlh" placeholder="NDLH" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm">
+                            <input type="number" id="sales-nrd" placeholder="NRD" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm">
+                            <input type="number" id="sales-narr" placeholder="NARR" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm">
+                            <input type="number" id="sales-nkach" placeholder="NKACH" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm col-span-2">
+                        </div>
+                    </div>
+                    <button type="submit" id="btn-sales" class="w-full bg-appyellow text-black font-bold rounded-full px-5 py-4 mt-6">Update Sales</button>
+                </form>
+
+                <form id="tab-stock" class="hide space-y-4">
+                    <input type="text" id="stock-tgl" placeholder="Tanggal (DD/MM/YYYY)" required class="w-full bg-appcard text-white rounded-2xl px-4 py-3">
+                    <div class="bg-[#242426] p-4 rounded-3xl mt-4 border border-white/5">
+                        <p class="text-xs text-appyellow font-bold mb-3">INPUT STOCK HARIAN (CARTON)</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="number" id="stock-nka" placeholder="NKA" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm">
+                            <input type="number" id="stock-ndlh" placeholder="NDLH" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm">
+                            <input type="number" id="stock-nrd" placeholder="NRD" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm">
+                            <input type="number" id="stock-narr" placeholder="NARR" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm">
+                            <input type="number" id="stock-nkach" placeholder="NKACH" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm col-span-2">
+                        </div>
+                    </div>
+                    <button type="submit" id="btn-stock" class="w-full bg-appyellow text-black font-bold rounded-full px-5 py-4 mt-6">Simpan Stock</button>
+                </form>
+
+                <div id="tab-log" class="hide space-y-4">
+                    <div class="flex gap-2">
+                        <input type="text" id="filter-id" placeholder="Cari ID PO..." class="w-2/3 bg-appcard text-white rounded-2xl px-4 py-3 text-sm">
+                        <button onclick="loadLogData()" class="w-1/3 bg-appyellow text-black font-bold rounded-2xl text-sm">Cari</button>
+                    </div>
+                    <div class="flex gap-2 mb-4">
+                        <select id="filter-month" class="w-1/2 bg-appcard text-white rounded-2xl px-4 py-3 text-sm appearance-none">
+                            <option value="">Bulan</option>
+                            <option value="1">Januari</option>
+                            <option value="2">Februari</option>
+                            <option value="3">Maret</option>
+                            <option value="4">April</option>
+                        </select>
+                        <select id="filter-year" class="w-1/2 bg-appcard text-white rounded-2xl px-4 py-3 text-sm appearance-none">
+                            <option value="">Tahun</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                    <div id="log-container" class="mt-6 space-y-3">
+                        <p class="text-center text-gray-500 text-sm">Tekan "Cari" untuk memuat data.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="view-owner" class="hide flex-col h-full">
+            <div class="p-6 pb-4 flex justify-between items-end sticky top-0 bg-appbg z-10 border-b border-white/10">
+                <div>
+                    <h2 class="text-2xl font-bold text-appyellow">Master Dashboard</h2>
+                    <p class="text-xs text-gray-400">Helicopter View Buffer & FPD</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="loadOwnerData()" class="bg-appyellow text-black p-2 rounded-full h-8 w-8 flex justify-center items-center">↻</button>
+                    <button onclick="logout()" class="bg-appcard text-white p-2 rounded-full h-8 w-8 flex justify-center items-center">✕</button>
+                </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto pb-24">
+                <div id="owner-container" class="space-y-4">
+                    <p class="text-center text-gray-500 text-sm mt-10">Memuat data agregat...</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // URL Webhook Production n8n yang Anda berikan
+        const WEBHOOK_URL = "https://n8n-mzbmiib3etk4.kangkung.sumopod.my.id/webhook/ff-indonesia-api";
+        let loggedInUser = '';
+
+        // FUNGSI KOMUNIKASI API
+        async function sendApi(payload) {
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    mode: 'cors', // Mengizinkan request dari domain Vercel ke domain Sumopod
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error("API Error:", error);
+                return { status: "error", message: "Koneksi ke server n8n gagal." };
+            }
+        }
+
+        // FUNGSI NAVIGASI UI
+        function switchView(viewId) {
+            ['view-login', 'view-admin', 'view-owner'].forEach(id => {
+                document.getElementById(id).classList.add('hide');
+            });
+            document.getElementById(viewId).classList.remove('hide');
+        }
+
+        function switchTab(tabId) {
+            ['tab-po', 'tab-sales', 'tab-stock', 'tab-log'].forEach(id => {
+                document.getElementById(id).classList.add('hide');
+                document.getElementById('btn-' + id).classList.replace('tab-active', 'tab-inactive');
+            });
+            document.getElementById(tabId).classList.remove('hide');
+            document.getElementById('btn-' + tabId).classList.replace('tab-inactive', 'tab-active');
+            
+            if(tabId === 'tab-log') loadLogData(); // Auto load saat tab dibuka
+        }
+
+        function logout() {
+            loggedInUser = '';
+            document.getElementById('form-login').reset();
+            switchView('view-login');
+        }
+
+        function toggleBtnState(btnId, isLoading, defaultText) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            if (isLoading) {
+                btn.disabled = true;
+                btn.innerHTML = `<span class="animate-pulse">Loading...</span>`;
+                btn.classList.add('opacity-50');
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = defaultText;
+                btn.classList.remove('opacity-50');
+            }
+        }
+
+        // EVENT: LOGIN
+        document.getElementById('form-login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // Force toLowerCase agar sinkron sempurna dengan database n8n
+            const user = document.getElementById('login-user').value.trim().toLowerCase();
+            const pass = document.getElementById('login-pass').value;
+            
+            toggleBtnState('btn-login', true, "Masuk ke Sistem");
+            
+            const res = await sendApi({ action: "login", user_id: user, password: pass });
+            
+            toggleBtnState('btn-login', false, `<span>Masuk ke Sistem</span><span class="bg-black/10 rounded-full h-8 w-8 flex items-center justify-center">➔</span>`);
+
+            if (res.status === "success") {
+                loggedInUser = res.user_id;
+                
+                // Cek Role (Master/Owner vs Admin)
+                if (loggedInUser.includes("master") || loggedInUser.includes("owner") || loggedInUser.includes("bos")) {
+                    switchView('view-owner');
+                    loadOwnerData();
+                } else {
+                    document.getElementById('admin-user-display').innerText = `User: ${loggedInUser.toUpperCase()}`;
+                    switchView('view-admin');
+                    switchTab('tab-po');
+                }
+            } else {
+                alert(res.message || "Gagal login. Cek koneksi / kredensial.");
+            }
+        });
+
+        // EVENT: INSERT PO
+        document.getElementById('tab-po').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            toggleBtnState('btn-po', true, "Simpan PO Baru");
+            
+            const payload = {
+                action: "insert_po",
+                id: document.getElementById('po-id').value,
+                tanggal_po: document.getElementById('po-tgl').value,
+                tanggal_exp: document.getElementById('po-exp').value,
+                dc: document.getElementById('po-dc').value,
+                po_nka: document.getElementById('po-nka').value,
+                po_ndlh: document.getElementById('po-ndlh').value,
+                po_nrd: document.getElementById('po-nrd').value,
+                po_narr: document.getElementById('po-narr').value,
+                po_nkach: document.getElementById('po-nkach').value
+            };
+
+            const res = await sendApi(payload);
+            toggleBtnState('btn-po', false, "Simpan PO Baru");
+            alert(res.message);
+            if(res.status === 'success') document.getElementById('tab-po').reset();
+        });
+
+        // EVENT: INSERT SALES
+        document.getElementById('tab-sales').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            toggleBtnState('btn-sales', true, "Update Sales");
+
+            const payload = {
+                action: "insert_sales",
+                id: document.getElementById('sales-id').value,
+                nka: document.getElementById('sales-nka').value,
+                ndlh: document.getElementById('sales-ndlh').value,
+                nrd: document.getElementById('sales-nrd').value,
+                narr: document.getElementById('sales-narr').value,
+                nkach: document.getElementById('sales-nkach').value
+            };
+
+            const res = await sendApi(payload);
+            toggleBtnState('btn-sales', false, "Update Sales");
+            alert(res.message);
+            if(res.status === 'success') document.getElementById('tab-sales').reset();
+        });
+
+        // EVENT: INSERT STOCK
+        document.getElementById('tab-stock').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            toggleBtnState('btn-stock', true, "Simpan Stock");
+
+            const payload = {
+                action: "insert_stock",
+                tanggal: document.getElementById('stock-tgl').value,
+                nka: document.getElementById('stock-nka').value,
+                ndlh: document.getElementById('stock-ndlh').value,
+                nrd: document.getElementById('stock-nrd').value,
+                narr: document.getElementById('stock-narr').value,
+                nkach: document.getElementById('stock-nkach').value
+            };
+
+            const res = await sendApi(payload);
+            toggleBtnState('btn-stock', false, "Simpan Stock");
+            alert(res.message);
+            if(res.status === 'success') document.getElementById('tab-stock').reset();
+        });
+
+        // FUNGSI: LOAD LOG ADMIN
+        async function loadLogData() {
+            const container = document.getElementById('log-container');
+            container.innerHTML = '<p class="text-center text-appyellow animate-pulse text-sm">Menarik data dari server...</p>';
+
+            const payload = {
+                action: "load_admin",
+                search_id: document.getElementById('filter-id').value,
+                filter_month: document.getElementById('filter-month').value,
+                filter_year: document.getElementById('filter-year').value
+            };
+
+            const res = await sendApi(payload);
+            container.innerHTML = '';
+
+            if (res.status === "success" && res.data && res.data.length > 0) {
+                res.data.forEach(item => {
+                    // Bypass baris yang kosong atau sudah dibatalkan
+                    if(!item.ID || item["PO NKA"] === "[BATAL]") return;
+
+                    const card = document.createElement('div');
+                    card.className = "bg-appcard rounded-3xl p-5 relative overflow-hidden shadow-md";
+                    card.innerHTML = `
+                        <div class="pr-12">
+                            <h3 class="font-bold text-lg text-white mb-1">${item.ID}</h3>
+                            <p class="text-xs text-gray-400 mb-3">PO: ${item["Tanggal PO"] || "-"} | DC: ${item.DC || "-"}</p>
+                            
+                            <div class="grid grid-cols-2 gap-2 bg-[#1C1C1E] p-2 rounded-2xl">
+                                <div class="text-center">
+                                    <p class="text-[10px] text-gray-500 uppercase">PO Qty</p>
+                                    <p class="text-sm font-bold text-gray-300">${item["TOTAL PO ctn"] || 0}</p>
+                                </div>
+                                <div class="text-center border-l border-white/5">
+                                    <p class="text-[10px] text-appyellow uppercase">Realisasi</p>
+                                    <p class="text-sm font-bold text-appyellow">${item["Qty Terpenuhi (Kirim)"] || 0}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="deleteRow('${item.ID}')" class="absolute top-5 right-4 h-10 w-10 bg-appred/10 text-appred rounded-full flex justify-center items-center text-xl hover:bg-appred hover:text-white transition">
+                            ✕
+                        </button>
+                    `;
+                    container.appendChild(card);
+                });
+            } else {
+                container.innerHTML = '<p class="text-center text-gray-500 text-sm">Data tidak ditemukan.</p>';
+            }
+        }
+
+        // FUNGSI: DELETE/CANCEL PO
+        async function deleteRow(id) {
+            if(!confirm(`PERINGATAN: Yakin membatalkan PO dengan ID ${id}?`)) return;
+            
+            const res = await sendApi({ action: "delete", id: id });
+            alert(res.message);
+            if(res.status === "success") loadLogData();
+        }
+
+        // FUNGSI: LOAD OWNER DASHBOARD (Helicopter View)
+        async function loadOwnerData() {
+            const container = document.getElementById('owner-container');
+            container.innerHTML = '<p class="text-center text-appyellow animate-pulse text-sm">Mengambil agregasi data Buffer...</p>';
+
+            const res = await sendApi({ action: "load_owner" });
+            container.innerHTML = '';
+
+            if (res.status === "success" && res.buffer_data) {
+                res.buffer_data.forEach(item => {
+                    if(!item["Nama SKU"]) return;
+
+                    let bgColor = "bg-appcard text-white";
+                    const itemStatus = (item.status || "").toUpperCase();
+                    
+                    // Logic pewarnaan berdasarkan status logistik
+                    if (itemStatus.includes("SAFE")) bgColor = "bg-appgreen text-black";
+                    if (itemStatus.includes("WARNING") || itemStatus.includes("UNDER")) bgColor = "bg-appyellow text-black";
+                    if (itemStatus.includes("DANGER") || itemStatus.includes("FAILURE")) bgColor = "bg-appred text-black";
+
+                    const card = document.createElement('div');
+                    card.className = `${bgColor} rounded-3xl p-5 shadow-lg`;
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-xl leading-tight">${item["Nama SKU"]}</h3>
+                                <p class="text-[10px] uppercase font-bold opacity-70 mt-1">Status: ${itemStatus || "N/A"}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-2 bg-black/10 p-3 rounded-2xl">
+                            <div class="text-center">
+                                <p class="text-[9px] opacity-70 uppercase font-bold">Avg Demand</p>
+                                <p class="font-bold text-sm mt-1">${item["Avg. Demand 5 Bulanan"] || 0}</p>
+                            </div>
+                            <div class="text-center border-l border-black/10">
+                                <p class="text-[9px] opacity-70 uppercase font-bold">Forecast</p>
+                                <p class="font-bold text-sm mt-1">${item["FORECAST PO (Maret 2026)"] || 0}</p>
+                            </div>
+                            <div class="text-center border-l border-black/10">
+                                <p class="text-[9px] opacity-70 uppercase font-bold">Buffer</p>
+                                <p class="font-bold text-sm mt-1">${item["Buffer ( Maret )"] || 0}</p>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } else {
+                container.innerHTML = '<p class="text-center text-gray-500 text-sm">Gagal memuat dashboard owner.</p>';
+            }
+        }
+    </script>
+</body>
+</html>
