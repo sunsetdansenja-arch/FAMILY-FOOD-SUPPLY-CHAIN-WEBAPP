@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FamilyFood SC Tracker</title>
+    <title>FamilyFood SC Tracker (Testing Mode)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -38,36 +38,16 @@
 
     <div id="app" class="w-full max-w-md bg-appbg min-h-screen relative overflow-x-hidden shadow-2xl flex flex-col">
         
-        <div id="view-login" class="flex flex-col h-screen p-8 justify-center">
-            <div class="mb-10 text-center">
-                <div class="h-24 w-24 bg-appcard rounded-full mx-auto mb-6 flex items-center justify-center text-4xl">🥦</div>
-                <h1 class="text-3xl font-bold text-white mb-2">Family Food</h1>
-                <p class="text-gray-400 text-sm">Supply Chain Tracker</p>
+        <div id="view-login" class="hide flex flex-col h-screen p-8 justify-center">
             </div>
 
-            <form id="form-login" class="space-y-4">
-                <div>
-                    <input type="text" id="login-user" placeholder="USER ID" required autocomplete="off"
-                        class="w-full bg-appcard text-white rounded-2xl px-5 py-4 focus:ring-1 focus:ring-appyellow">
-                </div>
-                <div>
-                    <input type="password" id="login-pass" placeholder="PASSWORD" required
-                        class="w-full bg-appcard text-white rounded-2xl px-5 py-4 focus:ring-1 focus:ring-appyellow">
-                </div>
-                <button type="submit" id="btn-login" class="w-full bg-appyellow text-black font-bold rounded-full px-5 py-4 mt-4 flex justify-between items-center">
-                    <span>Masuk ke Sistem</span>
-                    <span class="bg-black/10 rounded-full h-8 w-8 flex items-center justify-center">➔</span>
-                </button>
-            </form>
-        </div>
-
-        <div id="view-admin" class="hide flex-col h-full">
+        <div id="view-admin" class="flex-col h-full">
             <div class="p-6 pb-2 flex justify-between items-center sticky top-0 bg-appbg z-10">
                 <div>
                     <h2 class="text-2xl font-bold">Admin Panel</h2>
-                    <p class="text-xs text-gray-400" id="admin-user-display">Welcome, Admin</p>
+                    <p class="text-xs text-appyellow animate-pulse" id="admin-user-display">Mode Testing (Tanpa Login)</p>
                 </div>
-                <button onclick="logout()" class="bg-appcard text-xs text-white px-4 py-2 rounded-full">Keluar</button>
+                <button onclick="testToOwner()" class="bg-appcard text-xs text-white px-4 py-2 rounded-full border border-white/10">Ke View Owner ➔</button>
             </div>
 
             <div class="flex overflow-x-auto px-6 py-4 gap-3 sticky top-[72px] bg-appbg z-10 border-b border-white/10">
@@ -120,7 +100,7 @@
                             <input type="number" id="po-nkach" placeholder="NKACH" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm col-span-2">
                         </div>
                     </div>
-                    <button type="submit" id="btn-po" class="w-full bg-appyellow text-black font-bold rounded-full px-5 py-4 mt-6">Simpan PO Baru</button>
+                    <button type="submit" id="btn-po" class="w-full bg-appyellow text-black font-bold rounded-full px-5 py-4 mt-6 hover:bg-yellow-400 transition">Simpan PO Baru</button>
                 </form>
 
                 <form id="tab-sales" class="hide space-y-4">
@@ -135,7 +115,7 @@
                             <input type="number" id="sales-nkach" placeholder="NKACH" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm col-span-2">
                         </div>
                     </div>
-                    <button type="submit" id="btn-sales" class="w-full bg-appyellow text-black font-bold rounded-full px-5 py-4 mt-6">Update Sales</button>
+                    <button type="submit" id="btn-sales" class="w-full bg-appyellow text-black font-bold rounded-full px-5 py-4 mt-6 hover:bg-yellow-400 transition">Update Sales</button>
                 </form>
 
                 <form id="tab-stock" class="hide space-y-4">
@@ -150,7 +130,7 @@
                             <input type="number" id="stock-nkach" placeholder="NKACH" required class="bg-appcard text-white rounded-xl px-4 py-3 text-sm col-span-2">
                         </div>
                     </div>
-                    <button type="submit" id="btn-stock" class="w-full bg-appyellow text-black font-bold rounded-full px-5 py-4 mt-6">Simpan Stock</button>
+                    <button type="submit" id="btn-stock" class="w-full bg-appyellow text-black font-bold rounded-full px-5 py-4 mt-6 hover:bg-yellow-400 transition">Simpan Stock</button>
                 </form>
 
                 <div id="tab-log" class="hide space-y-4">
@@ -188,7 +168,7 @@
                 </div>
                 <div class="flex gap-2">
                     <button onclick="loadOwnerData()" class="bg-appyellow text-black p-2 rounded-full h-8 w-8 flex justify-center items-center">↻</button>
-                    <button onclick="logout()" class="bg-appcard text-white p-2 rounded-full h-8 w-8 flex justify-center items-center">✕</button>
+                    <button onclick="testToAdmin()" class="bg-appcard text-white p-2 text-xs rounded-full h-8 px-4 flex justify-center items-center">➔ Admin</button>
                 </div>
             </div>
 
@@ -202,16 +182,22 @@
     </div>
 
     <script>
-        // URL Webhook Production n8n yang Anda berikan
         const WEBHOOK_URL = "https://n8n-mzbmiib3etk4.kangkung.sumopod.my.id/webhook/ff-indonesia-api";
-        let loggedInUser = '';
+
+        // INIT KETIKA WEB DIBUKA (Auto-load tanpa login)
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('view-login').classList.add('hide');
+            document.getElementById('view-admin').classList.remove('hide');
+            document.getElementById('view-owner').classList.add('hide');
+            switchTab('tab-po');
+        });
 
         // FUNGSI KOMUNIKASI API
         async function sendApi(payload) {
             try {
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
-                    mode: 'cors', // Mengizinkan request dari domain Vercel ke domain Sumopod
+                    mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
@@ -224,14 +210,20 @@
             }
         }
 
-        // FUNGSI NAVIGASI UI
-        function switchView(viewId) {
-            ['view-login', 'view-admin', 'view-owner'].forEach(id => {
-                document.getElementById(id).classList.add('hide');
-            });
-            document.getElementById(viewId).classList.remove('hide');
+        // FUNGSI TESTING BYPASS
+        function testToOwner() {
+            document.getElementById('view-admin').classList.add('hide');
+            document.getElementById('view-owner').classList.remove('hide');
+            loadOwnerData();
         }
 
+        function testToAdmin() {
+            document.getElementById('view-owner').classList.add('hide');
+            document.getElementById('view-admin').classList.remove('hide');
+            switchTab('tab-po');
+        }
+
+        // FUNGSI NAVIGASI UI
         function switchTab(tabId) {
             ['tab-po', 'tab-sales', 'tab-stock', 'tab-log'].forEach(id => {
                 document.getElementById(id).classList.add('hide');
@@ -240,13 +232,7 @@
             document.getElementById(tabId).classList.remove('hide');
             document.getElementById('btn-' + tabId).classList.replace('tab-inactive', 'tab-active');
             
-            if(tabId === 'tab-log') loadLogData(); // Auto load saat tab dibuka
-        }
-
-        function logout() {
-            loggedInUser = '';
-            document.getElementById('form-login').reset();
-            switchView('view-login');
+            if(tabId === 'tab-log') loadLogData();
         }
 
         function toggleBtnState(btnId, isLoading, defaultText) {
@@ -262,36 +248,6 @@
                 btn.classList.remove('opacity-50');
             }
         }
-
-        // EVENT: LOGIN
-        document.getElementById('form-login').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            // Force toLowerCase agar sinkron sempurna dengan database n8n
-            const user = document.getElementById('login-user').value.trim().toLowerCase();
-            const pass = document.getElementById('login-pass').value;
-            
-            toggleBtnState('btn-login', true, "Masuk ke Sistem");
-            
-            const res = await sendApi({ action: "login", user_id: user, password: pass });
-            
-            toggleBtnState('btn-login', false, `<span>Masuk ke Sistem</span><span class="bg-black/10 rounded-full h-8 w-8 flex items-center justify-center">➔</span>`);
-
-            if (res.status === "success") {
-                loggedInUser = res.user_id;
-                
-                // Cek Role (Master/Owner vs Admin)
-                if (loggedInUser.includes("master") || loggedInUser.includes("owner") || loggedInUser.includes("bos")) {
-                    switchView('view-owner');
-                    loadOwnerData();
-                } else {
-                    document.getElementById('admin-user-display').innerText = `User: ${loggedInUser.toUpperCase()}`;
-                    switchView('view-admin');
-                    switchTab('tab-po');
-                }
-            } else {
-                alert(res.message || "Gagal login. Cek koneksi / kredensial.");
-            }
-        });
 
         // EVENT: INSERT PO
         document.getElementById('tab-po').addEventListener('submit', async (e) => {
@@ -376,7 +332,6 @@
 
             if (res.status === "success" && res.data && res.data.length > 0) {
                 res.data.forEach(item => {
-                    // Bypass baris yang kosong atau sudah dibatalkan
                     if(!item.ID || item["PO NKA"] === "[BATAL]") return;
 
                     const card = document.createElement('div');
@@ -417,7 +372,7 @@
             if(res.status === "success") loadLogData();
         }
 
-        // FUNGSI: LOAD OWNER DASHBOARD (Helicopter View)
+        // FUNGSI: LOAD OWNER DASHBOARD
         async function loadOwnerData() {
             const container = document.getElementById('owner-container');
             container.innerHTML = '<p class="text-center text-appyellow animate-pulse text-sm">Mengambil agregasi data Buffer...</p>';
@@ -432,7 +387,6 @@
                     let bgColor = "bg-appcard text-white";
                     const itemStatus = (item.status || "").toUpperCase();
                     
-                    // Logic pewarnaan berdasarkan status logistik
                     if (itemStatus.includes("SAFE")) bgColor = "bg-appgreen text-black";
                     if (itemStatus.includes("WARNING") || itemStatus.includes("UNDER")) bgColor = "bg-appyellow text-black";
                     if (itemStatus.includes("DANGER") || itemStatus.includes("FAILURE")) bgColor = "bg-appred text-black";
