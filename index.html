@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FamilyFood SC Tracker (Owner Mode)</title>
+    <title>FamilyFood SC Tracker (Professional Owner)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        appbg: '#1C1C1E',      
-                        appcard: '#2C2C2E',    
+                        appbg: '#121212',      
+                        appcard: '#1E1E1E',    
                         appyellow: '#F4D160',  
-                        appgreen: '#D4E08B',   
-                        appred: '#E86A58'      
+                        appgreen: '#4ADE80',   
+                        appred: '#FB7185',
+                        apporange: '#FB923C'
                     },
-                    borderRadius: { '3xl': '1.5rem', '4xl': '2rem' }
+                    borderRadius: { '3xl': '1.25rem', '4xl': '2rem' }
                 }
             }
         }
@@ -25,67 +26,66 @@
         body { background-color: #000; color: #fff; font-family: ui-sans-serif, system-ui, sans-serif; }
         .hide { display: none !important; }
         ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
-        .tab-btn { transition: all 0.2s ease; white-space: nowrap; }
-        .tab-active { background-color: #F4D160; color: #000; font-weight: 600; }
-        .tab-inactive { background-color: #2C2C2E; color: #A1A1AA; }
+        .tab-btn { transition: all 0.2s ease; font-weight: 500; }
+        .tab-active { background-color: #F4D160; color: #000; }
+        .tab-inactive { background-color: #1E1E1E; color: #A1A1AA; }
+        .critical-glow { box-shadow: 0 0 15px rgba(251, 113, 133, 0.1); border: 1px solid rgba(251, 113, 133, 0.3); }
+        .safe-border { border: 1px solid rgba(74, 222, 128, 0.1); }
     </style>
 </head>
 <body class="flex justify-center antialiased">
 
-    <div id="app" class="w-full max-w-md bg-appbg min-h-screen relative overflow-x-hidden shadow-2xl flex flex-col">
+    <div id="app" class="w-full max-w-md bg-appbg min-h-screen relative overflow-x-hidden flex flex-col">
         
-        <div id="view-admin" class="flex-col h-full">
-            <div class="p-6 pb-2 flex justify-between items-center sticky top-0 bg-appbg z-10 border-b border-white/10">
-                <div>
-                    <h2 class="text-2xl font-bold text-appyellow">FamilyFood</h2>
-                    <p class="text-xs text-white opacity-70">Dimas Santosa | Owner Dashboard</p>
-                </div>
+        <div class="p-6 pb-2 sticky top-0 bg-appbg/80 backdrop-blur-md z-20">
+            <div class="flex justify-between items-center mb-1">
+                <h2 class="text-2xl font-black text-appyellow tracking-tighter italic">FAMILYFOOD</h2>
+                <span class="bg-white/5 px-3 py-1 rounded-full text-[10px] text-gray-400 border border-white/10 uppercase tracking-widest">OWNER DASHBOARD</span>
             </div>
+            <p class="text-[11px] text-gray-500 font-medium">Monitoring Forecast & DC Health Analysis</p>
+        </div>
 
-            <div class="flex overflow-x-auto px-6 py-4 gap-3 sticky top-[75px] bg-appbg z-10 border-b border-white/5">
-                <button onclick="switchTab('tab-owner')" id="btn-tab-owner" class="tab-btn tab-active px-5 py-2.5 rounded-full text-sm">Owner Analytics</button>
-                <button onclick="switchTab('tab-log')" id="btn-tab-log" class="tab-btn tab-inactive px-5 py-2.5 rounded-full text-sm">LOG PO</button>
-            </div>
+        <div class="flex px-6 py-4 gap-2 sticky top-[75px] bg-appbg/80 backdrop-blur-md z-20">
+            <button onclick="switchTab('tab-owner')" id="btn-tab-owner" class="tab-btn tab-active flex-1 py-3 rounded-2xl text-xs uppercase tracking-tight">Analytics</button>
+            <button onclick="switchTab('tab-log')" id="btn-tab-log" class="tab-btn tab-inactive flex-1 py-3 rounded-2xl text-xs uppercase tracking-tight">Log PO</button>
+        </div>
 
-            <div class="p-6 overflow-y-auto pb-24">
-                
-                <div id="tab-owner" class="space-y-6">
-                    <button onclick="loadOwnerData()" id="btn-load-owner" class="w-full bg-appgreen text-black font-bold rounded-2xl px-5 py-4 shadow-lg flex justify-center items-center gap-2">
-                        <span class="text-xl">📊</span> Sinkronisasi Data Forecast
-                    </button>
+        <div class="p-6 pt-2 pb-24 space-y-8">
+            
+            <div id="tab-owner" class="space-y-8">
+                <button onclick="loadOwnerData()" id="btn-load-owner" class="w-full bg-white text-black font-bold py-4 rounded-3xl shadow-xl flex justify-center items-center gap-3 active:scale-95 transition-transform">
+                    <span class="text-lg">⚡</span> SINKRONISASI DATA REALTIME
+                </button>
 
-                    <div id="owner-summary" class="grid grid-cols-2 gap-3 hide">
-                        <div class="bg-appcard p-4 rounded-3xl border border-white/5">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold">Total SKU</p>
-                            <p id="stat-sku" class="text-2xl font-bold text-white">0</p>
-                        </div>
-                        <div class="bg-appcard p-4 rounded-3xl border border-white/5">
-                            <p class="text-[10px] text-gray-500 uppercase font-bold">DC Aktif</p>
-                            <p id="stat-dc" class="text-2xl font-bold text-appgreen">0</p>
-                        </div>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end px-1">
+                        <h4 class="text-sm font-bold text-white uppercase tracking-widest">Inventory Health</h4>
+                        <span id="stat-sku" class="text-[10px] text-appyellow font-bold uppercase">0 SKU Aktif</span>
                     </div>
-
-                    <div class="space-y-3">
-                        <h4 class="text-sm font-bold text-gray-400 px-1">Inventory & Forecast</h4>
-                        <div id="forecast-container" class="space-y-4">
-                             <p class="text-center text-gray-500 text-xs py-10">Tekan tombol di atas untuk sinkronisasi.</p>
+                    <div id="forecast-container" class="space-y-4">
+                        <div class="bg-appcard/50 p-10 rounded-4xl border border-white/5 text-center">
+                            <p class="text-gray-500 text-xs">Menunggu sinkronisasi data...</p>
                         </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <h4 class="text-sm font-bold text-gray-400 px-1">Diagnosa Kendala DC</h4>
-                        <div id="diagnosa-container" class="space-y-4"></div>
                     </div>
                 </div>
 
-                <div id="tab-log" class="hide space-y-4">
-                    <button onclick="loadLogData()" id="btn-load-log" class="w-full bg-appyellow text-black font-bold rounded-2xl px-5 py-4 shadow-lg flex justify-center items-center gap-2">
-                        <span class="text-xl">🗃️</span> Tarik Data LOG PO
-                    </button>
-                    <div id="log-container" class="mt-6 space-y-4"></div>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end px-1">
+                        <h4 class="text-sm font-bold text-white uppercase tracking-widest">DC Diagnose Center</h4>
+                        <span id="stat-dc" class="text-[10px] text-appgreen font-bold uppercase">0 DC Terdeteksi</span>
+                    </div>
+                    <div id="diagnosa-container" class="bg-appcard rounded-4xl p-2 border border-white/5">
+                        </div>
                 </div>
-
             </div>
+
+            <div id="tab-log" class="hide space-y-4">
+                <button onclick="loadLogData()" id="btn-load-log" class="w-full bg-appyellow text-black font-bold py-4 rounded-3xl shadow-lg flex justify-center items-center gap-2">
+                    <span class="text-xl">🗃️</span> Tarik Log PO Terbaru
+                </button>
+                <div id="log-container" class="space-y-3"></div>
+            </div>
+
         </div>
     </div>
 
@@ -95,15 +95,14 @@
         async function sendApi(payload) {
             try {
                 const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    mode: 'cors',
+                    method: 'POST', mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
                 return await response.json();
             } catch (error) {
-                console.error("API Error:", error);
-                return { status: "error", message: "Koneksi ke server n8n gagal." };
+                console.error("Error:", error);
+                return { status: "error" };
             }
         }
 
@@ -121,72 +120,83 @@
             const dContainer = document.getElementById('diagnosa-container');
             const btn = document.getElementById('btn-load-owner');
             
-            btn.innerHTML = `<span class="animate-spin text-xl">⏳</span> Sinkronisasi...`;
-            btn.classList.add('opacity-70', 'pointer-events-none');
+            btn.innerHTML = `<span class="animate-spin text-lg">⏳</span> MEMPROSES DATA...`;
+            btn.classList.add('opacity-50', 'pointer-events-none');
 
-            let res = await sendApi({ action: "load_owner" });
-            
-            // Handle n8n standard array output
-            if (Array.isArray(res)) res = res[0];
+            let resRaw = await sendApi({ action: "load_owner" });
+            let res = Array.isArray(resRaw) ? resRaw[0] : resRaw;
 
-            btn.innerHTML = `<span class="text-xl">📊</span> Sinkronisasi Data Forecast`;
-            btn.classList.remove('opacity-70', 'pointer-events-none');
+            btn.innerHTML = `<span class="text-lg">⚡</span> SINKRONISASI DATA REALTIME`;
+            btn.classList.remove('opacity-50', 'pointer-events-none');
 
-            if (res && res.status === "success" && res.data) {
-                document.getElementById('owner-summary').classList.remove('hide');
-                document.getElementById('stat-sku').innerText = res.total_sku || 0;
-                document.getElementById('stat-dc').innerText = res.total_dc || 0;
+            if (res && res.status === "success") {
+                document.getElementById('stat-sku').innerText = `${res.total_sku} SKU AKTIF`;
+                document.getElementById('stat-dc').innerText = `${res.total_dc} DC TERPANTAU`;
 
-                // Render Forecast Section
+                // Render Forecast dengan visual PRO
                 fContainer.innerHTML = '';
-                if(!res.data.forecast || res.data.forecast.length === 0) {
-                    fContainer.innerHTML = `<p class="text-center text-appred text-xs py-5">⚠️ Data Forecast kosong. Periksa filter di n8n.</p>`;
-                } else {
-                    res.data.forecast.forEach(item => {
-                        const statusStr = String(item.status || "");
-                        const isSafe = statusStr.includes("SAFE");
-                        const card = document.createElement('div');
-                        card.className = `bg-appcard rounded-3xl p-5 border ${isSafe ? 'border-appgreen/20' : 'border-appred/20'} shadow-lg`;
-                        card.innerHTML = `
-                            <div class="flex justify-between items-start mb-4">
-                                <div>
-                                    <h3 class="font-bold text-white text-lg">${item.sku_name}</h3>
-                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold ${isSafe ? 'bg-appgreen/10 text-appgreen' : 'bg-appred/10 text-appred'}">${statusStr}</span>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-[10px] text-gray-500 uppercase font-bold">Forecast</p>
-                                    <p class="text-lg font-bold text-white">${item.forecast_po} <span class="text-xs font-normal opacity-50">Ctn</span></p>
+                res.data.forecast.forEach(item => {
+                    const isCritical = item.status && item.status.includes("CRITICAL");
+                    const card = document.createElement('div');
+                    card.className = `bg-appcard p-5 rounded-4xl ${isCritical ? 'critical-glow' : 'safe-border'} transition-all`;
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center mb-5">
+                            <div>
+                                <h3 class="font-black text-xl text-white tracking-tighter">${item.sku_name}</h3>
+                                <div class="flex items-center gap-1.5 mt-1">
+                                    <span class="h-2 w-2 rounded-full ${isCritical ? 'bg-appred animate-pulse' : 'bg-appgreen'}"></span>
+                                    <span class="text-[10px] font-black uppercase ${isCritical ? 'text-appred' : 'text-appgreen'}">${item.status}</span>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-3 gap-2 pt-3 border-t border-white/5">
-                                <div><p class="text-[9px] text-gray-500 uppercase">Demand</p><p class="text-xs font-bold text-gray-300">${item.avg_demand}</p></div>
-                                <div><p class="text-[9px] text-gray-500 uppercase">Buffer</p><p class="text-xs font-bold text-gray-300">${item.buffer}</p></div>
-                                <div class="text-right"><p class="text-[9px] text-gray-500 uppercase">Under</p><p class="text-xs font-bold text-appred">${item.under_stock}</p></div>
-                            </div>`;
-                        fContainer.appendChild(card);
-                    });
-                }
+                            <div class="text-right bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
+                                <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">Forecast PO</p>
+                                <p class="text-lg font-black text-white">${item.forecast_po} <span class="text-[10px] text-gray-500">Ctn</span></p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <div class="bg-black/20 p-3 rounded-2xl border border-white/5">
+                                <p class="text-[8px] text-gray-500 uppercase font-bold mb-1">Avg Demand</p>
+                                <p class="text-sm font-bold text-gray-300">${item.avg_demand || '-'}</p>
+                            </div>
+                            <div class="bg-black/20 p-3 rounded-2xl border border-white/5">
+                                <p class="text-[8px] text-gray-500 uppercase font-bold mb-1">Stock Buffer</p>
+                                <p class="text-sm font-bold text-gray-300">${item.buffer || '-'}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 pt-3 border-t border-white/5">
+                             <div class="flex-1">
+                                <div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                    <div class="h-full ${isCritical ? 'bg-appred' : 'bg-appgreen'}" style="width: ${isCritical ? '100%' : '30%'}"></div>
+                                </div>
+                             </div>
+                             <p class="text-[10px] font-bold ${isCritical ? 'text-appred' : 'text-gray-500'}">
+                                ${isCritical ? '⚠️ UNDER: ' + item.under_stock : 'SURPLUS: ' + item.over_stock}
+                             </p>
+                        </div>`;
+                    fContainer.appendChild(card);
+                });
 
-                // Render Diagnosa Section
+                // Render Diagnosa dengan visual list PRO
                 dContainer.innerHTML = '';
-                if(res.data.diagnosa && res.data.diagnosa.length > 0) {
-                    res.data.diagnosa.forEach(item => {
-                        const resStr = String(item.diagnose_result || "");
-                        const isMoq = resStr.includes("MOQ");
-                        const totalFail = Number(item.warehouse_failure || 0) + Number(item.under_moq || 0);
-                        const card = document.createElement('div');
-                        card.className = "bg-[#1C1C1E] rounded-2xl p-4 border border-white/5 flex items-center gap-4 mb-3";
-                        card.innerHTML = `
-                            <div class="h-10 w-10 rounded-full bg-appcard flex items-center justify-center text-lg">${isMoq ? '📦' : '🏗️'}</div>
-                            <div class="flex-1"><h4 class="font-bold text-white text-xs uppercase">${item.dc_name}</h4><p class="text-[10px] text-appyellow font-medium">${resStr}</p></div>
-                            <div class="text-right border-l border-white/10 pl-4"><p class="text-[8px] text-gray-500 uppercase font-bold">Fail</p><p class="text-xs font-bold text-appred">${totalFail}</p></div>`;
-                        dContainer.appendChild(card);
-                    });
-                } else {
-                    dContainer.innerHTML = `<p class="text-center text-gray-500 text-xs py-5">Tidak ada diagnosa DC yang tersedia.</p>`;
-                }
-            } else {
-                alert("Gagal memuat data: " + (res.message || "Pastikan n8n mengirimkan properti 'status' dan 'data'"));
+                res.data.diagnosa.forEach(item => {
+                    const isFail = item.diagnose_result && item.diagnose_result.includes("FAILURE");
+                    const totalVal = Number(item.warehouse_failure) + Number(item.under_moq);
+                    const itemEl = document.createElement('div');
+                    itemEl.className = "flex items-center gap-4 p-4 border-b border-white/5 last:border-0";
+                    itemEl.innerHTML = `
+                        <div class="h-10 w-10 shrink-0 rounded-2xl ${isFail ? 'bg-appred/10 text-appred' : 'bg-apporange/10 text-apporange'} flex items-center justify-center text-sm font-black border border-current/10">
+                            ${totalVal}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-xs font-black text-white uppercase truncate">${item.dc_name}</h4>
+                            <p class="text-[10px] ${isFail ? 'text-appred/80' : 'text-apporange/80'} font-medium truncate italic">${item.diagnose_result}</p>
+                        </div>
+                        <div class="text-right">
+                             <div class="text-[10px] font-black text-gray-400">${item.warehouse_failure}/${item.under_moq}</div>
+                             <p class="text-[8px] text-gray-600 uppercase font-bold tracking-tighter">Fail/MOQ</p>
+                        </div>`;
+                    dContainer.appendChild(itemEl);
+                });
             }
         }
 
@@ -195,26 +205,20 @@
             const btn = document.getElementById('btn-load-log');
             btn.innerHTML = `<span class="animate-spin text-xl">⏳</span> Menarik Data...`;
             container.innerHTML = '';
-
             const resRaw = await sendApi({ action: "load_admin" });
             const res = Array.isArray(resRaw) ? resRaw[0] : resRaw;
-            btn.innerHTML = `<span class="text-xl">🗃️</span> Tarik Data LOG PO`;
-
+            btn.innerHTML = `<span class="text-xl">🗃️</span> Tarik Log PO Terbaru`;
             if (res.status === "success" && res.data) {
                 res.data.forEach(item => {
                     if(!item.ID || item["PO NKA"] === "[BATAL]") return;
                     const card = document.createElement('div');
-                    card.className = "bg-appcard rounded-3xl p-5 relative shadow-lg border border-white/5 mb-3";
+                    card.className = "bg-appcard p-4 rounded-3xl border border-white/5 border-l-4 border-l-appyellow";
                     card.innerHTML = `
-                        <div class="pr-12">
-                            <h3 class="font-bold text-lg text-white mb-1">${item.ID}</h3>
-                            <p class="text-[11px] text-gray-400 mb-3">DC: ${item.DC || "-"}</p>
-                            <div class="grid grid-cols-2 gap-2 bg-[#1C1C1E] p-3 rounded-2xl">
-                                <div><p class="text-[9px] text-gray-500 uppercase font-bold">Total PO</p><p class="text-sm font-bold text-gray-300">${item["TOTAL PO ctn"] || 0} Ctn</p></div>
-                                <div class="border-l border-white/5 pl-2"><p class="text-[9px] text-appyellow uppercase font-bold">Terkirim</p><p class="text-sm font-bold text-appyellow">${item["Qty Terpenuhi (Kirim)"] || 0} Ctn</p></div>
-                            </div>
-                        </div>
-                    `;
+                        <h3 class="font-black text-sm text-white mb-1 uppercase tracking-tight">${item.ID}</h3>
+                        <div class="flex justify-between items-center text-[10px] text-gray-500">
+                            <span class="font-bold">DC: ${item.DC || "-"}</span>
+                            <span class="bg-white/5 px-2 py-0.5 rounded text-appyellow font-bold">${item["TOTAL PO ctn"] || 0} CTN</span>
+                        </div>`;
                     container.appendChild(card);
                 });
             }
