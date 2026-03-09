@@ -10,21 +10,28 @@
             theme: {
                 extend: {
                     colors: {
-                        appbg: '#0A0A0A',      
+                        appbg: '#000000',      
                         appcard: '#1C1C1E',    
-                        apporange: '#FF851B',  
-                        appblue: '#2B65F6',    
-                        appgreen: '#34C759',   
-                        appred: '#FF3B30'      
+                        appyellow: '#FFCC00',  
+                        appred: '#FF3B30',    
+                        appgreen: '#32D74B',   
+                        appblue: '#0A84FF'      
                     },
-                    borderRadius: { '3xl': '1.25rem', '4xl': '2rem' },
-                    boxShadow: { 'glow-orange': '0 0 20px rgba(255, 133, 27, 0.3)', 'glow-blue': '0 0 20px rgba(43, 101, 246, 0.3)' },
+                    borderRadius: { '3xl': '1.5rem', '4xl': '2rem', '5xl': '2.5rem' },
+                    boxShadow: { 
+                        'glow-yellow': '0 0 25px rgba(255, 204, 0, 0.25)', 
+                        'glow-red': '0 0 25px rgba(255, 59, 48, 0.3)',
+                        'glow-blue': '0 0 25px rgba(10, 132, 255, 0.3)'
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"San Francisco"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif']
+                    },
                     animation: {
-                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                        'fade-in-up': 'fadeInUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
                         'shimmer': 'shimmer 1.5s infinite linear'
                     },
                     keyframes: {
-                        fadeInUp: { '0%': { opacity: 0, transform: 'translateY(20px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
+                        fadeInUp: { '0%': { opacity: 0, transform: 'translateY(20px) scale(0.95)' }, '100%': { opacity: 1, transform: 'translateY(0) scale(1)' } },
                         shimmer: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } }
                     }
                 }
@@ -32,15 +39,15 @@
         }
     </script>
     <style>
-        body { background-color: #0A0A0A; color: #fff; font-family: ui-sans-serif, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #000000; color: #ffffff; -webkit-tap-highlight-color: transparent; }
         .hide { display: none !important; }
         ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
         
-        input, select { background-color: #1C1C1E; border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; color: white; width: 100%; border-radius: 1rem; padding: 1rem 1.25rem; outline: none; font-weight: bold;}
-        input:focus, select:focus { border-color: #FF851B; background-color: #121212; box-shadow: 0 0 15px rgba(255,133,27,0.15); }
+        input, select { background-color: #2C2C2E; border: 2px solid transparent; transition: all 0.2s; color: white; width: 100%; border-radius: 1.25rem; padding: 1rem 1.25rem; outline: none; font-weight: 700;}
+        input:focus, select:focus { border-color: #FFCC00; background-color: #1C1C1E; box-shadow: 0 0 15px rgba(255,204,0,0.2); }
         
         .btn-tactile { transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
-        .btn-tactile:active { transform: scale(0.95); opacity: 0.9; }
+        .btn-tactile:active { transform: scale(0.92); opacity: 0.8; }
         
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s; opacity: 0; }
         .accordion-expanded { max-height: 800px; opacity: 1; border-top: 1px solid rgba(255,255,255,0.05); }
@@ -54,170 +61,179 @@
 </head>
 <body class="flex justify-center antialiased">
 
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-appcard border-2 border-apporange text-white px-6 py-3 rounded-full shadow-glow-orange font-bold text-sm flex items-center gap-3 w-max max-w-[90%] pointer-events-none">
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-appcard border border-white/10 text-white px-6 py-3 rounded-full shadow-2xl font-bold text-sm flex items-center gap-3 w-max max-w-[90%] pointer-events-none">
         <span id="toast-icon">✅</span>
         <span id="toast-msg">Success</span>
     </div>
 
-    <div id="modal-dc" class="fixed inset-0 bg-black/95 backdrop-blur-sm z-[100] hide flex flex-col px-4 pt-12 pb-6">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="text-white font-black text-xl italic tracking-tight text-apporange uppercase px-2">Pilih Nama DC</h3>
-            <button onclick="closeDCModal()" class="text-gray-400 bg-white/10 p-2 rounded-full btn-tactile hover:text-white">✕</button>
+    <div id="modal-dc" class="fixed inset-0 bg-black/95 backdrop-blur-md z-[100] hide flex flex-col px-5 pt-16 pb-8">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="text-white font-black text-2xl tracking-tight text-appyellow uppercase">Pilih DC</h3>
+            <button onclick="closeDCModal()" class="text-gray-400 bg-white/10 w-10 h-10 flex items-center justify-center rounded-full btn-tactile hover:text-white">✕</button>
         </div>
-        <div class="grid grid-cols-3 gap-3 overflow-y-auto pb-10 content-start flex-1 px-2" id="dc-grid"></div>
+        <div class="grid grid-cols-3 gap-3 overflow-y-auto pb-10 content-start flex-1" id="dc-grid"></div>
     </div>
 
     <div id="app" class="w-full max-w-md bg-appbg min-h-screen relative overflow-x-hidden flex flex-col shadow-2xl">
         
-        <div id="view-login" class="flex flex-col h-screen p-8 justify-center items-center relative z-40 bg-[#0A0A0A]">
+        <div id="view-login" class="flex flex-col h-screen p-8 justify-center items-center relative z-40 bg-appbg">
             <div class="w-full max-w-sm space-y-12">
                 <div class="text-center space-y-3">
-                    <div class="w-20 h-20 bg-apporange rounded-3xl mx-auto flex items-center justify-center shadow-glow-orange mb-6">
-                        <svg class="w-10 h-10 text-black" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    <div class="w-24 h-24 bg-appyellow rounded-[2rem] mx-auto flex items-center justify-center shadow-glow-yellow mb-8">
+                        <svg class="w-12 h-12 text-black" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     </div>
-                    <h1 class="text-3xl font-black text-white tracking-tighter italic uppercase">Family<span class="text-apporange">Food</span></h1>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-[0.3em] font-bold">Secure Access Center</p>
+                    <h1 class="text-4xl font-black text-white tracking-tighter uppercase">Family<span class="text-appyellow">Food</span></h1>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-[0.3em] font-bold">Secure Access</p>
                 </div>
                 <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
-                    <input type="text" id="login-user" placeholder="USER ID" required class="text-center font-black uppercase tracking-widest bg-appcard border-white/5">
-                    <input type="password" id="login-pass" placeholder="PASSWORD" required class="text-center font-black tracking-widest bg-appcard border-white/5">
-                    <button type="submit" id="btn-login" class="w-full bg-apporange text-black font-black py-4 rounded-2xl shadow-glow-orange mt-4 uppercase tracking-widest text-sm btn-tactile hover:bg-orange-500 transition-colors">MASUK SISTEM</button>
+                    <input type="text" id="login-user" placeholder="USER ID" required class="text-center text-sm font-black uppercase tracking-widest bg-[#121212] border border-white/5">
+                    <input type="password" id="login-pass" placeholder="PASSWORD" required class="text-center text-sm font-black tracking-widest bg-[#121212] border border-white/5">
+                    <button type="submit" id="btn-login" class="w-full bg-appyellow text-black font-black py-4 rounded-[1.5rem] shadow-glow-yellow mt-6 uppercase tracking-widest text-sm btn-tactile">AUTHORIZE</button>
                 </form>
             </div>
         </div>
 
         <div id="view-main" class="hide flex-col h-full">
-            <div class="px-6 py-4 sticky top-0 bg-[#0A0A0A]/90 backdrop-blur-xl z-20 flex justify-between items-center border-b border-white/5">
+            
+            <div class="px-6 py-5 sticky top-0 bg-[#000000]/80 backdrop-blur-2xl z-20 flex justify-between items-center">
                 <div>
-                    <h2 class="text-xl font-black text-white tracking-tighter italic leading-none">FAMILY<span class="text-apporange">FOOD</span></h2>
-                    <div class="flex items-center gap-1.5 mt-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-appgreen animate-pulse shadow-[0_0_8px_#34C759]"></span>
+                    <h2 class="text-xl font-black text-white tracking-tighter uppercase leading-none">FAMILY<span class="text-appyellow">FOOD</span></h2>
+                    <div class="flex items-center gap-1.5 mt-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-appgreen animate-pulse shadow-[0_0_8px_#32D74B]"></span>
                         <p id="header-username" class="text-[9px] text-gray-400 uppercase font-bold tracking-widest">USER</p>
                     </div>
                 </div>
-                <button onclick="logout()" class="bg-white/5 px-3 py-2 rounded-xl text-gray-400 btn-tactile border border-white/5 text-[10px] font-bold uppercase hover:bg-white/10 hover:text-white transition-colors">Logout</button>
+                <button onclick="logout()" class="bg-[#1C1C1E] px-4 py-2 rounded-xl text-gray-400 btn-tactile text-[10px] font-bold uppercase tracking-wider">Logout</button>
             </div>
 
             <div class="flex-1 overflow-y-auto pb-32">
                 
                 <div id="tab-analytics" class="p-6 space-y-8">
-                    <div class="flex gap-3">
-                        <div class="flex-1 bg-appcard border border-white/5 p-4 rounded-3xl flex flex-col justify-between relative overflow-hidden">
-                            <p class="text-[8px] uppercase font-bold text-gray-500 tracking-widest relative z-10">Total SKU</p>
-                            <p id="stat-sku" class="text-3xl font-black text-white relative z-10 mt-1 ticker">0</p>
+                    
+                    <div class="flex flex-col gap-3">
+                        <div class="bg-appred text-black p-6 rounded-5xl flex justify-between items-center shadow-glow-red h-32 relative overflow-hidden">
+                            <div class="absolute -right-4 -bottom-8 opacity-10">
+                                <svg class="w-48 h-48" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
+                            </div>
+                            <p class="text-[11px] uppercase font-black tracking-widest opacity-90 w-1/2 leading-snug relative z-10">Total SKU<br>Monitor</p>
+                            <p id="stat-sku" class="text-[5.5rem] font-light tracking-tighter relative z-10 leading-none">0</p>
                         </div>
-                        <div class="flex-1 bg-appcard border border-white/5 p-4 rounded-3xl flex flex-col justify-between relative overflow-hidden">
-                            <p class="text-[8px] uppercase font-bold text-gray-500 tracking-widest relative z-10">DC Terpantau</p>
-                            <p id="stat-dc" class="text-3xl font-black text-appblue relative z-10 mt-1 ticker">0</p>
+                        
+                        <div class="grid grid-cols-2 gap-3 h-36">
+                            <div class="bg-appcard text-white p-5 rounded-[2rem] flex flex-col justify-center items-center relative shadow-lg">
+                                <p class="text-[9px] uppercase font-bold tracking-widest text-gray-400 mb-1">DC Terpantau</p>
+                                <p id="stat-dc" class="text-5xl font-light tracking-tighter text-white">0</p>
+                            </div>
+                            
+                            <button onclick="loadAnalytics()" id="btn-sync-analytics" class="bg-appyellow text-black p-5 rounded-[2rem] flex flex-col justify-center items-center shadow-glow-yellow btn-tactile relative overflow-hidden">
+                                <span class="text-3xl mb-2" id="sync-icon">🔄</span>
+                                <span class="text-[10px] font-black uppercase tracking-widest" id="sync-text">Sync Data</span>
+                            </button>
                         </div>
                     </div>
 
-                    <button onclick="loadAnalytics()" id="btn-sync-analytics" class="w-full bg-white text-black font-black py-4 rounded-2xl btn-tactile shadow-[0_0_20px_rgba(255,255,255,0.15)] flex justify-center items-center gap-2 text-xs uppercase tracking-widest">
-                        <span>🔄</span> SYNC ANALYTIC DATA
-                    </button>
-
-                    <div class="bg-appcard rounded-[2rem] border border-apporange/30 shadow-[0_0_20px_rgba(255,133,27,0.05)] overflow-hidden">
-                        <div class="bg-apporange/10 px-5 py-4 border-b border-apporange/20">
-                            <h4 class="text-sm font-black text-apporange uppercase tracking-widest">📦 INVENTORY HEALTH</h4>
+                    <div class="bg-appcard rounded-4xl border border-white/5 overflow-hidden">
+                        <div class="px-5 py-4 border-b border-white/5">
+                            <h4 class="text-xs font-black text-gray-300 uppercase tracking-widest">📦 Inventory Health</h4>
                         </div>
                         <div class="p-2 overflow-x-auto">
                             <div class="min-w-[340px]">
                                 <div class="grid grid-cols-5 gap-1 px-3 py-2 text-[8px] text-gray-500 font-bold uppercase tracking-widest border-b border-white/5 text-center">
                                     <div class="text-left">NAMA SKU</div>
                                     <div>AVG<br>3 BLN</div>
-                                    <div id="th-forecast" class="text-appblue">FORECAST<br>(DEPAN)</div>
-                                    <div id="th-buffer" class="text-apporange">BUFFER<br>(INI)</div>
+                                    <div id="th-forecast" class="text-appblue">FORECAST</div>
+                                    <div id="th-buffer" class="text-appyellow">BUFFER</div>
                                     <div>STATUS</div>
                                 </div>
                                 <div id="forecast-container" class="px-2 pb-2">
-                                    <div class="py-10 text-center opacity-30 italic text-xs">Tekan Sync Data...</div>
+                                    <div class="py-10 text-center opacity-30 italic text-xs">Data Kosong...</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="space-y-4 pt-2">
-                        <h4 class="text-xs font-black text-appblue uppercase tracking-[0.2em] px-2">DC Diagnose List</h4>
-                        <div id="diagnosa-container" class="grid gap-4"></div>
+                        <h4 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] px-2">DC Diagnose Results</h4>
+                        <div id="diagnosa-container" class="grid gap-3"></div>
                     </div>
                 </div>
 
                 <div id="tab-log" class="hide p-6 space-y-6">
-                    <div class="sticky top-[68px] bg-[#0A0A0A]/95 backdrop-blur-xl z-10 pt-2 pb-4 border-b border-white/5">
-                        <button onclick="loadLogPO()" id="btn-sync-log" class="w-full bg-appblue text-white font-black py-4 rounded-2xl btn-tactile shadow-glow-blue flex justify-center items-center gap-2 uppercase tracking-widest text-xs mb-4">TARIK DATABASE PO</button>
-                        <input type="text" id="search-po" placeholder="Cari ID PO atau DC..." class="text-sm bg-appcard border border-white/10" onkeyup="filterLogLocal()">
+                    <div class="sticky top-[68px] bg-[#000000]/90 backdrop-blur-xl z-10 pt-2 pb-4 border-b border-white/5">
+                        <button onclick="loadLogPO()" id="btn-sync-log" class="w-full bg-appblue text-white font-black py-4 rounded-4xl btn-tactile shadow-glow-blue flex justify-center items-center gap-2 uppercase tracking-widest text-xs mb-4">Tarik Database PO</button>
+                        <input type="text" id="search-po" placeholder="Cari ID PO atau DC..." class="text-sm bg-appcard border-white/5" onkeyup="filterLogLocal()">
                     </div>
                     <div id="log-container" class="space-y-4"></div>
                 </div>
 
                 <div id="tab-forms" class="hide p-6 space-y-6">
-                    <div class="flex bg-appcard p-1.5 rounded-2xl border border-white/5 shadow-xl">
-                        <button onclick="switchForm('po')" id="btn-form-po" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-apporange text-black shadow-glow-orange">New PO</button>
-                        <button onclick="switchForm('sales')" id="btn-form-sales" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500">Sales</button>
-                        <button onclick="switchForm('stock')" id="btn-form-stock" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500">Stock</button>
+                    <div class="flex bg-[#121212] p-1.5 rounded-3xl border border-white/5 relative shadow-xl">
+                        <button onclick="switchForm('po')" id="btn-form-po" class="flex-1 py-3 rounded-2xl text-xs font-black uppercase transition-all bg-appyellow text-black shadow-glow-yellow">New PO</button>
+                        <button onclick="switchForm('sales')" id="btn-form-sales" class="flex-1 py-3 rounded-2xl text-xs font-black uppercase transition-all text-gray-500">Sales</button>
+                        <button onclick="switchForm('stock')" id="btn-form-stock" class="flex-1 py-3 rounded-2xl text-xs font-black uppercase transition-all text-gray-500">Stock</button>
                     </div>
 
-                    <form id="form-po" onsubmit="submitAction(event, 'insert_po')" class="space-y-5 bg-appcard p-5 rounded-[2rem] border border-white/5">
-                        <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase bg-[#121212]">
+                    <form id="form-po" onsubmit="submitAction(event, 'insert_po')" class="space-y-5 bg-appcard p-6 rounded-4xl border border-white/5">
+                        <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase bg-[#000000]">
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="text" id="po-tanggal" placeholder="Tgl PO (DD/MM/YYYY)" required class="bg-[#121212]">
-                            <input type="text" id="po-exp" placeholder="Tgl EXP (DD/MM/YYYY)" required class="bg-[#121212]">
+                            <input type="text" id="po-tanggal" placeholder="Tgl PO (DD/MM/YYYY)" required class="bg-[#000000] text-sm">
+                            <input type="text" id="po-exp" placeholder="Tgl EXP (DD/MM/YYYY)" required class="bg-[#000000] text-sm">
                         </div>
                         <div class="relative cursor-pointer btn-tactile" onclick="openDCModal('po-dc')">
                             <input type="text" id="po-dc" placeholder="PILIH NAMA DC" required readonly class="pointer-events-none uppercase bg-appblue/10 border border-appblue/30 text-appblue">
                             <div class="absolute right-4 top-1/2 -translate-y-1/2 text-appblue">🔍</div>
                         </div>
                         <div class="pt-4 border-t border-white/5 grid grid-cols-2 gap-3">
-                            <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="po-nka" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                            <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="po-ndlh" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                            <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="po-nrd" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                            <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="po-narr" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                            <div class="bg-[#000000] p-3 rounded-3xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NKA</label><input type="number" id="po-nka" value="0" required class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
+                            <div class="bg-[#000000] p-3 rounded-3xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NDLH</label><input type="number" id="po-ndlh" value="0" required class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
+                            <div class="bg-[#000000] p-3 rounded-3xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NRD</label><input type="number" id="po-nrd" value="0" required class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
+                            <div class="bg-[#000000] p-3 rounded-3xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase tracking-widest">NARR</label><input type="number" id="po-narr" value="0" required class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
                         </div>
-                        <button type="submit" class="w-full bg-apporange text-black font-black py-4 rounded-2xl btn-tactile shadow-glow-orange tracking-widest uppercase">SUBMIT PO BARU</button>
+                        <button type="submit" class="w-full bg-appyellow text-black font-black py-4 rounded-[1.5rem] btn-tactile shadow-glow-yellow tracking-widest uppercase mt-2">Submit PO</button>
                     </form>
 
-                    <form id="form-sales" onsubmit="submitAction(event, 'insert_sales')" class="hide space-y-5 bg-appcard p-5 rounded-[2rem] border border-white/5">
-                        <input type="text" id="sls-id" placeholder="ID PO (Harus Sesuai Database)" required class="uppercase bg-[#121212]">
+                    <form id="form-sales" onsubmit="submitAction(event, 'insert_sales')" class="hide space-y-5 bg-appcard p-6 rounded-4xl border border-white/5">
+                        <input type="text" id="sls-id" placeholder="ID PO (Match Database)" required class="uppercase bg-[#000000]">
                         <div class="relative cursor-pointer btn-tactile" onclick="openDCModal('sls-dc')">
-                            <input type="text" id="sls-dc" placeholder="PILIH DC (OPSIONAL)" readonly class="pointer-events-none uppercase bg-appblue/10 border border-appblue/30 text-appblue">
+                            <input type="text" id="sls-dc" placeholder="PILIH DC (OPSIONAL)" readonly class="pointer-events-none uppercase bg-[#000000]">
                         </div>
                         <div class="pt-4 border-t border-white/5 grid grid-cols-2 gap-3">
-                            <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="sls-nka" value="0" class="bg-transparent border-none mt-1 p-2"></div>
-                            <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="sls-ndlh" value="0" class="bg-transparent border-none mt-1 p-2"></div>
-                            <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="sls-nrd" value="0" class="bg-transparent border-none mt-1 p-2"></div>
-                            <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="sls-narr" value="0" class="bg-transparent border-none mt-1 p-2"></div>
-                            <div class="col-span-2 bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="sls-nkach" value="0" class="bg-transparent border-none mt-1 p-2"></div>
+                            <div class="bg-[#000000] p-3 rounded-3xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="sls-nka" value="0" class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
+                            <div class="bg-[#000000] p-3 rounded-3xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="sls-ndlh" value="0" class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
+                            <div class="bg-[#000000] p-3 rounded-3xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="sls-nrd" value="0" class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
+                            <div class="bg-[#000000] p-3 rounded-3xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="sls-narr" value="0" class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
+                            <div class="col-span-2 bg-[#000000] p-3 rounded-3xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="sls-nkach" value="0" class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
                         </div>
-                        <button type="submit" class="w-full bg-appblue text-white font-black py-4 rounded-2xl btn-tactile shadow-glow-blue tracking-widest uppercase">UPDATE SALES</button>
+                        <button type="submit" class="w-full bg-appblue text-white font-black py-4 rounded-[1.5rem] btn-tactile shadow-glow-blue tracking-widest uppercase mt-2">Update Sales</button>
                     </form>
 
-                    <form id="form-stock" onsubmit="submitAction(event, 'insert_stock')" class="hide space-y-5 bg-appcard p-5 rounded-[2rem] border border-white/5">
-                        <input type="text" id="stk-tanggal" placeholder="Tanggal (DD/MM/YYYY)" required class="bg-[#121212]">
+                    <form id="form-stock" onsubmit="submitAction(event, 'insert_stock')" class="hide space-y-5 bg-appcard p-6 rounded-4xl border border-white/5">
+                        <input type="text" id="stk-tanggal" placeholder="Tanggal (DD/MM/YYYY)" required class="bg-[#000000]">
                         <div class="pt-2 border-t border-white/5 mt-2 grid grid-cols-2 gap-3">
-                            <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="stk-nka" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                            <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="stk-ndlh" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                            <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="stk-nrd" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                            <div class="bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="stk-narr" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
-                            <div class="col-span-2 bg-black/40 p-2 rounded-2xl border border-white/5"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="stk-nkach" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                            <div class="bg-[#000000] p-3 rounded-3xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="stk-nka" value="0" class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
+                            <div class="bg-[#000000] p-3 rounded-3xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="stk-ndlh" value="0" class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
+                            <div class="bg-[#000000] p-3 rounded-3xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="stk-nrd" value="0" class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
+                            <div class="bg-[#000000] p-3 rounded-3xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="stk-narr" value="0" class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
+                            <div class="col-span-2 bg-[#000000] p-3 rounded-3xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="stk-nkach" value="0" class="bg-transparent border-none mt-1 p-0 px-2 text-xl font-light text-white w-full"></div>
                         </div>
-                        <button type="submit" class="w-full bg-appgreen text-black font-black py-4 rounded-2xl btn-tactile tracking-widest shadow-[0_0_20px_rgba(52,199,89,0.2)] uppercase">UPDATE STOCK</button>
+                        <button type="submit" class="w-full bg-appgreen text-black font-black py-4 rounded-[1.5rem] btn-tactile tracking-widest uppercase mt-2">Update Stock</button>
                     </form>
                 </div>
             </div>
 
-            <div class="fixed bottom-0 w-full max-w-md bg-[#0A0A0A]/95 backdrop-blur-xl border-t border-white/5 pt-3 pb-6 px-6 flex justify-between items-center z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-                <button onclick="switchMainTab('tab-analytics', this)" class="nav-item flex-1 flex flex-col items-center gap-1 text-apporange transition-colors btn-tactile">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    <span class="text-[8px] mt-0.5 font-black uppercase tracking-widest">Analytic</span>
+            <div class="fixed bottom-0 w-full max-w-md bg-[#000000]/95 backdrop-blur-xl border-t border-white/5 pt-4 pb-8 px-8 flex justify-between items-center z-50 rounded-t-[2.5rem]">
+                <button onclick="switchMainTab('tab-analytics', this)" class="nav-item flex flex-col items-center gap-1.5 text-appyellow transition-colors btn-tactile">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <span class="text-[9px] font-black uppercase tracking-widest">Analytic</span>
                 </button>
-                <div class="relative -top-7">
-                    <button onclick="switchMainTab('tab-forms', this)" class="nav-item bg-white text-black h-16 w-16 rounded-full flex justify-center items-center shadow-[0_0_20px_rgba(255,255,255,0.3)] btn-tactile border-[6px] border-[#0A0A0A]">
+                <div class="relative -top-8">
+                    <button onclick="switchMainTab('tab-forms', this)" class="nav-item bg-white text-black h-[4.5rem] w-[4.5rem] rounded-full flex justify-center items-center shadow-[0_0_25px_rgba(255,255,255,0.2)] btn-tactile border-[6px] border-[#000000]">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
                     </button>
                 </div>
-                <button onclick="switchMainTab('tab-log', this)" class="nav-item flex-1 flex flex-col items-center gap-1 text-gray-600 transition-colors btn-tactile">
+                <button onclick="switchMainTab('tab-log', this)" class="nav-item flex flex-col items-center gap-1.5 text-gray-600 transition-colors btn-tactile">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-                    <span class="text-[8px] mt-0.5 font-black uppercase tracking-widest">Database</span>
+                    <span class="text-[9px] font-black uppercase tracking-widest">Database</span>
                 </button>
             </div>
         </div>
@@ -233,13 +249,13 @@
         function updateMonthHeaders() {
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
             const d = new Date();
-            document.getElementById('th-buffer').innerHTML = `BUFFER<br>(${months[d.getMonth()]})`;
-            document.getElementById('th-forecast').innerHTML = `FORECAST<br>(${months[(d.getMonth() + 1) % 12]})`;
+            document.getElementById('th-buffer').innerText = `BUFFER (${months[d.getMonth()]})`;
+            document.getElementById('th-forecast').innerText = `FORECAST (${months[(d.getMonth() + 1) % 12]})`;
         }
 
         function getSkeletonHTML(count, isList = false) {
-            if(isList) return Array(count).fill(`<div class="skeleton-box rounded-[1.5rem] h-20 w-full mb-3"></div>`).join('');
-            return Array(count).fill(`<div class="skeleton-box rounded-xl h-10 w-full mb-1"></div>`).join('');
+            if(isList) return Array(count).fill(`<div class="skeleton-box rounded-3xl h-24 w-full mb-3"></div>`).join('');
+            return Array(count).fill(`<div class="skeleton-box rounded-2xl h-10 w-full mb-1.5"></div>`).join('');
         }
 
         function runTicker(el, endVal) {
@@ -258,13 +274,13 @@
             const t = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
             document.getElementById('toast-icon').innerText = isError ? '❌' : '✅';
-            t.className = `fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-full font-black text-sm flex items-center gap-3 w-max max-w-[90%] transition-transform duration-300 border-2 ${isError ? 'bg-[#3A0000] border-appred text-appred shadow-[0_0_20px_rgba(255,59,48,0.4)]' : 'bg-appcard border-appgreen text-white shadow-[0_0_20px_rgba(52,199,89,0.3)]'}`;
-            if(!isError && msg.includes("Login") || msg.includes("Akses")) t.classList.replace('border-appgreen', 'border-apporange');
+            t.className = `fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-appcard border-2 text-white px-6 py-3 rounded-full font-bold text-sm flex items-center gap-3 w-max max-w-[90%] transition-transform duration-300 ${isError ? 'border-appred shadow-glow-red' : 'border-appgreen shadow-[0_0_20px_rgba(50,215,75,0.3)]'}`;
+            if(!isError && (msg.includes("Login") || msg.includes("Akses"))) t.classList.replace('border-appgreen', 'border-appyellow');
             t.classList.add('toast-show');
             setTimeout(() => t.classList.remove('toast-show'), 3000);
         }
 
-        // ================= KODE KONEKSI N8N ORIGINAL =================
+        // ================= KONEKSI ORIGINAL =================
         async function sendApi(payload, btnElement = null, originalText = "") {
             if(btnElement) { btnElement.innerHTML = `<span class="animate-spin">⏳</span>`; btnElement.classList.add('opacity-50', 'pointer-events-none'); }
             try {
@@ -274,8 +290,7 @@
                 return Array.isArray(data) ? data[0] : data;
             } catch (e) {
                 if(btnElement) { btnElement.innerHTML = originalText; btnElement.classList.remove('opacity-50', 'pointer-events-none'); }
-                showToast("Koneksi Server Error", true);
-                return null;
+                showToast("Koneksi Server Error", true); return null;
             }
         }
 
@@ -284,27 +299,20 @@
             const btn = document.getElementById('btn-login');
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
-            
-            const res = await sendApi({ action: "login", user_id: user, password: pass }, btn, "MASUK SISTEM");
+            const res = await sendApi({ action: "login", user_id: user, password: pass }, btn, "AUTHORIZE");
             if (res && res.status === "success") {
                 showToast("Akses Diberikan!");
                 document.getElementById('view-login').classList.add('hide');
                 document.getElementById('view-main').classList.remove('hide');
                 document.getElementById('header-username').innerText = res.user_id || user;
-                
-                updateMonthHeaders();
-                initDCPicker();
-                loadAnalytics(); 
-            } else {
-                showToast(res ? res.message : "Akses Ditolak", true);
-            }
+                updateMonthHeaders(); initDCPicker(); loadAnalytics(); 
+            } else showToast(res ? res.message : "Akses Ditolak", true);
         }
-        // ===============================================================
 
         function logout() { location.reload(); }
 
         function initDCPicker() {
-            document.getElementById('dc-grid').innerHTML = DC_LIST.map(dc => `<button type="button" onclick="selectDC('${dc}')" class="bg-appcard border border-white/5 text-gray-300 text-[9px] font-black py-4 rounded-2xl btn-tactile hover:border-apporange hover:text-apporange transition-colors uppercase tracking-wider">${dc}</button>`).join('');
+            document.getElementById('dc-grid').innerHTML = DC_LIST.map(dc => `<button type="button" onclick="selectDC('${dc}')" class="bg-[#1C1C1E] border border-white/5 text-gray-300 text-[9px] font-black py-5 rounded-[1.5rem] btn-tactile hover:border-appyellow hover:text-appyellow transition-colors uppercase tracking-wider">${dc}</button>`).join('');
         }
         function openDCModal(id) { targetDCInput = id; document.getElementById('modal-dc').classList.remove('hide'); }
         function closeDCModal() { document.getElementById('modal-dc').classList.add('hide'); }
@@ -313,105 +321,122 @@
         function switchMainTab(tabId, element) {
             ['tab-analytics', 'tab-log', 'tab-forms'].forEach(id => document.getElementById(id).classList.add('hide'));
             document.getElementById(tabId).classList.remove('hide');
-            document.querySelectorAll('.nav-item').forEach(el => {
-                if(el.classList.contains('w-16')) return; 
-                el.classList.replace('text-apporange', 'text-gray-600');
-                el.classList.replace('text-appblue', 'text-gray-600');
-            });
-            if(element && !element.classList.contains('w-16')) element.classList.replace('text-gray-600', tabId === 'tab-analytics' ? 'text-apporange' : 'text-appblue');
+            document.querySelectorAll('.nav-item').forEach(el => { if(el.classList.contains('w-[4.5rem]')) return; el.classList.replace('text-appyellow', 'text-gray-600'); el.classList.replace('text-appblue', 'text-gray-600'); });
+            if(element && !element.classList.contains('w-[4.5rem]')) element.classList.replace('text-gray-600', tabId === 'tab-analytics' ? 'text-appyellow' : 'text-appblue');
         }
 
         function switchForm(formType) {
-            ['form-po', 'form-sales', 'form-stock'].forEach(id => document.getElementById(id).classList.add('hide'));
+            ['form-po', 'form-sales', 'form-stock'].forEach(id => document.getElementById('form-' + id).classList.add('hide'));
             document.getElementById('form-' + formType).classList.remove('hide');
-            ['btn-form-po', 'btn-form-sales', 'btn-form-stock'].forEach(id => document.getElementById(id).className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500 bg-transparent");
-            const activeBtn = document.getElementById('btn-form-' + formType);
-            if(formType === 'po') activeBtn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-apporange text-black shadow-glow-orange";
-            if(formType === 'sales') activeBtn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-appblue text-white shadow-glow-blue";
-            if(formType === 'stock') activeBtn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-appgreen text-black shadow-[0_0_15px_rgba(52,199,89,0.3)]";
+            ['btn-form-po', 'btn-form-sales', 'btn-form-stock'].forEach(id => document.getElementById(id).className = "flex-1 py-3 rounded-2xl text-xs font-black uppercase transition-all text-gray-500 bg-transparent");
+            const btn = document.getElementById('btn-form-' + formType);
+            if(formType === 'po') btn.className = "flex-1 py-3 rounded-2xl text-xs font-black uppercase transition-all bg-appyellow text-black shadow-glow-yellow";
+            if(formType === 'sales') btn.className = "flex-1 py-3 rounded-2xl text-xs font-black uppercase transition-all bg-appblue text-white shadow-glow-blue";
+            if(formType === 'stock') btn.className = "flex-1 py-3 rounded-2xl text-xs font-black uppercase transition-all bg-appgreen text-black shadow-[0_0_15px_rgba(50,215,75,0.3)]";
         }
 
-        // --- 1. ANALYTICS VIEW ---
+        // --- 1. LOGIC 2 RUTE ANALYTICS (Tahan Banting & Anti Nyasar) ---
         async function loadAnalytics() {
             const fCont = document.getElementById('forecast-container');
             const dCont = document.getElementById('diagnosa-container');
-            const btn = document.getElementById('btn-sync-analytics');
+            const btnText = document.getElementById('sync-text');
+            const btnIcon = document.getElementById('sync-icon');
             
             fCont.innerHTML = getSkeletonHTML(5, false); 
             dCont.innerHTML = getSkeletonHTML(4, true);
+            if(btnIcon) btnIcon.classList.add('animate-spin');
 
-            const res = await sendApi({ action: "load_owner" }, btn, "<span>🔄</span> SYNC ANALYTIC DATA");
-            
-            if (res && res.status === "success" && res.data) {
-                // Table Data Forecast
+            try {
+                // Eksekusi API Paralel ke n8n
+                const [reqStatus, reqDiag] = await Promise.all([
+                    fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_status" }) }),
+                    fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_diagnose" }) })
+                ]);
+
+                let rawStatus = await reqStatus.json();
+                let rawDiag = await reqDiag.json();
+
+                // N8n 'allIncomingItems' akan mengirim Array
+                const forecastRows = Array.isArray(rawStatus) ? rawStatus : [rawStatus];
+                const diagRows = Array.isArray(rawDiag) ? rawDiag : [rawDiag];
+
+                // Render Inventory (SKU)
                 fCont.innerHTML = '';
-                const forecastData = Array.isArray(res.data.forecast) ? res.data.forecast : [];
                 let skuCount = 0;
-                
-                forecastData.forEach((item, idx) => {
-                    if(!item.sku_name || item.sku_name === "N/A") return;
+                forecastRows.forEach((item, idx) => {
+                    const vals = Object.values(item);
+                    let skuName = item.col_2 || item["Nama SKU"] || vals[1]; 
+                    if(!skuName || skuName === "" || skuName.includes("Nama") || skuName.includes("col_")) return;
+
                     skuCount++;
-                    const dot = String(item.status).includes("CRITICAL") ? '<span class="h-2.5 w-2.5 rounded-full bg-appred shadow-[0_0_8px_#FF3B30] inline-block animate-pulse"></span>' : '<span class="h-2.5 w-2.5 rounded-full bg-appgreen shadow-[0_0_8px_#34C759] inline-block"></span>';
+                    const demand = Number(item.col_3 || item["Avg. Demand 3 Bulanan"] || vals[2] || 0);
+                    const forecast = Number(item.col_4 || vals[3] || 0);
+                    const buffer = Number(item.col_5 || vals[4] || 0);
+                    const statusText = String(item.col_6 || item["status"] || vals[5] || "");
+
+                    const dot = statusText.includes("CRITICAL") ? '<span class="h-2.5 w-2.5 rounded-full bg-appred shadow-[0_0_10px_#FF3B30] inline-block animate-pulse"></span>' : '<span class="h-2.5 w-2.5 rounded-full bg-appgreen shadow-[0_0_10px_#32D74B] inline-block"></span>';
+                    
                     fCont.innerHTML += `
-                        <div class="grid grid-cols-5 gap-1 items-center py-2.5 border-b border-white/5 text-[10px] text-center animate-fade-in-up" style="animation-delay: ${idx * 50}ms; opacity: 0;">
-                            <div class="font-black text-left text-white px-2 uppercase">${item.sku_name}</div>
-                            <div class="text-gray-400 font-bold">${item.avg_demand || 0}</div>
-                            <div class="text-white font-black">${item.forecast_po || 0}</div>
-                            <div class="text-white font-black">${item.buffer || 0}</div>
-                            <div class="flex justify-center items-center">${dot}</div>
+                        <div class="grid grid-cols-5 gap-1 items-center py-3 border-b border-white/5 text-[10px] text-center animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0">
+                            <div class="font-black text-left text-white px-1 uppercase">${skuName}</div>
+                            <div class="text-gray-400 font-bold">${demand}</div>
+                            <div class="text-white font-black">${forecast}</div>
+                            <div class="text-white font-black">${buffer}</div>
+                            <div class="flex justify-center">${dot}</div>
                         </div>`;
                 });
                 runTicker(document.getElementById('stat-sku'), skuCount);
 
-                // DC Diagnose 
+                // Render Diagnose (DC)
                 dCont.innerHTML = '';
-                const diagData = Array.isArray(res.data.diagnosa) ? res.data.diagnosa : [];
-                let dcIssueCount = 0;
-                
-                diagData.forEach((item, idx) => {
-                    const failCount = Number(item.warehouse_failure) || 0;
-                    const moqCount = Number(item.under_moq) || 0;
-                    const total = failCount + moqCount;
-                    if(total > 0 || item.dc_name !== "N/A") dcIssueCount++;
+                let dcCount = 0;
+                diagRows.forEach((item, idx) => {
+                    const vals = Object.values(item);
+                    let dcName = item.col_2 || item["DC"] || vals[1];
+                    if(!dcName || dcName === "" || dcName.includes("DC") || dcName.includes("col_")) return;
+
+                    const fail = Number(item.col_3 || item["WAREHOUSE FAILURE"] || vals[2] || 0);
+                    const moq = Number(item.col_5 || item["UNDER MOQ"] || vals[4] || 0);
+                    const dr = String(item.col_9 || item["DIAGNOSE RESULTS (DR)"] || vals[8] || "N/A").toUpperCase();
+
+                    const total = fail + moq;
+                    if(total > 0 || dcName !== "N/A") dcCount++;
                     
-                    const failPct = total > 0 ? Math.round((failCount / total) * 100) : 0;
-                    const moqPct = total > 0 ? Math.round((moqCount / total) * 100) : 0;
-                    const resStr = String(item.diagnose_result || "").toUpperCase();
+                    const failPct = total > 0 ? Math.round((fail/total)*100) : 0;
+                    const moqPct = total > 0 ? Math.round((moq/total)*100) : 0;
 
                     dCont.innerHTML += `
-                        <div class="bg-appcard p-4 rounded-[2rem] border border-white/5 animate-fade-in-up" style="animation-delay: ${idx * 50}ms; opacity: 0;">
-                            <div class="mb-3">
-                                <h4 class="text-xs font-black text-white uppercase tracking-tighter">${item.dc_name}</h4>
-                                <p class="text-[8px] font-bold mt-1 ${resStr.includes('FAILURE') ? 'text-appred' : 'text-apporange'} tracking-widest bg-white/5 inline-block px-2 py-1 rounded">⚠️ ${resStr}</p>
+                        <div class="bg-appcard p-5 rounded-4xl border border-white/5 animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0">
+                            <h4 class="text-sm font-black text-white uppercase tracking-tighter mb-3">${dcName}</h4>
+                            <div class="grid grid-cols-3 gap-1 text-[9px] font-bold bg-[#000000] p-3 rounded-3xl text-center shadow-inner">
+                                <div><p class="text-gray-600 text-[8px] mb-1 uppercase tracking-widest">Failure</p><p class="text-appred font-black text-base">${failPct}%</p></div>
+                                <div class="border-x border-white/10"><p class="text-gray-600 text-[8px] mb-1 uppercase tracking-widest">Under MOQ</p><p class="text-appyellow font-black text-base">${moqPct}%</p></div>
+                                <div><p class="text-gray-600 text-[8px] mb-1 uppercase tracking-widest">Above MOQ</p><p class="text-appgreen font-black text-base">0%</p></div>
                             </div>
-                            <div class="flex justify-between items-center text-[10px] font-bold bg-black/40 p-2.5 rounded-xl border border-white/5">
-                                <div class="text-center flex-1 border-r border-white/10"><p class="text-gray-600 uppercase mb-0.5 text-[8px] tracking-widest">WH Failure</p><p class="text-appred font-black text-sm">${failPct}%</p></div>
-                                <div class="text-center flex-1 border-r border-white/10"><p class="text-gray-600 uppercase mb-0.5 text-[8px] tracking-widest">Under MOQ</p><p class="text-apporange font-black text-sm">${moqPct}%</p></div>
-                                <div class="text-center flex-1"><p class="text-gray-600 uppercase mb-0.5 text-[8px] tracking-widest">Above MOQ</p><p class="text-appgreen font-black text-sm">0%</p></div>
-                            </div>
+                            <p class="text-[9px] font-bold mt-4 ${dr.includes('FAILURE') ? 'text-appred' : 'text-appyellow'} tracking-widest text-center uppercase bg-white/5 py-2 rounded-xl">⚠️ ${dr}</p>
                         </div>`;
                 });
-                runTicker(document.getElementById('stat-dc'), dcIssueCount);
+                runTicker(document.getElementById('stat-dc'), dcCount);
+
+            } catch (err) {
+                showToast("Gagal Sync Data", true);
+            } finally {
+                if(btnIcon) btnIcon.classList.remove('animate-spin');
             }
         }
 
-        // --- 2. LOG PO (Database 85% Logic) ---
+        // --- DATABASE LOG PO ---
         async function loadLogPO() {
-            const btn = document.getElementById('btn-sync-log');
             const cont = document.getElementById('log-container');
+            const btn = document.getElementById('btn-sync-log');
             cont.innerHTML = getSkeletonHTML(5, true);
-
             const res = await sendApi({ action: "load_admin" }, btn, "TARIK DATABASE PO");
-            if (res && res.status === "success") {
-                activeLogData = res.data;
-                renderLogs(activeLogData);
-            }
+            if (res && res.status === "success") { activeLogData = res.data; renderLogs(activeLogData); }
         }
 
         function filterLogLocal() {
             const q = document.getElementById('search-po').value.toLowerCase();
-            const filtered = activeLogData.filter(i => (i.ID && i.ID.toLowerCase().includes(q)) || (i.DC && i.DC.toLowerCase().includes(q)));
-            renderLogs(filtered);
+            renderLogs(activeLogData.filter(i => (i.ID && i.ID.toLowerCase().includes(q)) || (i.DC && i.DC.toLowerCase().includes(q))));
         }
 
         function renderLogs(data) {
@@ -419,122 +444,57 @@
             cont.innerHTML = '';
             data.forEach((item, idx) => {
                 if(!item.ID || String(item["PO NKA"]).includes("BATAL")) return;
-                
                 const poQty = Number(item["TOTAL PO ctn"]) || 0;
                 const salesQty = Number(item["Qty Terpenuhi (Kirim)"]) || 0;
-                
-                let borderCol = "", textCol = "", bgCol = "";
-                if (salesQty === 0) { 
-                    borderCol = "border-appred/40"; textCol = "text-appred"; bgCol = "shadow-[0_0_15px_rgba(255,59,48,0.1)]"; 
-                } else if (salesQty < (poQty * 0.85)) { 
-                    borderCol = "border-apporange/40"; textCol = "text-apporange"; bgCol = "shadow-[0_0_15px_rgba(255,133,27,0.1)]"; 
-                } else { 
-                    borderCol = "border-appgreen/40"; textCol = "text-appgreen"; bgCol = "shadow-[0_0_15px_rgba(52,199,89,0.05)]"; 
-                }
+                let borderCol = "border-appred/40", textCol = "text-appred", glow = "shadow-[0_0_15px_rgba(255,59,48,0.1)]";
+                if(salesQty >= (poQty * 0.85)) { borderCol = "border-appgreen/40"; textCol = "text-appgreen"; glow = "shadow-[0_0_15px_rgba(50,215,75,0.1)]"; }
+                else if(salesQty > 0) { borderCol = "border-appyellow/40"; textCol = "text-appyellow"; glow = "shadow-[0_0_15px_rgba(255,204,0,0.1)]"; }
 
-                cont.innerHTML += `
-                    <div class="bg-appcard rounded-3xl border ${borderCol} ${bgCol} overflow-hidden transition-all duration-300 animate-fade-in-up" style="animation-delay: ${idx * 30}ms; opacity: 0;">
-                        <div class="p-5 flex items-center justify-between cursor-pointer btn-tactile" onclick="toggleCard('${item.ID}')">
-                            <div>
-                                <h4 class="font-black text-sm text-white uppercase tracking-tight">${item.ID}</h4>
-                                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-1">${item.DC} • ${item["Tanggal PO"]}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[8px] text-gray-500 uppercase font-bold tracking-widest mb-0.5">PO / SALES</p>
-                                <p class="text-sm font-black ${textCol} leading-none">${poQty} <span class="text-gray-500 mx-0.5">/</span> ${salesQty}</p>
-                            </div>
+                cont.innerHTML += `<div class="bg-appcard rounded-4xl border ${borderCol} ${glow} overflow-hidden animate-fade-in-up" style="animation-delay: ${idx * 30}ms; opacity:0">
+                    <div class="p-5 flex items-center justify-between cursor-pointer btn-tactile" onclick="toggleCard('${item.ID}')">
+                        <div>
+                            <h4 class="font-black text-[13px] text-white uppercase tracking-tight">${item.ID}</h4>
+                            <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">${item.DC} • ${item["Tanggal PO"]}</p>
                         </div>
-                        
-                        <div id="det-${item.ID}" class="accordion-content bg-black/50">
-                            <div class="p-5 pt-2 space-y-3 border-t border-white/5 mt-1">
-                                <div class="flex text-[8px] text-gray-500 font-bold uppercase tracking-widest px-2 mb-1">
-                                    <span class="w-12">SKU</span>
-                                    <span class="flex-1 text-center">PO</span>
-                                    <span class="flex-1 text-center">SALES</span>
-                                </div>
-                                <div class="space-y-1.5 text-[10px] font-black uppercase text-white">
-                                    <div class="flex items-center bg-white/5 py-2 px-3 rounded-xl"><span class="w-12 text-gray-400">NKA</span><span class="flex-1 text-center text-gray-300">${item["PO NKA"] || 0}</span><span class="flex-1 text-center text-appblue">${item["NKA"] || 0}</span></div>
-                                    <div class="flex items-center bg-white/5 py-2 px-3 rounded-xl"><span class="w-12 text-gray-400">NDLH</span><span class="flex-1 text-center text-gray-300">${item["PO NDLH"] || 0}</span><span class="flex-1 text-center text-appblue">${item["NDLH"] || 0}</span></div>
-                                    <div class="flex items-center bg-white/5 py-2 px-3 rounded-xl"><span class="w-12 text-gray-400">NRD</span><span class="flex-1 text-center text-gray-300">${item["PO NRD"] || 0}</span><span class="flex-1 text-center text-appblue">${item["NRD"] || 0}</span></div>
-                                    <div class="flex items-center bg-white/5 py-2 px-3 rounded-xl"><span class="w-12 text-gray-400">NARR</span><span class="flex-1 text-center text-gray-300">${item["PO NARR"] || 0}</span><span class="flex-1 text-center text-appblue">${item["NARR"] || 0}</span></div>
-                                </div>
-                                <div class="flex justify-between items-center border-t border-white/10 pt-4 mt-2">
-                                    <div>
-                                        <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">GAP Pengiriman</p>
-                                        <p class="text-base font-black ${item["GAP"] == 0 ? 'text-appgreen' : 'text-appred'}">${item["GAP"] || 0} CTN</p>
-                                    </div>
-                                    <button onclick="deletePO('${item.ID}')" class="bg-appred/10 text-appred border border-appred/30 font-bold text-[10px] py-2.5 px-4 rounded-xl btn-tactile hover:bg-appred hover:text-white transition-colors uppercase tracking-widest">
-                                        BATAL PO
-                                    </button>
-                                </div>
-                            </div>
+                        <div class="text-right">
+                            <p class="text-[8px] text-gray-600 uppercase font-bold tracking-widest mb-0.5 uppercase">PO / Sales</p>
+                            <p class="text-sm font-black ${textCol} leading-none">${poQty} / ${salesQty}</p>
                         </div>
-                    </div>`;
+                    </div>
+                    <div id="det-${item.ID}" class="accordion-content bg-[#000000] p-5 space-y-3">
+                        <div class="space-y-2 text-[10px] font-black uppercase text-white">
+                            <div class="flex items-center justify-between bg-appcard py-2.5 px-4 rounded-2xl"><span>NKA</span><div class="space-x-3"><span class="text-gray-500">P: ${item["PO NKA"] || 0}</span><span class="text-appblue">S: ${item["NKA"] || 0}</span></div></div>
+                            <div class="flex items-center justify-between bg-appcard py-2.5 px-4 rounded-2xl"><span>NDLH</span><div class="space-x-3"><span class="text-gray-500">P: ${item["PO NDLH"] || 0}</span><span class="text-appblue">S: ${item["NDLH"] || 0}</span></div></div>
+                            <div class="flex items-center justify-between bg-appcard py-2.5 px-4 rounded-2xl"><span>NRD</span><div class="space-x-3"><span class="text-gray-500">P: ${item["PO NRD"] || 0}</span><span class="text-appblue">S: ${item["NRD"] || 0}</span></div></div>
+                            <div class="flex items-center justify-between bg-appcard py-2.5 px-4 rounded-2xl"><span>NARR</span><div class="space-x-3"><span class="text-gray-500">P: ${item["PO NARR"] || 0}</span><span class="text-appblue">S: ${item["NARR"] || 0}</span></div></div>
+                        </div>
+                        <div class="flex justify-between items-center pt-4 border-t border-white/5 mt-2">
+                            <div><p class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">GAP Kirim</p><p class="text-base font-black ${item["GAP"] == 0 ? 'text-appgreen' : 'text-appred'}">${item["GAP"] || 0} CTN</p></div>
+                            <button onclick="deletePO('${item.ID}')" class="bg-appred/10 text-appred border border-appred/30 font-bold text-[10px] py-2 px-5 rounded-xl btn-tactile tracking-widest uppercase">Batal PO</button>
+                        </div>
+                    </div>
+                </div>`;
             });
         }
-
-        function toggleCard(id) {
-            const el = document.getElementById('det-' + id);
-            el.classList.toggle('accordion-expanded');
-        }
+        function toggleCard(id) { document.getElementById('det-' + id).classList.toggle('accordion-expanded'); }
 
         async function deletePO(id) {
-            if(!confirm(`PERINGATAN: Batalkan PO ${id}?`)) return;
+            if(!confirm(`Batal PO ${id}?`)) return;
             const res = await sendApi({ action: "delete", id: id });
-            if(res && res.status === "success") {
-                showToast(`PO ${id} Dibatalkan`);
-                loadLogPO();
-            } else showToast("Gagal membatalkan PO", true);
+            if(res && res.status === "success") { showToast(`PO Dibatalkan`); loadLogPO(); } else showToast("Gagal", true);
         }
 
-        // --- 3. FORMS INPUT ---
-        async function submitAction(e, actionType) {
+        async function submitAction(e, act) {
             e.preventDefault();
             const btn = e.target.querySelector('button[type="submit"]');
-            let payload = { action: actionType };
-
-            if(actionType === 'insert_po') {
-                payload = { ...payload, 
-                    id: document.getElementById('po-id').value.toUpperCase(),
-                    tanggal_po: document.getElementById('po-tanggal').value,
-                    tanggal_exp: document.getElementById('po-exp').value,
-                    dc: document.getElementById('po-dc').value.toUpperCase(),
-                    po_nka: document.getElementById('po-nka').value,
-                    po_ndlh: document.getElementById('po-ndlh').value,
-                    po_nrd: document.getElementById('po-nrd').value,
-                    po_narr: document.getElementById('po-narr').value,
-                    po_nkach: "0" 
-                };
-            } 
-            else if(actionType === 'insert_sales') {
-                payload = { ...payload, 
-                    id: document.getElementById('sls-id').value.toUpperCase(),
-                    dc: document.getElementById('sls-dc').value.toUpperCase(), 
-                    nka: document.getElementById('sls-nka').value,
-                    ndlh: document.getElementById('sls-ndlh').value,
-                    nrd: document.getElementById('sls-nrd').value,
-                    narr: document.getElementById('sls-narr').value,
-                    nkach: document.getElementById('sls-nkach').value
-                };
-            }
-            else if(actionType === 'insert_stock') {
-                payload = { ...payload, 
-                    tanggal: document.getElementById('stk-tanggal').value,
-                    nka: document.getElementById('stk-nka').value,
-                    ndlh: document.getElementById('stk-ndlh').value,
-                    nrd: document.getElementById('stk-nrd').value,
-                    narr: document.getElementById('stk-narr').value,
-                    nkach: document.getElementById('stk-nkach').value
-                };
-            }
-
+            let payload = { action: act };
+            const getVal = (id) => document.getElementById(id).value;
+            if(act === 'insert_po') payload = { ...payload, id: getVal('po-id'), tanggal_po: getVal('po-tanggal'), tanggal_exp: getVal('po-exp'), dc: getVal('po-dc'), po_nka: getVal('po-nka'), po_ndlh: getVal('po-ndlh'), po_nrd: getVal('po-nrd'), po_narr: getVal('po-narr'), po_nkach: "0" };
+            else if(act === 'insert_sales') payload = { ...payload, id: getVal('sls-id'), nka: getVal('sls-nka'), ndlh: getVal('sls-ndlh'), nrd: getVal('sls-nrd'), narr: getVal('sls-narr'), nkach: getVal('sls-nkach') };
+            else payload = { ...payload, tanggal: getVal('stk-tanggal'), nka: getVal('stk-nka'), ndlh: getVal('stk-ndlh'), nrd: getVal('stk-nrd'), narr: getVal('stk-narr'), nkach: getVal('stk-nkach') };
+            
             const res = await sendApi(payload, btn, btn.innerText);
-            if(res && res.status === "success") {
-                showToast(res.message || "Data Tersimpan!");
-                e.target.reset();
-            } else {
-                showToast("Gagal menyimpan data", true);
-            }
+            if(res && res.status === "success") { showToast("Data Tersimpan!"); e.target.reset(); } else showToast("Gagal", true);
         }
     </script>
 </body>
