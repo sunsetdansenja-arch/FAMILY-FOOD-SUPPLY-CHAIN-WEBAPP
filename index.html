@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FamilyFood SC Control</title>
     
+    <link rel="icon" type="image/png" href="./LOGO FFI.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -13,19 +15,17 @@
             theme: {
                 extend: {
                     colors: {
-                        // SKEMA WARNA BARU DARI GAMBAR 2 (APPLE UI VIBE)
-                        appbg: '#000000',      // Hitam Pekat Apple
-                        appcard: '#1C1C1E',    // Abu-abu Gelap Apple
-                        appinput: '#2C2C2E',    // Abu-abu Input Apple
-                        appapplered: '#FF3B30',  // Merah Vibran Apple (Widget Bawah)
-                        appappleblue: '#ADD8E6', // Biru Muda Apple (Widget Cuaca)
-                        appappleorange: '#FF9500', // Oranye Apple
+                        appbg: '#000000',      
+                        appcard: '#1C1C1E',    
+                        appinput: '#2C2C2E',    
+                        appapplered: '#FF3B30',  
+                        appappleblue: '#ADD8E6', 
+                        appappleorange: '#FF9500', 
                         appgreen: '#34C759',   
                         appred: '#FF3B30'      
                     },
                     borderRadius: { '3xl': '1.5rem', '4xl': '2rem' },
                     fontFamily: {
-                        // MENIRU FONT APPLE UI (SAN FRANCISCO)
                         'apple': ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
                     },
                     boxShadow: { 
@@ -45,17 +45,14 @@
         }
     </script>
     <style>
-        /* APLIKASIKAN FONT APPLE UI */
         body { background-color: #000000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
         .hidden-tab { display: none !important; }
         ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
         
-        /* GAYA INPUT DAN SELECT BARU (APPLE WIDGET VIBE) */
         input, select { background-color: #2C2C2E; border: 1.5px solid transparent; transition: all 0.25s; color: white; width: 100%; border-radius: 1.25rem; padding: 1.1rem 1.4rem; outline: none; font-weight: 600; font-size: 0.95rem; }
         input:focus, select:focus { border-color: #FF3B30; background-color: #1C1C1E; box-shadow: 0 0 15px rgba(255,59,48,0.25); }
         input::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
 
-        /* GAYA TOMBOL BARU DENGAN EFEK TAKTIL KUAT */
         .btn-tactile { transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8rem; }
         .btn-tactile:active { transform: scale(0.96); opacity: 0.92; }
         
@@ -259,14 +256,29 @@
 
         const DC_LIST = ["BANDUNG", "BALARAJA", "BEKASI", "BOGOR", "BREBEK", "CIANJUR", "CILEUNGSI", "CIKOKOL", "CILACAP", "JEMBER", "KARAWANG", "KLATEN", "MADIUN", "MALANG", "PARUNG", "PLUMBON", "REMBANG", "SEMARANG", "SERANG", "SIDOARJO", "TEGAL", "BALI", "BANJARMASIN", "BATAM", "GORONTALO", "JAMBI", "SUKABUMI", "LAMPUNG", "LOMBOK", "LUWU", "MAKASSAR", "MANADO", "MEDAN", "PALEMBANG", "PEKANBARU", "PONTIANAK"];
 
+        // ================= SISTEM AUTO LOGIN (LOCAL STORAGE) =================
+        window.onload = () => {
+            const savedUser = localStorage.getItem('ffi_user');
+            if(savedUser) {
+                // Bypass layar login
+                document.getElementById('view-login').classList.add('hidden-tab');
+                document.getElementById('view-main').classList.remove('hidden-tab');
+                document.getElementById('header-username').innerText = savedUser;
+                // Init data
+                initDateRecommendations(); 
+                updateMonthHeaders(); 
+                initDCPicker(); 
+                loadAnalytics();
+            }
+        };
+
         function initDateRecommendations() {
             const dl = document.getElementById('date-recom');
             if(!dl) return;
             dl.innerHTML = '';
             const today = new Date();
             for(let i=0; i<=3; i++) {
-                const d = new Date(today);
-                d.setDate(d.getDate() - i);
+                const d = new Date(today); d.setDate(d.getDate() - i);
                 const dd = String(d.getDate()).padStart(2, '0');
                 const mm = String(d.getMonth() + 1).padStart(2, '0');
                 const yyyy = d.getFullYear();
@@ -333,7 +345,11 @@
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
             const res = await sendApi({ action: "login", user_id: user, password: pass }, btn, "MASUK SISTEM");
+            
             if (res && res.status === "success") {
+                // SIMPAN TIKET LOGIN KE DEVICE
+                localStorage.setItem('ffi_user', res.user_id || user);
+                
                 showToast("Akses Diberikan!");
                 document.getElementById('view-login').classList.add('hidden-tab');
                 document.getElementById('view-main').classList.remove('hidden-tab');
@@ -342,7 +358,11 @@
             } else showToast(res ? res.message : "Akses Ditolak", true);
         }
 
-        function logout() { location.reload(); }
+        // ================= FUNGSI LOGOUT MENGHAPUS TIKET =================
+        function logout() { 
+            localStorage.removeItem('ffi_user'); // Bakar tiket
+            location.reload(); // Refresh kembali ke halaman login
+        }
 
         function initDCPicker() {
             const grid = document.getElementById('dc-grid');
