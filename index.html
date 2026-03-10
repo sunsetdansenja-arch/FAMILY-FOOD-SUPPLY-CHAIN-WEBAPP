@@ -103,7 +103,7 @@
                         <p id="header-username" class="text-[9px] text-gray-400 uppercase font-bold tracking-widest">USER</p>
                     </div>
                 </div>
-                <button onclick="logout()" class="bg-white/5 px-3 py-2 rounded-xl text-gray-400 btn-tactile border border-white/5 text-[10px] font-bold uppercase">Logout</button>
+                <button type="button" onclick="logout()" class="bg-white/5 px-3 py-2 rounded-xl text-gray-400 btn-tactile border border-white/5 text-[10px] font-bold uppercase">Logout</button>
             </div>
 
             <div class="flex-1 overflow-y-auto pb-32">
@@ -120,7 +120,7 @@
                         </div>
                     </div>
 
-                    <button onclick="loadAnalytics()" id="btn-sync-analytics" class="w-full bg-white text-black font-black py-4 rounded-2xl btn-tactile shadow-[0_0_20px_rgba(255,255,255,0.15)] flex justify-center items-center gap-2 text-xs uppercase tracking-widest">
+                    <button type="button" onclick="loadAnalytics()" id="btn-sync-analytics" class="w-full bg-white text-black font-black py-4 rounded-2xl btn-tactile shadow-[0_0_20px_rgba(255,255,255,0.15)] flex justify-center items-center gap-2 text-xs uppercase tracking-widest">
                         <i class="fa-solid fa-rotate-right" id="sync-icon"></i> SYNC ANALYTIC DATA
                     </button>
 
@@ -153,24 +153,24 @@
                 <div id="tab-log" class="hide p-6 space-y-6">
                     <div class="sticky top-[68px] bg-[#0A0A0A]/95 backdrop-blur-xl z-10 pt-2 pb-4 border-b border-white/5 flex gap-2">
                         <input type="text" id="search-po" placeholder="Cari ID / DC..." class="text-sm bg-appcard border border-white/10 flex-1" onkeyup="filterLogLocal()">
-                        <button onclick="loadLogPO()" id="btn-sync-log" class="bg-appblue text-white w-14 rounded-2xl flex justify-center items-center btn-tactile shadow-glow-blue"><i class="fa-solid fa-rotate-right"></i></button>
+                        <button type="button" onclick="loadLogPO()" id="btn-sync-log" class="bg-appblue text-white w-14 rounded-2xl flex justify-center items-center btn-tactile shadow-glow-blue"><i class="fa-solid fa-rotate-right"></i></button>
                     </div>
                     <div id="log-container" class="space-y-4"></div>
                 </div>
 
                 <div id="tab-forms" class="hide p-6 space-y-6">
                     <div class="flex bg-appcard p-1.5 rounded-2xl border border-white/5 shadow-xl">
-                        <button onclick="switchForm('po')" id="btn-form-po" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-apporange text-black">New PO</button>
-                        <button onclick="switchForm('sales')" id="btn-form-sales" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500">Sales</button>
-                        <button onclick="switchForm('stock')" id="btn-form-stock" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500">Stock</button>
+                        <button type="button" onclick="switchForm('po')" id="btn-form-po" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-apporange text-black">New PO</button>
+                        <button type="button" onclick="switchForm('sales')" id="btn-form-sales" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500">Sales</button>
+                        <button type="button" onclick="switchForm('stock')" id="btn-form-stock" class="flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500">Stock</button>
                     </div>
 
                     <form id="form-po" onsubmit="submitAction(event, 'insert_po')" class="space-y-5 bg-appcard p-5 rounded-[2rem] border border-white/5">
                         <div class="space-y-3">
-                            <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase">
+                            <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase bg-[#121212]">
                             <div class="grid grid-cols-2 gap-3">
-                                <input type="text" id="po-tanggal" list="date-recom" autocomplete="off" placeholder="Tgl PO" required>
-                                <input type="text" id="po-exp" list="date-recom" autocomplete="off" placeholder="Tgl EXP" required>
+                                <input type="text" id="po-tanggal" list="date-recom" autocomplete="off" placeholder="Tgl PO" required class="bg-[#121212]">
+                                <input type="text" id="po-exp" list="date-recom" autocomplete="off" placeholder="Tgl EXP" required class="bg-[#121212]">
                             </div>
                             <div class="relative cursor-pointer btn-tactile" onclick="openDCModal('po-dc')">
                                 <input type="text" id="po-dc" placeholder="PILIH NAMA DC" required readonly class="pointer-events-none uppercase bg-appblue/10 border border-appblue/30 text-appblue">
@@ -180,11 +180,11 @@
                         <div class="pt-4 border-t border-white/5">
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Kuantitas PO (Ctn)</p>
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="po-nka" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="po-ndlh" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="po-nrd" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="po-narr" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="po-nkach" value="0" required class="bg-transparent border-none mt-1"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="po-nka" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="po-ndlh" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="po-nrd" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="po-narr" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="po-nkach" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
                             </div>
                         </div>
                         <button type="submit" class="w-full bg-apporange text-black font-black py-4 rounded-2xl btn-tactile shadow-glow-orange tracking-widest uppercase">Submit PO</button>
@@ -192,31 +192,31 @@
 
                     <form id="form-sales" onsubmit="submitAction(event, 'insert_sales')" class="hide space-y-5 bg-appcard p-5 rounded-[2rem] border border-white/5">
                         <div class="space-y-3">
-                            <input type="text" id="sls-id" list="recent-po-ids" autocomplete="off" placeholder="ID PO DATABASE" required class="uppercase">
+                            <input type="text" id="sls-id" list="recent-po-ids" autocomplete="off" placeholder="ID PO DATABASE" required class="uppercase bg-[#121212]">
                         </div>
                         <div class="pt-4 border-t border-white/5">
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Realisasi Sales (Ctn)</p>
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="sls-nka" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="sls-ndlh" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="sls-nrd" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="sls-narr" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="sls-nkach" value="0" required class="bg-transparent border-none mt-1"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="sls-nka" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="sls-ndlh" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="sls-nrd" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="sls-narr" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="sls-nkach" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
                             </div>
                         </div>
                         <button type="submit" class="w-full bg-appblue text-white font-black py-4 rounded-2xl btn-tactile shadow-glow-blue tracking-widest uppercase">Update Sales</button>
                     </form>
 
                     <form id="form-stock" onsubmit="submitAction(event, 'insert_stock')" class="hide space-y-5 bg-appcard p-5 rounded-[2rem] border border-white/5">
-                        <input type="text" id="stk-tanggal" list="date-recom" autocomplete="off" placeholder="Tanggal (DD/MM/YYYY)" required>
+                        <input type="text" id="stk-tanggal" list="date-recom" autocomplete="off" placeholder="Tanggal (DD/MM/YYYY)" required class="bg-[#121212]">
                         <div class="pt-2 border-t border-white/5 mt-2">
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Fisik Stock (Ctn)</p>
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="stk-nka" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="stk-ndlh" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="stk-nrd" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="stk-narr" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="stk-nkach" value="0" required class="bg-transparent border-none mt-1"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="stk-nka" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="stk-ndlh" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="stk-nrd" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="stk-narr" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="stk-nkach" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
                             </div>
                         </div>
                         <button type="submit" class="w-full bg-appgreen text-black font-black py-4 rounded-2xl btn-tactile tracking-widest uppercase shadow-[0_0_15px_rgba(52,199,89,0.2)]">Update Stock</button>
@@ -225,16 +225,16 @@
             </div>
 
             <div class="fixed bottom-0 w-full max-w-md bg-[#0A0A0A]/95 backdrop-blur-xl border-t border-white/5 pt-3 pb-6 px-6 flex justify-between items-center z-50 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-                <button onclick="switchMainTab('tab-analytics', this)" class="nav-item flex-1 flex flex-col items-center gap-1 text-apporange transition-colors btn-tactile">
+                <button type="button" onclick="switchMainTab('tab-analytics', this)" class="nav-item flex-1 flex flex-col items-center gap-1 text-apporange transition-colors btn-tactile">
                     <i class="fa-solid fa-chart-simple text-xl"></i>
                     <span class="text-[8px] mt-0.5 font-black uppercase tracking-widest">Analytic</span>
                 </button>
                 <div class="relative -top-7">
-                    <button onclick="switchMainTab('tab-forms', this)" class="nav-item bg-white text-black h-16 w-16 rounded-full flex justify-center items-center shadow-[0_0_20px_rgba(255,255,255,0.3)] btn-tactile border-[6px] border-[#0A0A0A]">
+                    <button type="button" onclick="switchMainTab('tab-forms', this)" class="nav-item bg-white text-black h-16 w-16 rounded-full flex justify-center items-center shadow-[0_0_20px_rgba(255,255,255,0.3)] btn-tactile border-[6px] border-[#0A0A0A]">
                         <i class="fa-solid fa-plus text-2xl"></i>
                     </button>
                 </div>
-                <button onclick="switchMainTab('tab-log', this)" class="nav-item flex-1 flex flex-col items-center gap-1 text-gray-600 transition-colors btn-tactile">
+                <button type="button" onclick="switchMainTab('tab-log', this)" class="nav-item flex-1 flex flex-col items-center gap-1 text-gray-600 transition-colors btn-tactile">
                     <i class="fa-solid fa-database text-xl"></i>
                     <span class="text-[8px] mt-0.5 font-black uppercase tracking-widest">Database</span>
                 </button>
@@ -277,6 +277,7 @@
         }
 
         function runTicker(el, endVal) {
+            if(!el) return;
             let startT = null, duration = 800;
             function step(t) {
                 if(!startT) startT = t;
@@ -290,6 +291,7 @@
 
         function showToast(msg, isError = false) {
             const t = document.getElementById('toast');
+            if(!t) return;
             document.getElementById('toast-msg').innerText = msg;
             document.getElementById('toast-icon').innerText = isError ? '❌' : '✅';
             t.className = `fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-6 py-3 rounded-full font-black text-sm flex items-center gap-3 w-max max-w-[90%] transition-transform duration-300 border-2 ${isError ? 'bg-[#3A0000] border-appred text-appred shadow-[0_0_20px_rgba(255,59,48,0.4)]' : 'bg-appcard border-appgreen text-white shadow-[0_0_20px_rgba(52,199,89,0.3)]'}`;
@@ -298,17 +300,20 @@
             setTimeout(() => t.classList.remove('toast-show'), 3000);
         }
 
-        // ================= KONEKSI API =================
+        // ================= KONEKSI API N8N =================
         async function sendApi(payload, btnElement = null, originalText = "") {
             if(btnElement) { btnElement.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`; btnElement.classList.add('opacity-50', 'pointer-events-none'); }
             try {
                 const res = await fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const data = await res.json();
+                const textData = await res.text(); // Parse sebagai text dulu agar tidak crash jika n8n return string
+                let data;
+                try { data = JSON.parse(textData); } catch(err) { data = textData; } // Coba jadikan JSON
+                
                 if(btnElement) { btnElement.innerHTML = originalText; btnElement.classList.remove('opacity-50', 'pointer-events-none'); }
                 return Array.isArray(data) ? data[0] : data;
             } catch (e) {
                 if(btnElement) { btnElement.innerHTML = originalText; btnElement.classList.remove('opacity-50', 'pointer-events-none'); }
-                showToast("Koneksi Error", true); return null;
+                showToast("Koneksi Server Error", true); return null;
             }
         }
 
@@ -343,26 +348,47 @@
         function selectDC(dc) { document.getElementById(targetDCInput).value = dc; closeDCModal(); }
 
         function switchMainTab(tabId, element) {
-            ['tab-analytics', 'tab-log', 'tab-forms'].forEach(id => document.getElementById(id).classList.add('hide'));
-            document.getElementById(tabId).classList.remove('hide');
-            document.querySelectorAll('.nav-item').forEach(el => {
-                if(el.classList.contains('w-16')) return; 
-                el.classList.replace('text-apporange', 'text-gray-600'); el.classList.replace('text-appblue', 'text-gray-600');
-            });
-            if(element && !element.classList.contains('w-16')) element.classList.replace('text-gray-600', tabId === 'tab-analytics' ? 'text-apporange' : 'text-appblue');
+            try {
+                ['tab-analytics', 'tab-log', 'tab-forms'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('hide');
+                });
+                const target = document.getElementById(tabId);
+                if(target) target.classList.remove('hide');
+
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    if(el.classList.contains('w-16')) return; 
+                    el.classList.replace('text-apporange', 'text-gray-600'); el.classList.replace('text-appblue', 'text-gray-600');
+                });
+                if(element && !element.classList.contains('w-16')) element.classList.replace('text-gray-600', tabId === 'tab-analytics' ? 'text-apporange' : 'text-appblue');
+            } catch(e) { console.error("Error Tab Switch:", e); }
         }
 
         function switchForm(formType) {
-            ['form-po', 'form-sales', 'form-stock'].forEach(id => document.getElementById('form-' + id).classList.add('hide'));
-            document.getElementById('form-' + formType).classList.remove('hide');
-            ['btn-form-po', 'btn-form-sales', 'btn-form-stock'].forEach(id => document.getElementById(id).className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500 bg-transparent");
-            const btn = document.getElementById('btn-form-' + formType);
-            if(formType === 'po') btn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-apporange text-black shadow-glow-orange";
-            if(formType === 'sales') btn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-appblue text-white shadow-glow-blue";
-            if(formType === 'stock') btn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-appgreen text-black shadow-[0_0_15px_rgba(52,199,89,0.3)]";
+            try {
+                ['form-po', 'form-sales', 'form-stock'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.classList.add('hide');
+                });
+                
+                const targetForm = document.getElementById('form-' + formType);
+                if(targetForm) targetForm.classList.remove('hide');
+                
+                ['btn-form-po', 'btn-form-sales', 'btn-form-stock'].forEach(id => {
+                    const btn = document.getElementById(id);
+                    if(btn) btn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all text-gray-500 bg-transparent";
+                });
+                
+                const activeBtn = document.getElementById('btn-form-' + formType);
+                if(activeBtn) {
+                    if(formType === 'po') activeBtn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-apporange text-black shadow-glow-orange";
+                    if(formType === 'sales') activeBtn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-appblue text-white shadow-glow-blue";
+                    if(formType === 'stock') activeBtn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-appgreen text-black shadow-[0_0_15px_rgba(52,199,89,0.3)]";
+                }
+            } catch(e) { console.error("Error Form Switch:", e); }
         }
 
-        // --- 1. ANALYTICS (2 API CALL PARALEL & ROUNDING) ---
+        // --- 1. ANALYTICS (2 API PARALEL, ERROR SAFE, ROUNDING) ---
         async function loadAnalytics() {
             const fCont = document.getElementById('forecast-container');
             const dCont = document.getElementById('diagnosa-container');
@@ -372,21 +398,24 @@
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> MEMPROSES...`;
             btn.classList.add('opacity-50', 'pointer-events-none');
             
-            fCont.innerHTML = getSkeletonHTML(5, false); 
-            dCont.innerHTML = getSkeletonHTML(4, true);
+            if(fCont) fCont.innerHTML = getSkeletonHTML(5, false); 
+            if(dCont) dCont.innerHTML = getSkeletonHTML(4, true);
 
             try {
-                // EKSEKUSI 2 RUTE (PASTIKAN N8N ANDA SESUAI DENGAN ACTION INI)
                 const [reqOwner, reqDiag] = await Promise.allSettled([
                     fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_owner" }) }),
-                    fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "LOG_DIAGNOSE" }) }) // Sesuai gambar
+                    fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "LOG_DIAGNOSE" }) }) // Sesuai N8N Anda
                 ]);
 
                 // RENDER INVENTORY
-                fCont.innerHTML = '';
+                if(fCont) fCont.innerHTML = '';
                 let skuCount = 0;
-                if(reqOwner.status === 'fulfilled') {
-                    const rawOwner = await reqOwner.value.json();
+                
+                if(reqOwner.status === 'fulfilled' && reqOwner.value.ok) {
+                    const textOwner = await reqOwner.value.text();
+                    let rawOwner;
+                    try { rawOwner = JSON.parse(textOwner); } catch(e) { rawOwner = []; }
+                    
                     const forecastRows = Array.isArray(rawOwner) ? rawOwner : [rawOwner];
                     
                     forecastRows.forEach((item, idx) => {
@@ -397,7 +426,7 @@
                         if(!skuName || String(skuName).toUpperCase().includes("NAMA SKU") || String(skuName).includes("col_")) return;
 
                         skuCount++;
-                        // PEMBULATAN MATEMATIS
+                        // PEMBULATAN MATEMATIS TANPA DESIMAL
                         const demandBulat = Math.round(Number(row.col_3 || row["Avg. Demand 3 Bulanan"] || vals[2] || 0));
                         const forecastBulat = Math.round(Number(row.col_4 || row["FORECAST PO"] || vals[3] || 0));
                         const bufferBulat = Math.round(Number(row.col_5 || row["BUFFER"] || vals[4] || 0));
@@ -405,23 +434,29 @@
 
                         const dot = statusText.includes("CRITICAL") ? '<span class="h-2.5 w-2.5 rounded-full bg-appred shadow-[0_0_8px_#FF3B30] inline-block animate-pulse"></span>' : '<span class="h-2.5 w-2.5 rounded-full bg-appgreen shadow-[0_0_8px_#34C759] inline-block"></span>';
                         
-                        fCont.innerHTML += `
-                            <div class="grid grid-cols-5 gap-1 items-center py-2.5 border-b border-white/5 text-[10px] text-center animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0">
-                                <div class="font-black text-left text-white px-2 uppercase truncate min-w-0">${skuName}</div>
-                                <div class="text-gray-400 font-bold">${demandBulat}</div>
-                                <div class="text-white font-black">${forecastBulat}</div>
-                                <div class="text-white font-black">${bufferBulat}</div>
-                                <div class="flex justify-center items-center">${dot}</div>
-                            </div>`;
+                        if(fCont) {
+                            fCont.innerHTML += `
+                                <div class="grid grid-cols-5 gap-1 items-center py-2.5 border-b border-white/5 text-[10px] text-center animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0">
+                                    <div class="font-black text-left text-white px-2 uppercase truncate min-w-0">${skuName}</div>
+                                    <div class="text-gray-400 font-bold">${demandBulat}</div>
+                                    <div class="text-white font-black">${forecastBulat}</div>
+                                    <div class="text-white font-black">${bufferBulat}</div>
+                                    <div class="flex justify-center items-center">${dot}</div>
+                                </div>`;
+                        }
                     });
-                    runTicker(document.getElementById('stat-sku'), skuCount);
                 }
+                runTicker(document.getElementById('stat-sku'), skuCount);
 
                 // RENDER DIAGNOSE
-                dCont.innerHTML = '';
+                if(dCont) dCont.innerHTML = '';
                 let dcIssueCount = 0;
-                if(reqDiag.status === 'fulfilled') {
-                    const rawDiag = await reqDiag.value.json();
+                
+                if(reqDiag.status === 'fulfilled' && reqDiag.value.ok) {
+                    const textDiag = await reqDiag.value.text();
+                    let rawDiag;
+                    try { rawDiag = JSON.parse(textDiag); } catch(e) { rawDiag = []; }
+
                     const diagRows = Array.isArray(rawDiag) ? rawDiag : [rawDiag];
 
                     diagRows.forEach((item, idx) => {
@@ -441,37 +476,42 @@
                         const failPct = total > 0 ? Math.round((failCount / total) * 100) : 0;
                         const moqPct = total > 0 ? Math.round((moqCount / total) * 100) : 0;
 
-                        dCont.innerHTML += `
-                            <div class="bg-appcard p-4 rounded-[2rem] border border-white/5 mb-3 animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0">
-                                <div class="flex justify-between items-center mb-3">
-                                    <h4 class="text-sm font-black text-white uppercase tracking-tight truncate w-32">${dcName}</h4>
-                                    <p class="text-[8px] font-bold ${resStr.includes('FAILURE') ? 'text-appred' : 'text-apporange'} tracking-widest bg-black px-2 py-1 rounded-md border border-white/5">⚠️ ${resStr}</p>
-                                </div>
-                                <div class="grid grid-cols-3 gap-1 text-center bg-black/40 p-2.5 rounded-xl border border-white/5">
-                                    <div class="border-r border-white/10"><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1">Failure</p><p class="text-xs font-black text-appred">${failPct}%</p></div>
-                                    <div class="border-r border-white/10"><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1">Under MOQ</p><p class="text-xs font-black text-apporange">${moqPct}%</p></div>
-                                    <div><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1">Above MOQ</p><p class="text-xs font-black text-appgreen">0%</p></div>
-                                </div>
-                            </div>`;
+                        if(dCont) {
+                            dCont.innerHTML += `
+                                <div class="bg-appcard p-4 rounded-[2rem] border border-white/5 mb-3 animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <h4 class="text-sm font-black text-white uppercase tracking-tight truncate w-32">${dcName}</h4>
+                                        <p class="text-[8px] font-bold ${resStr.includes('FAILURE') ? 'text-appred' : 'text-apporange'} tracking-widest bg-black px-2 py-1 rounded-md border border-white/5">⚠️ ${resStr}</p>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-1 text-center bg-black/40 p-2.5 rounded-xl border border-white/5">
+                                        <div class="border-r border-white/10"><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1">Failure</p><p class="text-xs font-black text-appred">${failPct}%</p></div>
+                                        <div class="border-r border-white/10"><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1">Under MOQ</p><p class="text-xs font-black text-apporange">${moqPct}%</p></div>
+                                        <div><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1">Above MOQ</p><p class="text-xs font-black text-appgreen">0%</p></div>
+                                    </div>
+                                </div>`;
+                        }
                     });
-                    runTicker(document.getElementById('stat-dc'), dcIssueCount);
                 }
+                runTicker(document.getElementById('stat-dc'), dcIssueCount);
 
             } catch (err) {
                 showToast("Gagal Sync Data", true);
+                console.error(err);
             } finally {
-                btn.innerHTML = origText;
-                btn.classList.remove('opacity-50', 'pointer-events-none');
+                if(btn) {
+                    btn.innerHTML = origText;
+                    btn.classList.remove('opacity-50', 'pointer-events-none');
+                }
             }
         }
 
-        // --- 2. LOG PO DATABASE (DENGAN DATALIST ID) ---
+        // --- 2. LOG PO DATABASE ---
         async function loadLogPO() {
             const btn = document.getElementById('btn-sync-log');
             const cont = document.getElementById('log-container');
             const dl = document.getElementById('recent-po-ids'); 
             
-            cont.innerHTML = getSkeletonHTML(5, true);
+            if(cont) cont.innerHTML = getSkeletonHTML(5, true);
 
             const res = await sendApi({ action: "load_admin" }, btn, `<i class="fa-solid fa-rotate-right"></i>`);
             if (res && res.status === "success") {
@@ -499,6 +539,7 @@
 
         function renderLogs(data) {
             const cont = document.getElementById('log-container');
+            if(!cont) return;
             cont.innerHTML = '';
             data.forEach((item, idx) => {
                 if(!item.ID || String(item["PO NKA"]).includes("BATAL")) return;
@@ -513,7 +554,6 @@
                     borderCol = "border-apporange/40"; textCol = "text-apporange"; icon = "fa-clock-rotate-left"; iconCol="text-apporange";
                 }
 
-                // Tambahan NKACH
                 cont.innerHTML += `
                     <div class="bg-appcard rounded-3xl border ${borderCol} overflow-hidden transition-all duration-300 animate-fade-in-up" style="animation-delay: ${idx * 30}ms; opacity:0">
                         <div class="p-5 flex items-center justify-between cursor-pointer btn-tactile" onclick="toggleCard('${item.ID}')">
@@ -543,7 +583,7 @@
                                     <p class="text-[8px] text-gray-500 font-bold uppercase tracking-widest mb-0.5">GAP Pengiriman</p>
                                     <p class="text-sm font-black ${item["GAP"] == 0 ? 'text-appgreen' : 'text-appred'}">${item["GAP"] || 0} CTN</p>
                                 </div>
-                                <button onclick="deletePO('${item.ID}')" class="bg-appred/10 text-appred border border-appred/30 font-bold text-[10px] py-2 px-4 rounded-xl btn-tactile hover:bg-appred hover:text-white transition-colors uppercase tracking-widest">
+                                <button type="button" onclick="deletePO('${item.ID}')" class="bg-appred/10 text-appred border border-appred/30 font-bold text-[10px] py-2 px-4 rounded-xl btn-tactile hover:bg-appred hover:text-white transition-colors uppercase tracking-widest">
                                     <i class="fa-solid fa-trash mr-2"></i>BATAL
                                 </button>
                             </div>
@@ -551,7 +591,11 @@
                     </div>`;
             });
         }
-        function toggleCard(id) { document.getElementById('det-' + id).classList.toggle('accordion-expanded'); }
+        
+        function toggleCard(id) { 
+            const el = document.getElementById('det-' + id);
+            if(el) el.classList.toggle('accordion-expanded'); 
+        }
 
         async function deletePO(id) {
             if(!confirm(`PERINGATAN: Batalkan PO ${id}?`)) return;
@@ -560,50 +604,62 @@
             else showToast("Gagal membatalkan", true);
         }
 
-        // --- 3. FORMS INPUT (Penghapusan DC di Sales & Penambahan 5 SKU) ---
+        // --- 3. FORMS INPUT (DENGAN PROTEKSI TRY-CATCH) ---
         async function submitAction(e, act) {
             e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
-            let payload = { action: act };
-            const getVal = (id) => document.getElementById(id).value;
+            try {
+                const btn = e.target.querySelector('button[type="submit"]');
+                let payload = { action: act };
+                const getVal = (id) => {
+                    const el = document.getElementById(id);
+                    return el ? el.value : "";
+                };
 
-            if(act === 'insert_po') {
-                payload = { ...payload, 
-                    id: getVal('po-id').toUpperCase(),
-                    tanggal_po: getVal('po-tanggal'),
-                    tanggal_exp: getVal('po-exp'),
-                    dc: getVal('po-dc').toUpperCase(),
-                    po_nka: getVal('po-nka'),
-                    po_ndlh: getVal('po-ndlh'),
-                    po_nrd: getVal('po-nrd'),
-                    po_narr: getVal('po-narr'),
-                    po_nkach: getVal('po-nkach') 
-                };
-            } 
-            else if(act === 'insert_sales') {
-                payload = { ...payload, 
-                    id: getVal('sls-id').toUpperCase(),
-                    nka: getVal('sls-nka'),
-                    ndlh: document.getElementById('sls-ndlh').value,
-                    nrd: document.getElementById('sls-nrd').value,
-                    narr: document.getElementById('sls-narr').value,
-                    nkach: document.getElementById('sls-nkach').value
-                };
-            }
-            else if(act === 'insert_stock') {
-                payload = { ...payload, 
-                    tanggal: getVal('stk-tanggal'),
-                    nka: getVal('stk-nka'),
-                    ndlh: document.getElementById('stk-ndlh').value,
-                    nrd: document.getElementById('stk-nrd').value,
-                    narr: document.getElementById('stk-narr').value,
-                    nkach: document.getElementById('stk-nkach').value
-                };
-            }
+                if(act === 'insert_po') {
+                    payload = { ...payload, 
+                        id: getVal('po-id').toUpperCase(),
+                        tanggal_po: getVal('po-tanggal'),
+                        tanggal_exp: getVal('po-exp'),
+                        dc: getVal('po-dc').toUpperCase(),
+                        po_nka: getVal('po-nka'),
+                        po_ndlh: getVal('po-ndlh'),
+                        po_nrd: getVal('po-nrd'),
+                        po_narr: getVal('po-narr'),
+                        po_nkach: getVal('po-nkach') 
+                    };
+                } 
+                else if(act === 'insert_sales') {
+                    payload = { ...payload, 
+                        id: getVal('sls-id').toUpperCase(),
+                        nka: getVal('sls-nka'),
+                        ndlh: getVal('sls-ndlh'),
+                        nrd: getVal('sls-nrd'),
+                        narr: getVal('sls-narr'),
+                        nkach: getVal('sls-nkach')
+                    };
+                }
+                else if(act === 'insert_stock') {
+                    payload = { ...payload, 
+                        tanggal: getVal('stk-tanggal'),
+                        nka: getVal('stk-nka'),
+                        ndlh: getVal('stk-ndlh'),
+                        nrd: getVal('stk-nrd'),
+                        narr: getVal('stk-narr'),
+                        nkach: getVal('stk-nkach')
+                    };
+                }
 
-            const res = await sendApi(payload, btn, btn.innerText);
-            if(res && res.status === "success") { showToast("Data Tersimpan!"); e.target.reset(); } 
-            else showToast("Gagal menyimpan data", true);
+                const res = await sendApi(payload, btn, btn.innerText);
+                if(res && res.status === "success") { 
+                    showToast("Data Tersimpan!"); 
+                    e.target.reset(); 
+                } else {
+                    showToast("Gagal menyimpan data", true);
+                }
+            } catch(error) {
+                console.error(error);
+                showToast("Kesalahan Internal Form", true);
+            }
         }
     </script>
 </body>
