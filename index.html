@@ -50,7 +50,7 @@
         .btn-tactile:active { transform: scale(0.95); opacity: 0.9; }
         
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s; opacity: 0; }
-        .accordion-expanded { max-height: 800px; opacity: 1; border-top: 1px solid rgba(255,255,255,0.05); }
+        .accordion-expanded { max-height: 800px; opacity: 1; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem; margin-top: 0.5rem; }
         
         #toast { transform: translateY(-150%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .toast-show { transform: translateY(0) !important; }
@@ -97,6 +97,7 @@
         </div>
 
         <div id="view-main" class="hide flex-col h-full">
+            
             <div class="px-6 py-4 sticky top-0 bg-[#0A0A0A]/90 backdrop-blur-xl z-20 flex justify-between items-center border-b border-white/5">
                 <div>
                     <h2 class="text-xl font-black text-white tracking-tighter italic leading-none uppercase">Family<span class="text-apporange">Food</span></h2>
@@ -169,10 +170,10 @@
 
                     <form id="form-po" onsubmit="submitAction(event, 'insert_po')" class="space-y-5 bg-appcard p-5 rounded-[2rem] border border-white/5">
                         <div class="space-y-3">
-                            <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase">
+                            <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase bg-[#121212]">
                             <div class="grid grid-cols-2 gap-3">
-                                <input type="text" id="po-tanggal" list="date-recom" autocomplete="off" placeholder="Tgl PO" required>
-                                <input type="text" id="po-exp" list="date-recom" autocomplete="off" placeholder="Tgl EXP" required>
+                                <input type="text" id="po-tanggal" list="date-recom" autocomplete="off" placeholder="Tgl PO" required class="bg-[#121212]">
+                                <input type="text" id="po-exp" list="date-recom" autocomplete="off" placeholder="Tgl EXP" required class="bg-[#121212]">
                             </div>
                             <div class="relative cursor-pointer btn-tactile" onclick="openDCModal('po-dc')">
                                 <input type="text" id="po-dc" placeholder="PILIH NAMA DC" required readonly class="pointer-events-none uppercase bg-appblue/10 border border-appblue/30 text-appblue">
@@ -182,11 +183,11 @@
                         <div class="pt-4 border-t border-white/5">
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Kuantitas PO (Ctn)</p>
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="po-nka" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="po-ndlh" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="po-nrd" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="po-narr" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="po-nkach" value="0" required class="bg-transparent border-none mt-1"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="po-nka" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="po-ndlh" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="po-nrd" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="po-narr" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="po-nkach" value="0" required class="bg-transparent border-none mt-1 p-2 text-center"></div>
                             </div>
                         </div>
                         <button type="submit" class="w-full bg-apporange text-black font-black py-4 rounded-2xl btn-tactile shadow-glow-orange tracking-widest uppercase">Submit PO</button>
@@ -194,31 +195,31 @@
 
                     <form id="form-sales" onsubmit="submitAction(event, 'insert_sales')" class="hide space-y-5 bg-appcard p-5 rounded-[2rem] border border-white/5">
                         <div class="space-y-3">
-                            <input type="text" id="sls-id" list="recent-po-ids" autocomplete="off" placeholder="ID PO DATABASE" required class="uppercase">
+                            <input type="text" id="sls-id" list="recent-po-ids" autocomplete="off" placeholder="ID PO DATABASE" required class="uppercase bg-[#121212]">
                         </div>
                         <div class="pt-4 border-t border-white/5">
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Realisasi Sales (Ctn)</p>
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="sls-nka" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="sls-ndlh" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="sls-nrd" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="sls-narr" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="sls-nkach" value="0" required class="bg-transparent border-none mt-1"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="sls-nka" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="sls-ndlh" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="sls-nrd" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="sls-narr" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="sls-nkach" value="0" required class="bg-transparent border-none mt-1 p-2 text-center"></div>
                             </div>
                         </div>
                         <button type="submit" class="w-full bg-appblue text-white font-black py-4 rounded-2xl btn-tactile shadow-glow-blue tracking-widest uppercase">Update Sales</button>
                     </form>
 
                     <form id="form-stock" onsubmit="submitAction(event, 'insert_stock')" class="hide space-y-5 bg-appcard p-5 rounded-[2rem] border border-white/5">
-                        <input type="text" id="stk-tanggal" list="date-recom" autocomplete="off" placeholder="Tanggal (DD/MM/YYYY)" required>
+                        <input type="text" id="stk-tanggal" list="date-recom" autocomplete="off" placeholder="Tanggal (DD/MM/YYYY)" required class="bg-[#121212]">
                         <div class="pt-2 border-t border-white/5 mt-2">
                             <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Fisik Stock (Ctn)</p>
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="stk-nka" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="stk-ndlh" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="stk-nrd" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="stk-narr" value="0" required class="bg-transparent border-none mt-1"></div>
-                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="stk-nkach" value="0" required class="bg-transparent border-none mt-1"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKA</label><input type="number" id="stk-nka" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NDLH</label><input type="number" id="stk-ndlh" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NRD</label><input type="number" id="stk-nrd" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NARR</label><input type="number" id="stk-narr" value="0" required class="bg-transparent border-none mt-1 p-2"></div>
+                                <div class="col-span-2 bg-black/40 p-2 rounded-2xl"><label class="text-[9px] text-gray-500 ml-2 font-bold uppercase">NKACH</label><input type="number" id="stk-nkach" value="0" required class="bg-transparent border-none mt-1 p-2 text-center"></div>
                             </div>
                         </div>
                         <button type="submit" class="w-full bg-appgreen text-black font-black py-4 rounded-2xl btn-tactile tracking-widest uppercase shadow-[0_0_15px_rgba(52,199,89,0.2)]">Update Stock</button>
@@ -269,8 +270,10 @@
         function updateMonthHeaders() {
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
             const d = new Date();
-            document.getElementById('th-buffer').innerHTML = `BUFFER<br>(${months[d.getMonth()]})`;
-            document.getElementById('th-forecast').innerHTML = `FORECAST<br>(${months[(d.getMonth() + 1) % 12]})`;
+            const elBuffer = document.getElementById('th-buffer');
+            const elForecast = document.getElementById('th-forecast');
+            if(elBuffer) elBuffer.innerHTML = `BUFFER<br>(${months[d.getMonth()]})`;
+            if(elForecast) elForecast.innerHTML = `FORECAST<br>(${months[(d.getMonth() + 1) % 12]})`;
         }
 
         function getSkeletonHTML(count, isList = false) {
@@ -307,16 +310,16 @@
             if(btnElement) { btnElement.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`; btnElement.classList.add('opacity-50', 'pointer-events-none'); }
             try {
                 const res = await fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                // Robust parsing agar tidak crash kalau n8n bales error text
+                // Pengaman Parsing
                 const textData = await res.text();
                 let data;
-                try { data = JSON.parse(textData); } catch(err) { data = { status: "error", message: textData }; }
+                try { data = JSON.parse(textData); } catch(err) { data = { status: "error", message: "Response bukan JSON" }; }
                 
                 if(btnElement) { btnElement.innerHTML = originalText; btnElement.classList.remove('opacity-50', 'pointer-events-none'); }
                 return Array.isArray(data) ? data[0] : data;
             } catch (e) {
                 if(btnElement) { btnElement.innerHTML = originalText; btnElement.classList.remove('opacity-50', 'pointer-events-none'); }
-                showToast("Koneksi Server Error", true); return null;
+                showToast("Koneksi Error", true); return null;
             }
         }
 
@@ -344,33 +347,42 @@
 
         // --- NAVIGATION & MODALS ---
         function initDCPicker() {
-            document.getElementById('dc-grid').innerHTML = DC_LIST.map(dc => `<button type="button" onclick="selectDC('${dc}')" class="bg-appcard border border-white/5 text-gray-300 text-[10px] font-black py-4 rounded-2xl btn-tactile hover:border-apporange hover:text-apporange transition-colors uppercase tracking-wider">${dc}</button>`).join('');
+            const grid = document.getElementById('dc-grid');
+            if(grid) {
+                grid.innerHTML = DC_LIST.map(dc => `<button type="button" onclick="selectDC('${dc}')" class="bg-appcard border border-white/5 text-gray-300 text-[10px] font-black py-4 rounded-2xl btn-tactile hover:border-apporange hover:text-apporange transition-colors uppercase tracking-wider">${dc}</button>`).join('');
+            }
         }
         function openDCModal(id) { targetDCInput = id; document.getElementById('modal-dc').classList.remove('hide'); }
         function closeDCModal() { document.getElementById('modal-dc').classList.add('hide'); }
         function selectDC(dc) { document.getElementById(targetDCInput).value = dc; closeDCModal(); }
 
+        // PROTEKSI GANTI TAB AGAR TIDAK TUMPUK
         function switchMainTab(tabId, element) {
             try {
                 ['tab-analytics', 'tab-log', 'tab-forms'].forEach(id => {
                     const el = document.getElementById(id);
                     if(el) el.classList.add('hide');
                 });
-                const target = document.getElementById(tabId);
-                if(target) target.classList.remove('hide');
+                
+                const targetEl = document.getElementById(tabId);
+                if(targetEl) targetEl.classList.remove('hide');
 
                 document.querySelectorAll('.nav-item').forEach(el => {
                     if(el.classList.contains('w-16')) return; 
-                    el.classList.replace('text-apporange', 'text-gray-600'); el.classList.replace('text-appblue', 'text-gray-600');
+                    el.classList.replace('text-apporange', 'text-gray-600'); 
+                    el.classList.replace('text-appblue', 'text-gray-600');
                 });
-                if(element && !element.classList.contains('w-16')) element.classList.replace('text-gray-600', tabId === 'tab-analytics' ? 'text-apporange' : 'text-appblue');
-            } catch(e) { console.error(e); }
+                if(element && !element.classList.contains('w-16')) {
+                    element.classList.replace('text-gray-600', tabId === 'tab-analytics' ? 'text-apporange' : 'text-appblue');
+                }
+            } catch(e) { console.error("Error Tab:", e); }
         }
 
+        // PROTEKSI GANTI FORM AGAR TIDAK TUMPUK
         function switchForm(formType) {
             try {
                 ['form-po', 'form-sales', 'form-stock'].forEach(id => {
-                    const el = document.getElementById('form-' + id);
+                    const el = document.getElementById(id);
                     if(el) el.classList.add('hide');
                 });
                 
@@ -388,10 +400,10 @@
                     if(formType === 'sales') activeBtn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-appblue text-white shadow-glow-blue";
                     if(formType === 'stock') activeBtn.className = "flex-1 py-2.5 rounded-xl text-xs font-black uppercase transition-all bg-appgreen text-black shadow-[0_0_15px_rgba(52,199,89,0.3)]";
                 }
-            } catch(e) { console.error(e); }
+            } catch(e) { console.error("Error Form:", e); }
         }
 
-        // --- 1. ANALYTICS (ACTION SESUAI N8N) ---
+        // --- 1. ANALYTICS (ACTION load_buffer & load_diagnose) ---
         async function loadAnalytics() {
             const fCont = document.getElementById('forecast-container');
             const dCont = document.getElementById('diagnosa-container');
@@ -405,13 +417,13 @@
             if(dCont) dCont.innerHTML = getSkeletonHTML(4, true);
 
             try {
-                // Tembak load_buffer dan load_diagnose persis sesuai gambar n8n Anda
+                // Tembak 2 rute secara paralel sesuai nama Action di Router N8n
                 const [reqBuffer, reqDiag] = await Promise.allSettled([
                     fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_buffer" }) }),
                     fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_diagnose" }) }) 
                 ]);
 
-                // RENDER INVENTORY
+                // RENDER INVENTORY (load_buffer)
                 if(fCont) fCont.innerHTML = '';
                 let skuCount = 0;
                 
@@ -419,7 +431,7 @@
                     const textBuffer = await reqBuffer.value.text();
                     let rawBuffer;
                     try { rawBuffer = JSON.parse(textBuffer); } catch(e) { rawBuffer = []; }
-                    if(rawBuffer.data) rawBuffer = rawBuffer.data; // Kalau dilapis .data
+                    if(rawBuffer.data) rawBuffer = rawBuffer.data; 
                     
                     const forecastRows = Array.isArray(rawBuffer) ? rawBuffer : [rawBuffer];
                     
@@ -431,7 +443,7 @@
                         if(!skuName || String(skuName).toUpperCase().includes("NAMA SKU") || String(skuName).includes("col_")) return;
 
                         skuCount++;
-                        // ROUNDING DECIMAL
+                        // PEMBULATAN MATEMATIS TANPA DESIMAL
                         const demandBulat = Math.round(Number(row.col_3 || row["Avg. Demand 3 Bulanan"] || vals[2] || 0));
                         const forecastBulat = Math.round(Number(row.col_4 || row["FORECAST PO"] || vals[3] || 0));
                         const bufferBulat = Math.round(Number(row.col_5 || row["BUFFER"] || vals[4] || 0));
@@ -442,7 +454,7 @@
                         if(fCont) {
                             fCont.innerHTML += `
                                 <div class="grid grid-cols-5 gap-1 items-center py-2.5 border-b border-white/5 text-[10px] text-center animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0">
-                                    <div class="font-black text-left text-white px-2 uppercase truncate min-w-0">${skuName}</div>
+                                    <div class="font-black text-left text-white px-1 uppercase truncate min-w-0">${skuName}</div>
                                     <div class="text-gray-400 font-bold">${demandBulat}</div>
                                     <div class="text-white font-black">${forecastBulat}</div>
                                     <div class="text-white font-black">${bufferBulat}</div>
@@ -453,7 +465,7 @@
                 }
                 runTicker(document.getElementById('stat-sku'), skuCount);
 
-                // RENDER DIAGNOSE
+                // RENDER DIAGNOSE (load_diagnose) - Selalu Tampilkan Above MOQ 0%
                 if(dCont) dCont.innerHTML = '';
                 let dcIssueCount = 0;
                 
@@ -490,7 +502,7 @@
                                         <p class="text-[8px] font-bold ${resStr.includes('FAILURE') ? 'text-appred' : 'text-apporange'} tracking-widest bg-black px-2 py-1 rounded-md border border-white/5">⚠️ ${resStr}</p>
                                     </div>
                                     <div class="grid grid-cols-3 gap-1 text-center bg-black/40 p-2.5 rounded-xl border border-white/5">
-                                        <div class="border-r border-white/10"><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1">Failure</p><p class="text-xs font-black text-appred">${failPct}%</p></div>
+                                        <div class="border-r border-white/10"><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1">WH Failure</p><p class="text-xs font-black text-appred">${failPct}%</p></div>
                                         <div class="border-r border-white/10"><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1">Under MOQ</p><p class="text-xs font-black text-apporange">${moqPct}%</p></div>
                                         <div><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1">Above MOQ</p><p class="text-xs font-black text-appgreen">0%</p></div>
                                     </div>
@@ -652,7 +664,7 @@
                 const res = await sendApi(payload, btn, btn.innerText);
                 if(res && res.status === "success") { showToast("Data Tersimpan!"); e.target.reset(); } 
                 else showToast("Gagal menyimpan data", true);
-            } catch(error) { showToast("Kesalahan Internal Form", true); }
+            } catch(error) { showToast("Kesalahan Form Internal", true); }
         }
     </script>
 </body>
