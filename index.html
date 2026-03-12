@@ -48,7 +48,7 @@
         }
     </script>
     <style>
-        body { background-color: #000000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #000000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         .hidden-tab { display: none !important; }
         ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
         
@@ -69,11 +69,22 @@
         .skeleton-box { position: relative; overflow: hidden; background-color: #1C1C1E; }
         .skeleton-box::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shimmer 1.5s infinite; }
 
-        /* WADAH PDF TERSEMBUNYI (LIGHT MODE UNTUK PRINT) */
-        #pdf-container { position: absolute; left: -9999px; top: 0; width: 800px; background: white; color: black; padding: 40px; font-family: Arial, sans-serif; }
+        /* WADAH PDF DIPERBAIKI: Disembunyikan di belakang aplikasi, tapi tetap terbaca kamera PDF */
+        #pdf-container { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 800px; 
+            background: #ffffff; 
+            color: #000000; 
+            padding: 40px; 
+            font-family: Arial, sans-serif; 
+            z-index: -9999; 
+            pointer-events: none;
+        }
     </style>
 </head>
-<body class="flex justify-center antialiased font-apple">
+<body class="flex justify-center antialiased font-apple relative">
 
     <div id="pdf-container"></div>
 
@@ -474,13 +485,13 @@
             } catch(error) { showToast("Kesalahan Form Internal", true); }
         }
 
-        // ================= FITUR ENTERPRISE PDF RENDERER =================
+        // ================= FIX RENDERER PDF: JEDA SHUTTER & Z-INDEX =================
         function generateAnalyticReport() {
-            if(globalForecastData.length === 0 || activeLogData.length === 0) { showToast("Sync Data Dulu!", true); return; }
+            if(globalForecastData.length === 0 || activeLogData.length === 0) { showToast("Silakan Sync Data Dahulu!", true); return; }
             const btn = document.getElementById('btn-report-analytic'); const origHtml = btn.innerHTML;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> CREATING PDF...`; btn.classList.add('opacity-50', 'pointer-events-none');
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> MEMBUAT PDF...`; btn.classList.add('opacity-50', 'pointer-events-none');
 
-            // Hitung Kalkulasi Front-End (0 Server Load)
+            // Kalkulasi Logika Front-End
             let totPO = 0; let totSales = 0;
             activeLogData.forEach(i => { if(i.ID && !String(i["PO NKA"]).includes("BATAL")) { totPO += Number(i["TOTAL PO ctn"]||0); totSales += Number(i["Qty Terpenuhi (Kirim)"]||0); } });
             const fulfillPct = totPO > 0 ? Math.round((totSales/totPO)*100) : 0;
@@ -490,40 +501,49 @@
             const demandVsProd = totDemand > 0 ? Math.round((totPOForecast/totDemand)*100) : 0;
             const alertStatus = countCrit > 0 ? "⚠️ BUTUH PERHATIAN" : "✅ STOK AMAN";
 
-            // Siapkan Elemen HTML untuk PDF
+            // Struktur Elemen PDF
             const container = document.getElementById('pdf-container');
             container.innerHTML = `
-                <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #EEE; padding-bottom: 15px;">
-                    <h1 style="font-size: 24px; font-weight: bold; margin:0; color:#FF3B30;">FAMILY FOOD INDONESIA</h1>
-                    <p style="margin: 5px 0 0 0; color: #555;">Executive Summary Report - ${new Date().toLocaleDateString('id-ID')}</p>
+                <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #E5E7EB; padding-bottom: 15px;">
+                    <h1 style="font-size: 26px; font-weight: 900; margin:0; color:#FF3B30; letter-spacing: 1px;">FAMILY FOOD INDONESIA</h1>
+                    <p style="margin: 5px 0 0 0; color: #6B7280; font-size: 14px;">Executive Analytic Report - ${new Date().toLocaleDateString('id-ID')}</p>
                 </div>
-                <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 25px;">
-                    <div style="flex:1; background:#F8F9FA; padding:15px; border-radius:10px; border:1px solid #E9ECEF;">
-                        <div style="font-size:10px; color:#6C757D; text-transform:uppercase; font-weight:bold;">Fulfillment PO</div>
-                        <div style="font-size:24px; font-weight:bold; color:${fulfillPct >= 80 ? '#34C759' : '#FF9500'};">${fulfillPct}%</div>
+                
+                <div style="display: flex; justify-content: space-between; gap: 15px; margin-bottom: 30px;">
+                    <div style="flex:1; background:#F9FAFB; padding:20px; border-radius:12px; border:1px solid #E5E7EB;">
+                        <div style="font-size:11px; color:#6B7280; text-transform:uppercase; font-weight:800; letter-spacing: 0.5px;">Fulfillment PO</div>
+                        <div style="font-size:28px; font-weight:900; margin-top:8px; color:${fulfillPct >= 80 ? '#34C759' : '#FF9500'};">${fulfillPct}%</div>
                     </div>
-                    <div style="flex:1; background:#F8F9FA; padding:15px; border-radius:10px; border:1px solid #E9ECEF;">
-                        <div style="font-size:10px; color:#6C757D; text-transform:uppercase; font-weight:bold;">Alert Stock</div>
-                        <div style="font-size:14px; font-weight:bold; margin-top:5px; color:${countCrit > 0 ? '#FF3B30' : '#34C759'};">${alertStatus}</div>
+                    <div style="flex:1; background:#F9FAFB; padding:20px; border-radius:12px; border:1px solid #E5E7EB;">
+                        <div style="font-size:11px; color:#6B7280; text-transform:uppercase; font-weight:800; letter-spacing: 0.5px;">Alert Stock</div>
+                        <div style="font-size:16px; font-weight:900; margin-top:14px; color:${countCrit > 0 ? '#FF3B30' : '#34C759'};">${alertStatus}</div>
                     </div>
-                    <div style="flex:1; background:#F8F9FA; padding:15px; border-radius:10px; border:1px solid #E9ECEF;">
-                        <div style="font-size:10px; color:#6C757D; text-transform:uppercase; font-weight:bold;">Prod vs Demand</div>
-                        <div style="font-size:24px; font-weight:bold; color:#007BFF;">${demandVsProd}%</div>
+                    <div style="flex:1; background:#F9FAFB; padding:20px; border-radius:12px; border:1px solid #E5E7EB;">
+                        <div style="font-size:11px; color:#6B7280; text-transform:uppercase; font-weight:800; letter-spacing: 0.5px;">Prod vs Demand</div>
+                        <div style="font-size:28px; font-weight:900; margin-top:8px; color:#2B65F6;">${demandVsProd}%</div>
                     </div>
                 </div>
-                <div style="background:#F8F9FA; padding:15px; border-radius:10px; border:1px solid #E9ECEF; margin-bottom:25px; text-align:center;">
-                    <div style="font-size:12px; color:#6C757D; text-transform:uppercase; font-weight:bold;">Inventory Health (Global)</div>
-                    <div style="font-size:18px; font-weight:bold; margin-top:5px;"><span style="color:#FF3B30;">${countCrit} Critical</span> / <span style="color:#34C759;">${countSafe} Safe</span></div>
+
+                <div style="background:#F9FAFB; padding:20px; border-radius:12px; border:1px solid #E5E7EB; margin-bottom:30px; text-align:center;">
+                    <div style="font-size:13px; color:#6B7280; text-transform:uppercase; font-weight:800; letter-spacing: 1px;">Global Inventory Health</div>
+                    <div style="font-size:22px; font-weight:900; margin-top:8px;"><span style="color:#FF3B30;">${countCrit} Critical</span> <span style="color:#D1D5DB; margin: 0 10px;">|</span> <span style="color:#34C759;">${countSafe} Safe</span></div>
                 </div>
-                <div style="display: flex; justify-content: space-between; gap: 20px;">
-                    <div style="flex:1; width:48%;"><h4 style="font-size:12px; text-align:center;">SKU Demand vs PO Target</h4><canvas id="chartBar"></canvas></div>
-                    <div style="flex:1; width:48%;"><h4 style="font-size:12px; text-align:center;">DC Diagnose Distribution</h4><canvas id="chartPie"></canvas></div>
+
+                <div style="display: flex; justify-content: space-between; gap: 20px; align-items: center;">
+                    <div style="flex:1; width:48%;">
+                        <h4 style="font-size:14px; text-align:center; margin-bottom: 15px; font-weight: 800; color: #374151;">SKU Demand vs PO Target</h4>
+                        <canvas id="chartBar"></canvas>
+                    </div>
+                    <div style="flex:1; width:48%;">
+                        <h4 style="font-size:14px; text-align:center; margin-bottom: 15px; font-weight: 800; color: #374151;">DC Diagnose Distribution</h4>
+                        <canvas id="chartPie"></canvas>
+                    </div>
                 </div>
             `;
 
-            // RENDER GRAFIK
+            // Proses Render Chart & Download PDF
             setTimeout(() => {
-                // Bar Chart (Top 5 SKU)
+                // 1. Gambar Bar Chart
                 const topSku = [...globalForecastData].sort((a,b) => b.demand - a.demand).slice(0, 5);
                 new Chart(document.getElementById('chartBar'), {
                     type: 'bar',
@@ -534,7 +554,7 @@
                     options: { animation: false, responsive: true }
                 });
 
-                // Pie Chart (WH Failure vs Under MOQ)
+                // 2. Gambar Pie Chart
                 let totFail = 0; let totMoq = 0;
                 globalDiagnoseData.forEach(i => { totFail += i.failPct; totMoq += i.moqPct; });
                 new Chart(document.getElementById('chartPie'), {
@@ -543,34 +563,42 @@
                     options: { animation: false, responsive: true }
                 });
 
-                // Convert ke PDF
-                html2pdf().set({ margin: 10, filename: `FFI_Analytic_${new Date().getTime()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(container).save().then(() => {
-                    btn.innerHTML = origHtml; btn.classList.remove('opacity-50', 'pointer-events-none');
-                    container.innerHTML = ''; // Bersihkan div setelah di-download
-                    showToast("PDF Analytic Berhasil Diunduh!");
-                });
-            }, 500); // Wait for canvas render
+                // 3. JEDA SHUTTER (Tunggu grafik selesai digambar, baru difoto)
+                setTimeout(() => {
+                    html2pdf().set({ 
+                        margin: 15, 
+                        filename: `FFI_Analytic_Report_${new Date().getTime()}.pdf`, 
+                        image: { type: 'jpeg', quality: 1 }, 
+                        html2canvas: { scale: 2, scrollY: 0, useCORS: true }, 
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+                    }).from(container).save().then(() => {
+                        btn.innerHTML = origHtml; btn.classList.remove('opacity-50', 'pointer-events-none');
+                        container.innerHTML = ''; 
+                        showToast("PDF Analytic Berhasil Diunduh!");
+                    });
+                }, 800); // 800ms Shutter Delay
+            }, 100); 
         }
 
         function generateLogReport() {
-            if(activeLogData.length === 0) { showToast("Sync Data Log Dulu!", true); return; }
-            const monthVal = document.getElementById('report-month').value; // Format: YYYY-MM
+            if(activeLogData.length === 0) { showToast("Sync Data Log Dahulu!", true); return; }
+            const monthVal = document.getElementById('report-month').value; 
             if(!monthVal) { showToast("Pilih Bulan Dahulu!", true); return; }
             
             const btn = document.getElementById('btn-report-log'); const origHtml = btn.innerHTML;
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`; btn.classList.add('opacity-50', 'pointer-events-none');
 
             const [year, month] = monthVal.split('-');
-            const targetFormat = `${month}/${year}`; // Asumsi "Tanggal PO" format DD/MM/YYYY
+            const targetFormat = `${month}/${year}`; 
             
             let filteredLog = activeLogData.filter(i => {
                 if(!i.ID || String(i["PO NKA"]).includes("BATAL")) return false;
-                const dateStr = i["Tanggal PO"] || ""; // ex: 15/04/2026
+                const dateStr = i["Tanggal PO"] || ""; 
                 return dateStr.includes(targetFormat);
             });
 
             if(filteredLog.length === 0) {
-                showToast("Data Kosong di Bulan Ini", true);
+                showToast("Tidak ada transaksi di bulan ini", true);
                 btn.innerHTML = origHtml; btn.classList.remove('opacity-50', 'pointer-events-none'); return;
             }
 
@@ -578,27 +606,34 @@
             let tableRows = '';
             filteredLog.forEach(i => {
                 const poQty = Number(i["TOTAL PO ctn"]) || 0; const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0; const gap = i["GAP"] || 0;
-                tableRows += `<tr><td style="padding:8px; border:1px solid #CCC;">${i.ID}</td><td style="padding:8px; border:1px solid #CCC;">${i["Tanggal PO"]}</td><td style="padding:8px; border:1px solid #CCC;">${i.DC}</td><td style="padding:8px; border:1px solid #CCC; text-align:center;">${poQty}</td><td style="padding:8px; border:1px solid #CCC; text-align:center;">${salesQty}</td><td style="padding:8px; border:1px solid #CCC; text-align:center; color:${gap>0?'#FF3B30':'#34C759'};">${gap}</td></tr>`;
+                tableRows += `<tr><td style="padding:10px; border-bottom:1px solid #E5E7EB; font-weight: bold;">${i.ID}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; color: #6B7280;">${i["Tanggal PO"]}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB;">${i.DC}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; text-align:center;">${poQty}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; text-align:center;">${salesQty}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; text-align:center; font-weight:bold; color:${gap>0?'#FF3B30':'#34C759'};">${gap}</td></tr>`;
             });
 
             container.innerHTML = `
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <h1 style="font-size: 20px; font-weight: bold; margin:0; color:#FF3B30;">LOG ORDER & SALES REPORT</h1>
-                    <p style="margin: 5px 0 0 0; color: #555;">Periode: ${monthVal}</p>
+                <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #E5E7EB; padding-bottom: 15px;">
+                    <h1 style="font-size: 24px; font-weight: 900; margin:0; color:#2B65F6; letter-spacing: 1px;">DATABASE LOG REPORT</h1>
+                    <p style="margin: 5px 0 0 0; color: #6B7280; font-size: 14px;">Periode Pembukuan: ${month} / ${year}</p>
                 </div>
-                <table style="width:100%; border-collapse: collapse; font-size: 11px;">
-                    <thead><tr style="background:#F8F9FA;"><th style="padding:8px; border:1px solid #CCC; text-align:left;">ID PO</th><th style="padding:8px; border:1px solid #CCC; text-align:left;">TANGGAL</th><th style="padding:8px; border:1px solid #CCC; text-align:left;">DC</th><th style="padding:8px; border:1px solid #CCC; text-align:center;">PO (CTN)</th><th style="padding:8px; border:1px solid #CCC; text-align:center;">SALES</th><th style="padding:8px; border:1px solid #CCC; text-align:center;">GAP</th></tr></thead>
+                <table style="width:100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                    <thead><tr style="background:#F9FAFB; color: #374151; font-weight: 900;"><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">ID PO</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">TANGGAL</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">DC</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">PO (CTN)</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">SALES</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">GAP</th></tr></thead>
                     <tbody>${tableRows}</tbody>
                 </table>
             `;
 
+            // Beri waktu sejenak agar DOM mencerna HTML yang panjang sebelum difoto
             setTimeout(() => {
-                html2pdf().set({ margin: 10, filename: `FFI_LogReport_${monthVal}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(container).save().then(() => {
+                html2pdf().set({ 
+                    margin: 15, 
+                    filename: `FFI_LogReport_${monthVal}.pdf`, 
+                    image: { type: 'jpeg', quality: 1 }, 
+                    html2canvas: { scale: 2, scrollY: 0, useCORS: true }, 
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+                }).from(container).save().then(() => {
                     btn.innerHTML = origHtml; btn.classList.remove('opacity-50', 'pointer-events-none');
                     container.innerHTML = ''; 
                     showToast("PDF Log Berhasil Diunduh!");
                 });
-            }, 300);
+            }, 600);
         }
     </script>
 </body>
