@@ -70,8 +70,8 @@
         .skeleton-box::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shimmer 1.5s infinite; }
 
         /* WADAH KERTAS A4 VIRTUAL */
-        .a4-wrapper { overflow-x: auto; background-color: #1C1C1E; border-radius: 1rem; padding: 10px; border: 1px solid rgba(255,255,255,0.1); }
-        .a4-paper { width: 794px; min-height: 1122px; background: white; color: black; padding: 40px; font-family: Arial, sans-serif; box-sizing: border-box; }
+        .a4-wrapper { overflow-x: auto; background-color: #1C1C1E; border-radius: 1rem; padding: 10px; border: 1px solid rgba(255,255,255,0.1); position: relative; }
+        .a4-paper { width: 794px; min-height: 1122px; background: white; color: black; padding: 40px; font-family: Arial, sans-serif; box-sizing: border-box; position: relative; }
     </style>
 </head>
 <body class="flex justify-center antialiased font-apple relative">
@@ -178,7 +178,7 @@
                         </button>
                         <p class="text-[9px] text-gray-500 text-center uppercase tracking-widest font-bold">⬇️ Preview Laporan (Bisa di-scroll) ⬇️</p>
                         
-                        <div class="a4-wrapper">
+                        <div class="a4-wrapper" id="wrap-print-analytic">
                             <div id="print-analytic" class="a4-paper">
                                 <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #E5E7EB; padding-bottom: 15px;">
                                     <h1 style="font-size: 26px; font-weight: 900; margin:0; color:#FF3B30; letter-spacing: 1px;">FAMILY FOOD INDONESIA</h1>
@@ -225,7 +225,7 @@
                         </button>
                         <p class="text-[9px] text-gray-500 text-center uppercase tracking-widest font-bold">⬇️ Preview Laporan (Bisa di-scroll) ⬇️</p>
                         
-                        <div class="a4-wrapper">
+                        <div class="a4-wrapper" id="wrap-print-log">
                             <div id="print-log" class="a4-paper">
                                 <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #E5E7EB; padding-bottom: 15px;">
                                     <h1 style="font-size: 24px; font-weight: 900; margin:0; color:#2B65F6; letter-spacing: 1px;">DATABASE LOG REPORT</h1>
@@ -345,20 +345,13 @@
 
     <script>
         const WEBHOOK_URL = "https://n8n-mzbmiib3etk4.kangkung.sumopod.my.id/webhook/ff-indonesia-api";
-        let activeLogData = [];
-        let globalForecastData = [];
-        let globalDiagnoseData = [];
-        let targetDCInput = "";
-        let chartBarInstance = null;
-        let chartPieInstance = null;
-
+        let activeLogData = []; let globalForecastData = []; let globalDiagnoseData = []; let targetDCInput = "";
+        let chartBarInstance = null; let chartPieInstance = null;
         const DC_LIST = ["BANDUNG", "BALARAJA", "BEKASI", "BOGOR", "BREBEK", "CIANJUR", "CILEUNGSI", "CIKOKOL", "CILACAP", "JEMBER", "KARAWANG", "KLATEN", "MADIUN", "MALANG", "PARUNG", "PLUMBON", "REMBANG", "SEMARANG", "SERANG", "SIDOARJO", "TEGAL", "BALI", "BANJARMASIN", "BATAM", "GORONTALO", "JAMBI", "SUKABUMI", "LAMPUNG", "LOMBOK", "LUWU", "MAKASSAR", "MANADO", "MEDAN", "PALEMBANG", "PEKANBARU", "PONTIANAK"];
 
         window.onload = () => {
-            const d = new Date();
-            const currMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
+            const d = new Date(); const currMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
             document.getElementById('report-month').value = currMonth;
-
             const savedUser = localStorage.getItem('ffi_user');
             if(savedUser) {
                 document.getElementById('view-login').classList.add('hidden-tab'); document.getElementById('view-main').classList.remove('hidden-tab');
@@ -368,8 +361,7 @@
         };
 
         function initDateRecommendations() {
-            const dl = document.getElementById('date-recom'); if(!dl) return; dl.innerHTML = '';
-            const today = new Date();
+            const dl = document.getElementById('date-recom'); if(!dl) return; dl.innerHTML = ''; const today = new Date();
             for(let i=0; i<=3; i++) {
                 const d = new Date(today); d.setDate(d.getDate() - i);
                 const dd = String(d.getDate()).padStart(2, '0'); const mm = String(d.getMonth() + 1).padStart(2, '0'); const yyyy = d.getFullYear();
@@ -378,8 +370,7 @@
         }
 
         function updateMonthHeaders() {
-            const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-            const d = new Date();
+            const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"]; const d = new Date();
             const elBuffer = document.getElementById('th-buffer'); const elForecast = document.getElementById('th-forecast');
             if(elBuffer) elBuffer.innerHTML = `BUFFER<br>(${months[d.getMonth()]})`; if(elForecast) elForecast.innerHTML = `FORECAST<br>(${months[(d.getMonth() + 1) % 12]})`;
         }
@@ -392,8 +383,7 @@
         function runTicker(el, endVal) {
             if(!el) return; let startT = null, duration = 800;
             function step(t) {
-                if(!startT) startT = t; let prog = Math.min((t - startT) / duration, 1);
-                el.innerText = Math.floor(prog * endVal);
+                if(!startT) startT = t; let prog = Math.min((t - startT) / duration, 1); el.innerText = Math.floor(prog * endVal);
                 if(prog < 1) window.requestAnimationFrame(step); else el.innerText = endVal;
             } window.requestAnimationFrame(step);
         }
@@ -402,7 +392,7 @@
             const t = document.getElementById('toast'); if(!t) return;
             document.getElementById('toast-msg').innerText = msg; document.getElementById('toast-icon').innerText = isError ? '❌' : '✅';
             t.className = `fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-7 py-3 rounded-full font-extrabold text-sm flex items-center gap-3 w-max max-w-[90%] transition-transform duration-300 border-2 ${isError ? 'bg-[#3A0000] border-appred text-appred shadow-[0_0_20px_rgba(255,59,48,0.4)]' : 'bg-appcard border-appgreen text-white shadow-[0_0_20px_rgba(52,199,89,0.3)]'}`;
-            if(!isError && (msg.includes("Login") || msg.includes("Akses"))) t.classList.replace('border-appgreen', 'border-appappleorange');
+            if(!isError && (msg.includes("Login") || msg.includes("Akses") || msg.includes("Mencetak"))) t.classList.replace('border-appgreen', 'border-appappleorange');
             t.classList.add('toast-show'); setTimeout(() => t.classList.remove('toast-show'), 3000);
         }
 
@@ -452,7 +442,7 @@
                     const colorClass = (tabId === 'tab-analytics') ? 'text-appapplered' : (tabId === 'tab-report') ? 'text-appappleblue' : 'text-appgreen';
                     element.classList.replace('text-gray-600', colorClass); 
                 }
-                if(tabId === 'tab-report') { renderAnalyticPreview(); renderLogPreview(); } // Render saat tab report dibuka
+                if(tabId === 'tab-report') { renderAnalyticPreview(); renderLogPreview(); } 
             } catch(e) { console.error(e); }
         }
 
@@ -475,7 +465,6 @@
             document.getElementById('rep-view-log').classList.add('hidden-tab');
             document.getElementById('btn-rep-analytic').className = "flex-1 py-3 rounded-xl text-xs font-extrabold uppercase transition-all text-gray-500 bg-transparent";
             document.getElementById('btn-rep-log').className = "flex-1 py-3 rounded-xl text-xs font-extrabold uppercase transition-all text-gray-500 bg-transparent";
-
             if(type === 'analytic') {
                 document.getElementById('rep-view-analytic').classList.remove('hidden-tab');
                 document.getElementById('btn-rep-analytic').className = "flex-1 py-3 rounded-xl text-xs font-extrabold uppercase transition-all bg-appappleblue text-black shadow-glow-lightblue";
@@ -500,11 +489,9 @@
                     forecastRows.forEach((item, idx) => {
                         const row = item.json ? item.json : item; const vals = Object.values(row); let skuName = row.col_2 || row["Nama SKU"] || vals[1] || "";
                         if(!skuName || String(skuName).toUpperCase().includes("NAMA SKU") || String(skuName).includes("col_")) return;
-                        
                         const demandBulat = Math.round(Number(row.col_3 || row["Avg. Demand 3 Bulanan"] || vals[2] || 0)); const forecastBulat = Math.round(Number(row.col_4 || row["FORECAST PO"] || vals[3] || 0)); const bufferBulat = Math.round(Number(row.col_5 || row["BUFFER"] || vals[4] || 0)); const statusText = String(row.col_6 || row["STATUS"] || vals[5] || "");
                         globalForecastData.push({ sku: skuName, demand: demandBulat, po: forecastBulat, buffer: bufferBulat, status: statusText });
-                        skuCount++; 
-                        const dot = statusText.includes("CRITICAL") ? '<span class="h-2.5 w-2.5 rounded-full bg-appred shadow-[0_0_8px_#FF3B30] inline-block animate-pulse"></span>' : '<span class="h-2.5 w-2.5 rounded-full bg-appgreen shadow-[0_0_8px_#34C759] inline-block"></span>';
+                        skuCount++; const dot = statusText.includes("CRITICAL") ? '<span class="h-2.5 w-2.5 rounded-full bg-appred shadow-[0_0_8px_#FF3B30] inline-block animate-pulse"></span>' : '<span class="h-2.5 w-2.5 rounded-full bg-appgreen shadow-[0_0_8px_#34C759] inline-block"></span>';
                         if(fCont) { fCont.innerHTML += `<div class="grid grid-cols-5 gap-1.5 items-center py-3 border-b border-white/5 text-[10px] text-center animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0"><div class="font-extrabold text-left text-white px-1 uppercase truncate min-w-0">${skuName}</div><div class="text-gray-400 font-bold">${demandBulat}</div><div class="text-white font-black">${forecastBulat}</div><div class="text-white font-black">${bufferBulat}</div><div class="flex justify-center items-center">${dot}</div></div>`; }
                     });
                 } runTicker(document.getElementById('stat-sku'), skuCount);
@@ -515,15 +502,13 @@
                     diagRows.forEach((item, idx) => {
                         const row = item.json ? item.json : item; const vals = Object.values(row); let dcName = row["DC"] || row.col_2 || vals[1] || "";
                         if(!dcName || String(dcName).toUpperCase() === "DC" || String(dcName).includes("col_")) return;
-                        
                         const failCount = Number(row["WAREHOUSE FAILURE"] || row.col_3 || vals[2] || 0); const moqCount = Number(row["UNDER MOQ"] || row.col_5 || vals[4] || 0); const resStr = String(row["DIAGNOSE RESULTS (DR)"] || row.col_9 || vals[8] || "N/A").toUpperCase();
                         const total = failCount + moqCount; if(total > 0 || dcName !== "N/A") dcIssueCount++; const failPct = total > 0 ? Math.round((failCount / total) * 100) : 0; const moqPct = total > 0 ? Math.round((moqCount / total) * 100) : 0;
                         if(dcName !== "N/A") globalDiagnoseData.push({ dc: dcName, failPct: failPct, moqPct: moqPct, res: resStr });
-
                         if(dCont) { dCont.innerHTML += `<div class="bg-appcard p-5 rounded-4xl border border-white/7 mb-3.5 animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0"><div class="flex justify-between items-center mb-4"><h4 class="text-sm font-black text-white uppercase tracking-tight truncate w-32">${dcName}</h4><p class="text-[8px] font-bold ${resStr.includes('FAILURE') ? 'text-appred' : 'text-appappleorange'} tracking-widest bg-black px-2.5 py-1.5 rounded-md border border-white/7">⚠️ ${resStr}</p></div><div class="grid grid-cols-3 gap-1.5 text-center bg-black/50 p-3 rounded-2xl border border-white/7"><div class="border-r border-white/10"><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">WH Failure</p><p class="text-xs font-black text-appred">${failPct}%</p></div><div class="border-r border-white/10"><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">Under MOQ</p><p class="text-xs font-black text-appappleorange">${moqPct}%</p></div><div><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">Above MOQ</p><p class="text-xs font-black text-appgreen">0%</p></div></div></div>`; }
                     });
                 } runTicker(document.getElementById('stat-dc'), dcIssueCount);
-                renderAnalyticPreview(); // Update preview jika sedang di tab report
+                renderAnalyticPreview(); 
             } catch (err) { showToast("Gagal Sync Data", true); } finally { if(btn) { btn.innerHTML = origText; btn.classList.remove('opacity-50', 'pointer-events-none'); } }
         }
 
@@ -534,7 +519,7 @@
             if (res && res.status === "success") {
                 activeLogData = res.data || [];
                 if(dl) { dl.innerHTML = ''; let countID = 0; activeLogData.forEach(item => { if(item.ID && countID < 10 && !String(item["PO NKA"]).includes("BATAL")) { dl.innerHTML += `<option value="${item.ID}">`; countID++; } }); }
-                renderLogs(activeLogData); renderLogPreview(); // Update preview
+                renderLogs(activeLogData); renderLogPreview(); 
             }
         }
 
@@ -570,7 +555,7 @@
             } catch(error) { showToast("Kesalahan Form Internal", true); }
         }
 
-        // ================= RENDERING PDF PREVIEW A4 =================
+        // ================= PREVIEW RENDERER =================
         function renderAnalyticPreview() {
             document.getElementById('report-date').innerText = new Date().toLocaleDateString('id-ID');
             let totPO = 0; let totSales = 0;
@@ -588,7 +573,6 @@
             document.getElementById('rep-prod').innerText = `${demandVsProd}%`;
             document.getElementById('rep-inv-health').innerHTML = `<span style="color:#FF3B30;">${countCrit} Critical</span> <span style="color:#D1D5DB; margin: 0 10px;">|</span> <span style="color:#34C759;">${countSafe} Safe</span>`;
 
-            // Render Charts (Hancurkan instance lama agar tidak error canvas)
             if(chartBarInstance) chartBarInstance.destroy();
             if(chartPieInstance) chartPieInstance.destroy();
 
@@ -638,22 +622,42 @@
             tbody.innerHTML = tableRows;
         }
 
-        // ================= FUNGSI DOWNLOAD PDF DARI PREVIEW =================
+        // ================= FIX DOWNLOAD PDF (ANTI CROP) =================
         function downloadPDF(elementId, fileNamePrefix) {
             const element = document.getElementById(elementId);
+            const wrapper = element.parentElement; // Ambil container .a4-wrapper
+            
+            // FIX: Lepas belenggu scroll & Paksa kembali ke titik 0,0 sebelum difoto
+            if(wrapper) {
+                wrapper.style.overflowX = 'visible'; 
+                wrapper.scrollLeft = 0;
+            }
+            window.scrollTo(0,0);
+
             const fileName = elementId === 'print-log' ? `${fileNamePrefix}_${document.getElementById('report-month').value}.pdf` : `${fileNamePrefix}_${new Date().getTime()}.pdf`;
             
-            // Konfigurasi ukuran A4 Potrait
             const opt = {
-                margin:       [15, 10, 15, 10], // Top, Left, Bottom, Right
+                margin:       [10, 0, 10, 0], // Margin (Top, Left, Bottom, Right)
                 filename:     fileName,
                 image:        { type: 'jpeg', quality: 1 },
-                html2canvas:  { scale: 2, useCORS: true, windowWidth: 800 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    width: 794,        // Kunci pas lebar kertas A4
+                    windowWidth: 794,  // Tipu engine agar mengira HP Anda selebar 794px
+                    x: 0,              // Paksa jepretan dari koordinat nol
+                    y: 0,
+                    scrollX: 0,
+                    scrollY: 0
+                },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
             
-            showToast("Memproses PDF...");
+            showToast("Sedang mencetak A4...");
+            
             html2pdf().set(opt).from(element).save().then(() => {
+                // Kembalikan belenggu scroll seperti semula
+                if(wrapper) wrapper.style.overflowX = 'auto';
                 showToast("PDF Berhasil Diunduh!");
             });
         }
