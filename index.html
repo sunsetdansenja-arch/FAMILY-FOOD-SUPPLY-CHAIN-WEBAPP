@@ -177,16 +177,20 @@
                     </div>
 
                     <div id="rep-view-analytic" class="space-y-6">
-                        <button onclick="downloadPDF('print-analytic', 'FFI_Analytic_Report')" class="w-full max-w-2xl mx-auto bg-white text-black font-extrabold py-4 md:py-5 rounded-2xl btn-tactile shadow-[0_0_20px_rgba(255,255,255,0.3)] flex justify-center items-center gap-2 text-xs md:text-sm uppercase tracking-widest hover:scale-[0.98] transition-transform">
-                            <i class="fa-solid fa-download text-lg"></i> DOWNLOAD PDF A4
-                        </button>
+                        <div class="flex flex-col md:flex-row gap-3 md:gap-4 max-w-2xl mx-auto w-full">
+                            <input type="month" id="analytic-month" class="bg-appcard border border-white/10 text-white rounded-2xl flex-1 outline-none text-xs md:text-sm text-center font-bold px-3" required onchange="renderAnalyticPreview()">
+                            <button onclick="downloadPDF('print-analytic', 'FFI_Analytic_Report')" class="w-full md:w-auto bg-white text-black font-extrabold px-6 py-4 rounded-2xl btn-tactile shadow-[0_0_20px_rgba(255,255,255,0.3)] flex justify-center items-center gap-2 text-xs md:text-sm uppercase tracking-widest hover:scale-[0.98] transition-transform">
+                                <i class="fa-solid fa-download text-lg"></i> <span class="md:hidden ml-1">DOWNLOAD PDF</span>
+                            </button>
+                        </div>
                         <p class="text-[9px] md:text-xs text-gray-500 text-center uppercase tracking-widest font-bold">⬇️ Preview Laporan Asli ⬇️</p>
                         
                         <div class="a4-wrapper" id="wrap-print-analytic">
                             <div id="print-analytic" class="a4-paper">
                                 <div style="text-align: center; margin-bottom: 25px; border-bottom: 2px solid #E5E7EB; padding-bottom: 15px;">
                                     <h1 style="font-size: 26px; font-weight: 900; margin:0; color:#FF3B30; letter-spacing: 1px;">FAMILY FOOD INDONESIA</h1>
-                                    <p style="margin: 5px 0 0 0; color: #6B7280; font-size: 14px;">Executive Analytic Report - <span id="report-date"></span></p>
+                                    <p style="margin: 5px 0 0 0; color: #6B7280; font-size: 14px;">Executive Analytic Report</p>
+                                    <p style="margin: 2px 0 0 0; color: #888; font-size: 12px; font-style:italic;" id="report-date"></p>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; gap: 15px; margin-bottom: 30px;">
                                     <div style="flex:1; background:#F9FAFB; padding:20px; border-radius:12px; border:1px solid #E5E7EB;">
@@ -194,7 +198,7 @@
                                         <div id="rep-fulfill" style="font-size:28px; font-weight:900; margin-top:8px;">0%</div>
                                     </div>
                                     <div style="flex:1; background:#F9FAFB; padding:20px; border-radius:12px; border:1px solid #E5E7EB;">
-                                        <div style="font-size:11px; color:#6B7280; text-transform:uppercase; font-weight:800; letter-spacing: 0.5px;">Alert Stock</div>
+                                        <div style="font-size:11px; color:#6B7280; text-transform:uppercase; font-weight:800; letter-spacing: 0.5px;">Alert Stock (Real-Time)</div>
                                         <div id="rep-alert" style="font-size:16px; font-weight:900; margin-top:14px;">N/A</div>
                                     </div>
                                     <div style="flex:1; background:#F9FAFB; padding:20px; border-radius:12px; border:1px solid #E5E7EB;">
@@ -203,7 +207,7 @@
                                     </div>
                                 </div>
                                 <div style="background:#F9FAFB; padding:20px; border-radius:12px; border:1px solid #E5E7EB; margin-bottom:30px; text-align:center;">
-                                    <div style="font-size:13px; color:#6B7280; text-transform:uppercase; font-weight:800; letter-spacing: 1px;">Global Inventory Health</div>
+                                    <div style="font-size:13px; color:#6B7280; text-transform:uppercase; font-weight:800; letter-spacing: 1px;">Global Inventory Health (Real-Time)</div>
                                     <div id="rep-inv-health" style="font-size:22px; font-weight:900; margin-top:8px;">0 Critical | 0 Safe</div>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; gap: 20px; align-items: center;">
@@ -366,6 +370,7 @@
         window.onload = () => {
             const d = new Date(); const currMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
             document.getElementById('report-month').value = currMonth;
+            document.getElementById('analytic-month').value = currMonth;
             
             const savedUser = localStorage.getItem('ffi_user');
             if(savedUser) {
@@ -542,7 +547,7 @@
             if (res && res.status === "success") {
                 activeLogData = res.data || [];
                 if(dl) { dl.innerHTML = ''; let countID = 0; activeLogData.forEach(item => { if(item.ID && countID < 10 && !String(item["PO NKA"]).includes("BATAL")) { dl.innerHTML += `<option value="${item.ID}">`; countID++; } }); }
-                renderLogs(activeLogData); renderLogPreview(); 
+                renderLogs(activeLogData); renderLogPreview(); renderAnalyticPreview();
             }
         }
 
@@ -578,15 +583,37 @@
             } catch(error) { showToast("Kesalahan Form Internal", true); }
         }
 
-        // ================= PREVIEW RENDERER =================
+        // ====== UPDATE: ANALYTIC HYBRID REPORT DENGAN DUAL NET FILTER ======
         function renderAnalyticPreview() {
-            document.getElementById('report-date').innerText = new Date().toLocaleDateString('id-ID');
+            const monthVal = document.getElementById('analytic-month').value;
+            let target1 = "", target2 = "", displayPeriod = "-";
+            
+            if(monthVal) {
+                const [year, monthStr] = monthVal.split('-');
+                const monthInt = parseInt(monthStr, 10); 
+                target1 = `${monthStr}/${year}`;    // Jaring 1: "01/2026"
+                target2 = `/${monthInt}/${year}`;   // Jaring 2: "/1/2026"
+                displayPeriod = `Periode: ${monthStr} / ${year} (Histori) | Area: Inv. Real-Time`;
+            }
+            document.getElementById('report-date').innerText = displayPeriod;
+
+            // KALKULASI FULFILLMENT (Berdasarkan Bulan)
             let totPO = 0; let totSales = 0;
-            activeLogData.forEach(i => { if(i.ID && !String(i["PO NKA"]).includes("BATAL")) { totPO += Number(i["TOTAL PO ctn"]||0); totSales += Number(i["Qty Terpenuhi (Kirim)"]||0); } });
+            activeLogData.forEach(i => { 
+                if(i.ID && !String(i["PO NKA"]).includes("BATAL")) { 
+                    const tgl = i["Tanggal PO"] || "";
+                    // Filter Jaring Ganda
+                    if(monthVal && !(tgl.includes(target1) || tgl.includes(target2))) return;
+                    
+                    totPO += Number(i["TOTAL PO ctn"]||0); 
+                    totSales += Number(i["Qty Terpenuhi (Kirim)"]||0); 
+                } 
+            });
             const fulfillPct = totPO > 0 ? Math.round((totSales/totPO)*100) : 0;
             document.getElementById('rep-fulfill').innerText = `${fulfillPct}%`;
             document.getElementById('rep-fulfill').style.color = fulfillPct >= 80 ? '#34C759' : '#FF9500';
 
+            // KALKULASI INVENTORY & DEMAND (REAL-TIME KESELURUHAN)
             let totDemand = 0; let totPOForecast = 0; let countCrit = 0; let countSafe = 0;
             globalForecastData.forEach(i => { totDemand += i.demand; totPOForecast += i.po; if(i.status.includes("CRITICAL")) countCrit++; else countSafe++; });
             const demandVsProd = totDemand > 0 ? Math.round((totPOForecast/totDemand)*100) : 0;
@@ -618,22 +645,27 @@
             });
         }
 
-        // ====== UPDATE: RENDER LOG PREVIEW DUAL FILTER ======
+        // ====== UPDATE: LOG PREVIEW DENGAN DUAL NET FILTER ======
         function renderLogPreview() {
             const monthVal = document.getElementById('report-month').value; 
             const dcVal = document.getElementById('report-dc').value; 
             if(!monthVal) return;
             
-            const [year, month] = monthVal.split('-');
-            const targetFormat = `${month}/${year}`; 
+            const [year, monthStr] = monthVal.split('-');
+            const monthInt = parseInt(monthStr, 10); 
             
-            // Ubah Header PDF sesuai pilihan
+            // Jaring Ganda diaktifkan
+            const target1 = `${monthStr}/${year}`;    
+            const target2 = `/${monthInt}/${year}`;   
+            
             const dcHeader = dcVal === "ALL" ? "ALL DC" : dcVal;
-            document.getElementById('rep-log-period').innerHTML = `${month} / ${year} &nbsp;|&nbsp; AREA: <span style="color:#FF3B30;">${dcHeader}</span>`;
+            document.getElementById('rep-log-period').innerHTML = `${monthStr} / ${year} &nbsp;|&nbsp; AREA: <span style="color:#FF3B30;">${dcHeader}</span>`;
             
             let filteredLog = activeLogData.filter(i => {
                 if(!i.ID || String(i["PO NKA"]).includes("BATAL")) return false;
-                const matchMonth = (i["Tanggal PO"] || "").includes(targetFormat);
+                const tgl = i["Tanggal PO"] || "";
+                // Cek apakah tembus di jaring 1 atau jaring 2
+                const matchMonth = tgl.includes(target1) || tgl.includes(target2);
                 const matchDC = (dcVal === "ALL") || (i.DC === dcVal);
                 return matchMonth && matchDC;
             });
@@ -665,6 +697,9 @@
                 const monthVal = document.getElementById('report-month').value;
                 const dcVal = document.getElementById('report-dc').value;
                 fileName = `FFI_LogReport_${dcVal}_${monthVal}.pdf`;
+            } else if (elementId === 'print-analytic') {
+                const monthVal = document.getElementById('analytic-month').value;
+                fileName = `FFI_AnalyticReport_${monthVal}.pdf`;
             }
             
             const opt = {
