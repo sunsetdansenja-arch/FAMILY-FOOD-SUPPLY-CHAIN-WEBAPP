@@ -10,6 +10,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -50,6 +53,7 @@
         ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
         
         input, select { background-color: #2C2C2E; border: 1.5px solid transparent; transition: all 0.25s; color: white; width: 100%; border-radius: 1.25rem; padding: 1.1rem 1.4rem; outline: none; font-weight: 600; font-size: 0.95rem; }
+        input[type="month"] { padding: 0.8rem 1.2rem; }
         input:focus, select:focus { border-color: #FF3B30; background-color: #1C1C1E; box-shadow: 0 0 15px rgba(255,59,48,0.25); }
         input::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
 
@@ -64,9 +68,14 @@
         
         .skeleton-box { position: relative; overflow: hidden; background-color: #1C1C1E; }
         .skeleton-box::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shimmer 1.5s infinite; }
+
+        /* WADAH PDF TERSEMBUNYI (LIGHT MODE UNTUK PRINT) */
+        #pdf-container { position: absolute; left: -9999px; top: 0; width: 800px; background: white; color: black; padding: 40px; font-family: Arial, sans-serif; }
     </style>
 </head>
 <body class="flex justify-center antialiased font-apple">
+
+    <div id="pdf-container"></div>
 
     <datalist id="date-recom"></datalist>
     <datalist id="recent-po-ids"></datalist>
@@ -89,7 +98,7 @@
         <div id="view-login" class="flex flex-col h-screen p-9 justify-center items-center relative z-40 bg-[#000000]">
             <div class="w-full max-w-sm space-y-12">
                 <div class="text-center space-y-4">
-                    <img src="./LOGO FFI.png" alt="Family Food Logo" class="w-36 h-auto mx-auto mb-8 drop-shadow-[0_0_20px_rgba(255,59,48,0.4)] animate-fade-in-up">
+                    <img src="./LOGO FFI.png" alt="Family Food Logo" onerror="this.src='https://via.placeholder.com/150/FF3B30/FFFFFF?text=FFI'" class="w-36 h-auto mx-auto mb-8 drop-shadow-[0_0_20px_rgba(255,59,48,0.4)] animate-fade-in-up">
                     <p class="text-[11px] text-gray-500 uppercase tracking-[0.35em] font-extrabold">Secure Access Center</p>
                 </div>
                 <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4">
@@ -104,7 +113,7 @@
             
             <div class="px-6 py-4 sticky top-0 bg-[#000000]/92 backdrop-blur-xl z-20 flex justify-between items-center border-b border-white/7">
                 <div class="flex items-center gap-3">
-                    <img src="./LOGO FFI.png" alt="Family Food Logo" class="h-9 w-auto object-contain drop-shadow-[0_0_10px_rgba(255,59,48,0.25)]">
+                    <img src="./LOGO FFI.png" alt="Family Food Logo" onerror="this.src='https://via.placeholder.com/50/FF3B30/FFFFFF?text=FFI'" class="h-9 w-auto object-contain drop-shadow-[0_0_10px_rgba(255,59,48,0.25)]">
                     <div class="flex items-center gap-2">
                         <span class="w-1.5 h-1.5 rounded-full bg-appgreen animate-pulse shadow-[0_0_8px_#34C759]"></span>
                         <p id="header-username" class="text-[10px] text-gray-400 uppercase font-extrabold tracking-widest">USER</p>
@@ -115,7 +124,7 @@
 
             <div class="flex-1 overflow-y-auto pb-32">
                 
-                <div id="tab-analytics" class="p-6 space-y-8 animate-fade-in-up">
+                <div id="tab-analytics" class="p-6 space-y-6 animate-fade-in-up">
                     <div class="flex gap-4">
                         <div class="flex-1 bg-appcard border border-white/7 p-5 rounded-4xl flex flex-col justify-between shadow-glow-lightblue transition-all hover:shadow-[0_0_20px_rgba(173,216,230,0.3)]">
                             <p class="text-[9px] uppercase font-bold text-gray-500 tracking-widest">Total SKU</p>
@@ -127,9 +136,14 @@
                         </div>
                     </div>
 
-                    <button type="button" onclick="loadAnalytics()" id="btn-sync-analytics" class="w-full bg-white text-black font-extrabold py-4 rounded-2xl btn-tactile shadow-[0_0_25px_rgba(255,255,255,0.2)] flex justify-center items-center gap-2 text-xs uppercase tracking-widest">
-                        <i class="fa-solid fa-rotate-right" id="sync-icon"></i> SYNC ANALYTIC DATA
-                    </button>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="loadAnalytics()" id="btn-sync-analytics" class="flex-1 bg-white text-black font-extrabold py-3.5 rounded-2xl btn-tactile shadow-[0_0_25px_rgba(255,255,255,0.2)] flex justify-center items-center gap-2 text-[10px] uppercase tracking-widest">
+                            <i class="fa-solid fa-rotate-right" id="sync-icon"></i> SYNC
+                        </button>
+                        <button type="button" onclick="generateAnalyticReport()" id="btn-report-analytic" class="flex-1 bg-appappleblue text-black font-extrabold py-3.5 rounded-2xl btn-tactile shadow-glow-lightblue flex justify-center items-center gap-2 text-[10px] uppercase tracking-widest">
+                            <i class="fa-solid fa-file-pdf"></i> REPORT
+                        </button>
+                    </div>
 
                     <div class="bg-appcard rounded-4xl border border-appappleblue/25 shadow-glow-lightblue overflow-hidden">
                         <div class="bg-appappleblue/10 px-6 py-5 border-b border-appappleblue/15">
@@ -158,9 +172,17 @@
                 </div>
 
                 <div id="tab-log" class="hidden-tab p-6 space-y-6 animate-fade-in-up">
-                    <div class="sticky top-[72px] bg-[#000000]/95 backdrop-blur-xl z-10 pt-2.5 pb-5 border-b border-white/7 flex gap-2.5">
-                        <input type="text" id="search-po" placeholder="Cari ID / DC..." class="text-sm bg-appcard border border-white/10 flex-1 rounded-2xl" onkeyup="filterLogLocal()">
-                        <button type="button" onclick="loadLogPO()" id="btn-sync-log" class="bg-appapplered text-white w-16 rounded-2xl flex justify-center items-center btn-tactile shadow-glow-redorange"><i class="fa-solid fa-rotate-right"></i></button>
+                    <div class="sticky top-[72px] bg-[#000000]/95 backdrop-blur-xl z-10 pt-2.5 pb-5 border-b border-white/7 flex flex-col gap-3">
+                        <div class="flex gap-2.5">
+                            <input type="text" id="search-po" placeholder="Cari ID / DC..." class="text-sm bg-appcard border border-white/10 flex-1 rounded-2xl" onkeyup="filterLogLocal()">
+                            <button type="button" onclick="loadLogPO()" id="btn-sync-log" class="bg-appapplered text-white w-16 rounded-2xl flex justify-center items-center btn-tactile shadow-glow-redorange"><i class="fa-solid fa-rotate-right"></i></button>
+                        </div>
+                        <div class="flex gap-2.5 items-center bg-appcard p-2 rounded-2xl border border-white/10">
+                            <input type="month" id="report-month" class="bg-transparent border-none text-white flex-1 outline-none text-xs text-center font-bold" required>
+                            <button type="button" onclick="generateLogReport()" id="btn-report-log" class="bg-appgreen text-black px-4 py-2.5 rounded-xl font-extrabold text-[10px] uppercase tracking-widest btn-tactile shadow-[0_0_15px_rgba(52,199,89,0.3)]">
+                                <i class="fa-solid fa-download mr-1"></i> LOG PDF
+                            </button>
+                        </div>
                     </div>
                     <div id="log-container" class="space-y-4"></div>
                 </div>
@@ -251,37 +273,33 @@
 
     <script>
         const WEBHOOK_URL = "https://n8n-mzbmiib3etk4.kangkung.sumopod.my.id/webhook/ff-indonesia-api";
+        // GLOBAL STATE UNTUK MEMORI REPORTING PDF
         let activeLogData = [];
+        let globalForecastData = [];
+        let globalDiagnoseData = [];
         let targetDCInput = "";
 
         const DC_LIST = ["BANDUNG", "BALARAJA", "BEKASI", "BOGOR", "BREBEK", "CIANJUR", "CILEUNGSI", "CIKOKOL", "CILACAP", "JEMBER", "KARAWANG", "KLATEN", "MADIUN", "MALANG", "PARUNG", "PLUMBON", "REMBANG", "SEMARANG", "SERANG", "SIDOARJO", "TEGAL", "BALI", "BANJARMASIN", "BATAM", "GORONTALO", "JAMBI", "SUKABUMI", "LAMPUNG", "LOMBOK", "LUWU", "MAKASSAR", "MANADO", "MEDAN", "PALEMBANG", "PEKANBARU", "PONTIANAK"];
 
-        // ================= SISTEM AUTO LOGIN (LOCAL STORAGE) =================
         window.onload = () => {
+            const d = new Date();
+            const currMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
+            document.getElementById('report-month').value = currMonth;
+
             const savedUser = localStorage.getItem('ffi_user');
             if(savedUser) {
-                // Bypass layar login
-                document.getElementById('view-login').classList.add('hidden-tab');
-                document.getElementById('view-main').classList.remove('hidden-tab');
+                document.getElementById('view-login').classList.add('hidden-tab'); document.getElementById('view-main').classList.remove('hidden-tab');
                 document.getElementById('header-username').innerText = savedUser;
-                // Init data
-                initDateRecommendations(); 
-                updateMonthHeaders(); 
-                initDCPicker(); 
-                loadAnalytics();
+                initDateRecommendations(); updateMonthHeaders(); initDCPicker(); loadAnalytics(); loadLogPO(); // Load logs in bg for reporting
             }
         };
 
         function initDateRecommendations() {
-            const dl = document.getElementById('date-recom');
-            if(!dl) return;
-            dl.innerHTML = '';
+            const dl = document.getElementById('date-recom'); if(!dl) return; dl.innerHTML = '';
             const today = new Date();
             for(let i=0; i<=3; i++) {
                 const d = new Date(today); d.setDate(d.getDate() - i);
-                const dd = String(d.getDate()).padStart(2, '0');
-                const mm = String(d.getMonth() + 1).padStart(2, '0');
-                const yyyy = d.getFullYear();
+                const dd = String(d.getDate()).padStart(2, '0'); const mm = String(d.getMonth() + 1).padStart(2, '0'); const yyyy = d.getFullYear();
                 dl.innerHTML += `<option value="${dd}/${mm}/${yyyy}">`;
             }
         }
@@ -289,10 +307,8 @@
         function updateMonthHeaders() {
             const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
             const d = new Date();
-            const elBuffer = document.getElementById('th-buffer');
-            const elForecast = document.getElementById('th-forecast');
-            if(elBuffer) elBuffer.innerHTML = `BUFFER<br>(${months[d.getMonth()]})`;
-            if(elForecast) elForecast.innerHTML = `FORECAST<br>(${months[(d.getMonth() + 1) % 12]})`;
+            const elBuffer = document.getElementById('th-buffer'); const elForecast = document.getElementById('th-forecast');
+            if(elBuffer) elBuffer.innerHTML = `BUFFER<br>(${months[d.getMonth()]})`; if(elForecast) elForecast.innerHTML = `FORECAST<br>(${months[(d.getMonth() + 1) % 12]})`;
         }
 
         function getSkeletonHTML(count, isList = false) {
@@ -301,35 +317,27 @@
         }
 
         function runTicker(el, endVal) {
-            if(!el) return;
-            let startT = null, duration = 800;
+            if(!el) return; let startT = null, duration = 800;
             function step(t) {
-                if(!startT) startT = t;
-                let prog = Math.min((t - startT) / duration, 1);
+                if(!startT) startT = t; let prog = Math.min((t - startT) / duration, 1);
                 el.innerText = Math.floor(prog * endVal);
-                if(prog < 1) window.requestAnimationFrame(step);
-                else el.innerText = endVal;
-            }
-            window.requestAnimationFrame(step);
+                if(prog < 1) window.requestAnimationFrame(step); else el.innerText = endVal;
+            } window.requestAnimationFrame(step);
         }
 
         function showToast(msg, isError = false) {
-            const t = document.getElementById('toast');
-            if(!t) return;
-            document.getElementById('toast-msg').innerText = msg;
-            document.getElementById('toast-icon').innerText = isError ? '❌' : '✅';
+            const t = document.getElementById('toast'); if(!t) return;
+            document.getElementById('toast-msg').innerText = msg; document.getElementById('toast-icon').innerText = isError ? '❌' : '✅';
             t.className = `fixed top-5 left-1/2 -translate-x-1/2 z-[100] px-7 py-3 rounded-full font-extrabold text-sm flex items-center gap-3 w-max max-w-[90%] transition-transform duration-300 border-2 ${isError ? 'bg-[#3A0000] border-appred text-appred shadow-[0_0_20px_rgba(255,59,48,0.4)]' : 'bg-appcard border-appgreen text-white shadow-[0_0_20px_rgba(52,199,89,0.3)]'}`;
             if(!isError && (msg.includes("Login") || msg.includes("Akses"))) t.classList.replace('border-appgreen', 'border-appappleorange');
-            t.classList.add('toast-show');
-            setTimeout(() => t.classList.remove('toast-show'), 3000);
+            t.classList.add('toast-show'); setTimeout(() => t.classList.remove('toast-show'), 3000);
         }
 
         async function sendApi(payload, btnElement = null, originalText = "") {
             if(btnElement) { btnElement.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`; btnElement.classList.add('opacity-50', 'pointer-events-none'); }
             try {
                 const res = await fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const textData = await res.text();
-                let data;
+                const textData = await res.text(); let data;
                 try { data = JSON.parse(textData); } catch(err) { data = { status: "error", message: textData }; }
                 if(btnElement) { btnElement.innerHTML = originalText; btnElement.classList.remove('opacity-50', 'pointer-events-none'); }
                 return Array.isArray(data) ? data[0] : data;
@@ -340,29 +348,16 @@
         }
 
         async function handleLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-login');
-            const user = document.getElementById('login-user').value;
-            const pass = document.getElementById('login-pass').value;
+            e.preventDefault(); const btn = document.getElementById('btn-login'); const user = document.getElementById('login-user').value; const pass = document.getElementById('login-pass').value;
             const res = await sendApi({ action: "login", user_id: user, password: pass }, btn, "MASUK SISTEM");
-            
             if (res && res.status === "success") {
-                // SIMPAN TIKET LOGIN KE DEVICE
-                localStorage.setItem('ffi_user', res.user_id || user);
-                
-                showToast("Akses Diberikan!");
-                document.getElementById('view-login').classList.add('hidden-tab');
-                document.getElementById('view-main').classList.remove('hidden-tab');
-                document.getElementById('header-username').innerText = res.user_id || user;
-                initDateRecommendations(); updateMonthHeaders(); initDCPicker(); loadAnalytics(); 
+                localStorage.setItem('ffi_user', res.user_id || user); showToast("Akses Diberikan!");
+                document.getElementById('view-login').classList.add('hidden-tab'); document.getElementById('view-main').classList.remove('hidden-tab'); document.getElementById('header-username').innerText = res.user_id || user;
+                initDateRecommendations(); updateMonthHeaders(); initDCPicker(); loadAnalytics(); loadLogPO();
             } else showToast(res ? res.message : "Akses Ditolak", true);
         }
 
-        // ================= FUNGSI LOGOUT MENGHAPUS TIKET =================
-        function logout() { 
-            localStorage.removeItem('ffi_user'); // Bakar tiket
-            location.reload(); // Refresh kembali ke halaman login
-        }
+        function logout() { localStorage.removeItem('ffi_user'); location.reload(); }
 
         function initDCPicker() {
             const grid = document.getElementById('dc-grid');
@@ -397,31 +392,39 @@
 
         async function loadAnalytics() {
             const fCont = document.getElementById('forecast-container'); const dCont = document.getElementById('diagnosa-container'); const btn = document.getElementById('btn-sync-analytics'); const origText = btn.innerHTML;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> MEMPROSES...`; btn.classList.add('opacity-50', 'pointer-events-none');
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`; btn.classList.add('opacity-50', 'pointer-events-none');
             if(fCont) fCont.innerHTML = getSkeletonHTML(5, false); if(dCont) dCont.innerHTML = getSkeletonHTML(4, true);
             try {
                 const [reqBuffer, reqDiag] = await Promise.allSettled([ fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_buffer" }) }), fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_diagnose" }) }) ]);
-                if(fCont) fCont.innerHTML = ''; let skuCount = 0;
+                if(fCont) fCont.innerHTML = ''; let skuCount = 0; globalForecastData = [];
                 if(reqBuffer.status === 'fulfilled') {
                     const textBuffer = await reqBuffer.value.text(); let rawBuffer; try { rawBuffer = JSON.parse(textBuffer); } catch(e) { rawBuffer = []; } if(rawBuffer.data) rawBuffer = rawBuffer.data; 
                     const forecastRows = Array.isArray(rawBuffer) ? rawBuffer : [rawBuffer];
                     forecastRows.forEach((item, idx) => {
                         const row = item.json ? item.json : item; const vals = Object.values(row); let skuName = row.col_2 || row["Nama SKU"] || vals[1] || "";
                         if(!skuName || String(skuName).toUpperCase().includes("NAMA SKU") || String(skuName).includes("col_")) return;
-                        skuCount++; const demandBulat = Math.round(Number(row.col_3 || row["Avg. Demand 3 Bulanan"] || vals[2] || 0)); const forecastBulat = Math.round(Number(row.col_4 || row["FORECAST PO"] || vals[3] || 0)); const bufferBulat = Math.round(Number(row.col_5 || row["BUFFER"] || vals[4] || 0)); const statusText = String(row.col_6 || row["STATUS"] || vals[5] || "");
+                        
+                        const demandBulat = Math.round(Number(row.col_3 || row["Avg. Demand 3 Bulanan"] || vals[2] || 0)); const forecastBulat = Math.round(Number(row.col_4 || row["FORECAST PO"] || vals[3] || 0)); const bufferBulat = Math.round(Number(row.col_5 || row["BUFFER"] || vals[4] || 0)); const statusText = String(row.col_6 || row["STATUS"] || vals[5] || "");
+                        // Save to memory
+                        globalForecastData.push({ sku: skuName, demand: demandBulat, po: forecastBulat, buffer: bufferBulat, status: statusText });
+                        skuCount++; 
                         const dot = statusText.includes("CRITICAL") ? '<span class="h-2.5 w-2.5 rounded-full bg-appred shadow-[0_0_8px_#FF3B30] inline-block animate-pulse"></span>' : '<span class="h-2.5 w-2.5 rounded-full bg-appgreen shadow-[0_0_8px_#34C759] inline-block"></span>';
                         if(fCont) { fCont.innerHTML += `<div class="grid grid-cols-5 gap-1.5 items-center py-3 border-b border-white/5 text-[10px] text-center animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0"><div class="font-extrabold text-left text-white px-1 uppercase truncate min-w-0">${skuName}</div><div class="text-gray-400 font-bold">${demandBulat}</div><div class="text-white font-black">${forecastBulat}</div><div class="text-white font-black">${bufferBulat}</div><div class="flex justify-center items-center">${dot}</div></div>`; }
                     });
                 } runTicker(document.getElementById('stat-sku'), skuCount);
-                if(dCont) dCont.innerHTML = ''; let dcIssueCount = 0;
+                if(dCont) dCont.innerHTML = ''; let dcIssueCount = 0; globalDiagnoseData = [];
                 if(reqDiag.status === 'fulfilled') {
                     const textDiag = await reqDiag.value.text(); let rawDiag; try { rawDiag = JSON.parse(textDiag); } catch(e) { rawDiag = []; } if(rawDiag.data) rawDiag = rawDiag.data; 
                     const diagRows = Array.isArray(rawDiag) ? rawDiag : [rawDiag];
                     diagRows.forEach((item, idx) => {
                         const row = item.json ? item.json : item; const vals = Object.values(row); let dcName = row["DC"] || row.col_2 || vals[1] || "";
                         if(!dcName || String(dcName).toUpperCase() === "DC" || String(dcName).includes("col_")) return;
+                        
                         const failCount = Number(row["WAREHOUSE FAILURE"] || row.col_3 || vals[2] || 0); const moqCount = Number(row["UNDER MOQ"] || row.col_5 || vals[4] || 0); const resStr = String(row["DIAGNOSE RESULTS (DR)"] || row.col_9 || vals[8] || "N/A").toUpperCase();
                         const total = failCount + moqCount; if(total > 0 || dcName !== "N/A") dcIssueCount++; const failPct = total > 0 ? Math.round((failCount / total) * 100) : 0; const moqPct = total > 0 ? Math.round((moqCount / total) * 100) : 0;
+                        // Save to memory
+                        if(dcName !== "N/A") globalDiagnoseData.push({ dc: dcName, failPct: failPct, moqPct: moqPct, res: resStr });
+
                         if(dCont) { dCont.innerHTML += `<div class="bg-appcard p-5 rounded-4xl border border-white/7 mb-3.5 animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0"><div class="flex justify-between items-center mb-4"><h4 class="text-sm font-black text-white uppercase tracking-tight truncate w-32">${dcName}</h4><p class="text-[8px] font-bold ${resStr.includes('FAILURE') ? 'text-appred' : 'text-appappleorange'} tracking-widest bg-black px-2.5 py-1.5 rounded-md border border-white/7">⚠️ ${resStr}</p></div><div class="grid grid-cols-3 gap-1.5 text-center bg-black/50 p-3 rounded-2xl border border-white/7"><div class="border-r border-white/10"><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">WH Failure</p><p class="text-xs font-black text-appred">${failPct}%</p></div><div class="border-r border-white/10"><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">Under MOQ</p><p class="text-xs font-black text-appappleorange">${moqPct}%</p></div><div><p class="text-[7px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">Above MOQ</p><p class="text-xs font-black text-appgreen">0%</p></div></div></div>`; }
                     });
                 } runTicker(document.getElementById('stat-dc'), dcIssueCount);
@@ -433,7 +436,7 @@
             if(cont) cont.innerHTML = getSkeletonHTML(5, true);
             const res = await sendApi({ action: "load_admin" }, btn, `<i class="fa-solid fa-rotate-right"></i>`);
             if (res && res.status === "success") {
-                activeLogData = res.data;
+                activeLogData = res.data || [];
                 if(dl) { dl.innerHTML = ''; let countID = 0; activeLogData.forEach(item => { if(item.ID && countID < 10 && !String(item["PO NKA"]).includes("BATAL")) { dl.innerHTML += `<option value="${item.ID}">`; countID++; } }); }
                 renderLogs(activeLogData);
             }
@@ -448,7 +451,7 @@
                 const poQty = Number(item["TOTAL PO ctn"]) || 0; const salesQty = Number(item["Qty Terpenuhi (Kirim)"]) || 0;
                 let borderCol = "border-white/7", textCol = "text-appred", icon = "fa-circle-xmark", iconCol="text-appred";
                 if (salesQty >= (poQty * 0.85)) { borderCol = "border-appgreen/50"; textCol = "text-appgreen"; icon = "fa-circle-check"; iconCol="text-appgreen"; } else if (salesQty > 0) { borderCol = "border-appappleorange/50"; textCol = "text-appappleorange"; icon = "fa-clock-rotate-left"; iconCol="text-appappleorange"; }
-                cont.innerHTML += `<div class="bg-appcard rounded-4xl border ${borderCol} overflow-hidden transition-all duration-300 animate-fade-in-up" style="animation-delay: ${idx * 30}ms; opacity:0"><div class="p-6 flex items-center justify-between cursor-pointer btn-tactile" onclick="toggleCard('${item.ID}')"><div class="flex items-center gap-5 w-2/3"><div class="w-12 h-12 rounded-2xl bg-black flex items-center justify-center border border-white/7 ${iconCol}"><i class="fa-solid ${icon} text-xl drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]"></i></div><div class="min-w-0"><h4 class="font-black text-sm text-white uppercase tracking-tight truncate">${item.ID}</h4><p class="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest mt-1.5 truncate">${item.DC} • ${item["Tanggal PO"]}</p></div></div><div class="text-right"><p class="text-[9px] text-gray-600 uppercase font-black tracking-widest mb-1">PO / SALES</p><p class="text-base font-black ${textCol} leading-nonetickerTicker">${poQty} <span class="text-gray-600 mx-0.5">/</span> ${salesQty}</p></div></div><div id="det-${item.ID}" class="accordion-content bg-black/60 p-6"><div class="space-y-2 text-[11px] font-extrabold uppercase text-white"><div class="flex items-center justify-between bg-white/5 py-2.5 px-4 rounded-xl border border-white/7"><span class="w-14 text-gray-400">NKA</span><span class="flex-1 text-center text-gray-300">${item["PO NKA"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NKA"] || 0}</span></div><div class="flex items-center justify-between bg-white/5 py-2.5 px-4 rounded-xl border border-white/7"><span class="w-14 text-gray-400">NDLH</span><span class="flex-1 text-center text-gray-300">${item["PO NDLH"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NDLH"] || 0}</span></div><div class="flex items-center justify-between bg-white/5 py-2.5 px-4 rounded-xl border border-white/7"><span class="w-14 text-gray-400">NRD</span><span class="flex-1 text-center text-gray-300">${item["PO NRD"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NRD"] || 0}</span></div><div class="flex items-center justify-between bg-white/5 py-2.5 px-4 rounded-xl border border-white/7"><span class="w-14 text-gray-400">NARR</span><span class="flex-1 text-center text-gray-300">${item["PO NARR"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NARR"] || 0}</span></div><div class="flex items-center justify-between bg-white/5 py-2.5 px-4 rounded-xl border border-appappleblue/20"><span class="w-14 text-gray-400">NKACH</span><span class="flex-1 text-center text-gray-300">${item["PO NKACH"] || 0}</span><span class="flex-1 text-center text-appgreen">${item["NKACH"] || 0}</span></div></div><div class="flex justify-between items-center border-t border-white/7 pt-5 mt-4"><div><p class="text-[9px] text-gray-500 font-extrabold uppercase tracking-widest mb-1">GAP Pengiriman</p><p class="text-base font-black ${item["GAP"] == 0 ? 'text-appgreen' : 'text-appred'} tickerTickerTicker">${item["GAP"] || 0} CTN</p></div><button type="button" onclick="deletePO('${item.ID}')" class="bg-appred/10 text-appred border border-appred/30 font-extrabold text-[10px] py-2.5 px-5 rounded-xl btn-tactile hover:bg-appred hover:text-white transition-all uppercase tracking-widest"><i class="fa-solid fa-trash mr-2"></i>BATAL</button></div></div></div>`;
+                cont.innerHTML += `<div class="bg-appcard rounded-4xl border ${borderCol} overflow-hidden transition-all duration-300 animate-fade-in-up" style="animation-delay: ${idx * 30}ms; opacity:0"><div class="p-6 flex items-center justify-between cursor-pointer btn-tactile" onclick="toggleCard('${item.ID}')"><div class="flex items-center gap-5 w-2/3"><div class="w-12 h-12 rounded-2xl bg-black flex items-center justify-center border border-white/7 ${iconCol}"><i class="fa-solid ${icon} text-xl drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]"></i></div><div class="min-w-0"><h4 class="font-black text-sm text-white uppercase tracking-tight truncate">${item.ID}</h4><p class="text-[10px] text-gray-500 font-extrabold uppercase tracking-widest mt-1.5 truncate">${item.DC} • ${item["Tanggal PO"]}</p></div></div><div class="text-right"><p class="text-[9px] text-gray-600 uppercase font-black tracking-widest mb-1">PO / SALES</p><p class="text-base font-black ${textCol} leading-none">${poQty} <span class="text-gray-600 mx-0.5">/</span> ${salesQty}</p></div></div><div id="det-${item.ID}" class="accordion-content bg-black/60 p-6"><div class="space-y-2 text-[11px] font-extrabold uppercase text-white"><div class="flex items-center justify-between bg-white/5 py-2.5 px-4 rounded-xl border border-white/7"><span class="w-14 text-gray-400">NKA</span><span class="flex-1 text-center text-gray-300">${item["PO NKA"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NKA"] || 0}</span></div><div class="flex items-center justify-between bg-white/5 py-2.5 px-4 rounded-xl border border-white/7"><span class="w-14 text-gray-400">NDLH</span><span class="flex-1 text-center text-gray-300">${item["PO NDLH"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NDLH"] || 0}</span></div><div class="flex items-center justify-between bg-white/5 py-2.5 px-4 rounded-xl border border-white/7"><span class="w-14 text-gray-400">NRD</span><span class="flex-1 text-center text-gray-300">${item["PO NRD"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NRD"] || 0}</span></div><div class="flex items-center justify-between bg-white/5 py-2.5 px-4 rounded-xl border border-white/7"><span class="w-14 text-gray-400">NARR</span><span class="flex-1 text-center text-gray-300">${item["PO NARR"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NARR"] || 0}</span></div><div class="flex items-center justify-between bg-white/5 py-2.5 px-4 rounded-xl border border-appappleblue/20"><span class="w-14 text-gray-400">NKACH</span><span class="flex-1 text-center text-gray-300">${item["PO NKACH"] || 0}</span><span class="flex-1 text-center text-appgreen">${item["NKACH"] || 0}</span></div></div><div class="flex justify-between items-center border-t border-white/7 pt-5 mt-4"><div><p class="text-[9px] text-gray-500 font-extrabold uppercase tracking-widest mb-1">GAP Pengiriman</p><p class="text-base font-black ${item["GAP"] == 0 ? 'text-appgreen' : 'text-appred'}">${item["GAP"] || 0} CTN</p></div><button type="button" onclick="deletePO('${item.ID}')" class="bg-appred/10 text-appred border border-appred/30 font-extrabold text-[10px] py-2.5 px-5 rounded-xl btn-tactile hover:bg-appred hover:text-white transition-all uppercase tracking-widest"><i class="fa-solid fa-trash mr-2"></i>BATAL</button></div></div></div>`;
             });
         }
         function toggleCard(id) { const el = document.getElementById('det-' + id); if(el) el.classList.toggle('accordion-expanded'); }
@@ -469,6 +472,133 @@
                 const res = await sendApi(payload, btn, btn.innerText);
                 if(res && res.status === "success") { showToast("Data Tersimpan!"); e.target.reset(); } else showToast("Gagal menyimpan data", true);
             } catch(error) { showToast("Kesalahan Form Internal", true); }
+        }
+
+        // ================= FITUR ENTERPRISE PDF RENDERER =================
+        function generateAnalyticReport() {
+            if(globalForecastData.length === 0 || activeLogData.length === 0) { showToast("Sync Data Dulu!", true); return; }
+            const btn = document.getElementById('btn-report-analytic'); const origHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> CREATING PDF...`; btn.classList.add('opacity-50', 'pointer-events-none');
+
+            // Hitung Kalkulasi Front-End (0 Server Load)
+            let totPO = 0; let totSales = 0;
+            activeLogData.forEach(i => { if(i.ID && !String(i["PO NKA"]).includes("BATAL")) { totPO += Number(i["TOTAL PO ctn"]||0); totSales += Number(i["Qty Terpenuhi (Kirim)"]||0); } });
+            const fulfillPct = totPO > 0 ? Math.round((totSales/totPO)*100) : 0;
+            
+            let totDemand = 0; let totPOForecast = 0; let countCrit = 0; let countSafe = 0;
+            globalForecastData.forEach(i => { totDemand += i.demand; totPOForecast += i.po; if(i.status.includes("CRITICAL")) countCrit++; else countSafe++; });
+            const demandVsProd = totDemand > 0 ? Math.round((totPOForecast/totDemand)*100) : 0;
+            const alertStatus = countCrit > 0 ? "⚠️ BUTUH PERHATIAN" : "✅ STOK AMAN";
+
+            // Siapkan Elemen HTML untuk PDF
+            const container = document.getElementById('pdf-container');
+            container.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #EEE; padding-bottom: 15px;">
+                    <h1 style="font-size: 24px; font-weight: bold; margin:0; color:#FF3B30;">FAMILY FOOD INDONESIA</h1>
+                    <p style="margin: 5px 0 0 0; color: #555;">Executive Summary Report - ${new Date().toLocaleDateString('id-ID')}</p>
+                </div>
+                <div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 25px;">
+                    <div style="flex:1; background:#F8F9FA; padding:15px; border-radius:10px; border:1px solid #E9ECEF;">
+                        <div style="font-size:10px; color:#6C757D; text-transform:uppercase; font-weight:bold;">Fulfillment PO</div>
+                        <div style="font-size:24px; font-weight:bold; color:${fulfillPct >= 80 ? '#34C759' : '#FF9500'};">${fulfillPct}%</div>
+                    </div>
+                    <div style="flex:1; background:#F8F9FA; padding:15px; border-radius:10px; border:1px solid #E9ECEF;">
+                        <div style="font-size:10px; color:#6C757D; text-transform:uppercase; font-weight:bold;">Alert Stock</div>
+                        <div style="font-size:14px; font-weight:bold; margin-top:5px; color:${countCrit > 0 ? '#FF3B30' : '#34C759'};">${alertStatus}</div>
+                    </div>
+                    <div style="flex:1; background:#F8F9FA; padding:15px; border-radius:10px; border:1px solid #E9ECEF;">
+                        <div style="font-size:10px; color:#6C757D; text-transform:uppercase; font-weight:bold;">Prod vs Demand</div>
+                        <div style="font-size:24px; font-weight:bold; color:#007BFF;">${demandVsProd}%</div>
+                    </div>
+                </div>
+                <div style="background:#F8F9FA; padding:15px; border-radius:10px; border:1px solid #E9ECEF; margin-bottom:25px; text-align:center;">
+                    <div style="font-size:12px; color:#6C757D; text-transform:uppercase; font-weight:bold;">Inventory Health (Global)</div>
+                    <div style="font-size:18px; font-weight:bold; margin-top:5px;"><span style="color:#FF3B30;">${countCrit} Critical</span> / <span style="color:#34C759;">${countSafe} Safe</span></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; gap: 20px;">
+                    <div style="flex:1; width:48%;"><h4 style="font-size:12px; text-align:center;">SKU Demand vs PO Target</h4><canvas id="chartBar"></canvas></div>
+                    <div style="flex:1; width:48%;"><h4 style="font-size:12px; text-align:center;">DC Diagnose Distribution</h4><canvas id="chartPie"></canvas></div>
+                </div>
+            `;
+
+            // RENDER GRAFIK
+            setTimeout(() => {
+                // Bar Chart (Top 5 SKU)
+                const topSku = [...globalForecastData].sort((a,b) => b.demand - a.demand).slice(0, 5);
+                new Chart(document.getElementById('chartBar'), {
+                    type: 'bar',
+                    data: { labels: topSku.map(i => i.sku), datasets: [
+                        { label: 'Demand', data: topSku.map(i => i.demand), backgroundColor: '#ADD8E6' },
+                        { label: 'PO Target', data: topSku.map(i => i.po), backgroundColor: '#FF3B30' }
+                    ]},
+                    options: { animation: false, responsive: true }
+                });
+
+                // Pie Chart (WH Failure vs Under MOQ)
+                let totFail = 0; let totMoq = 0;
+                globalDiagnoseData.forEach(i => { totFail += i.failPct; totMoq += i.moqPct; });
+                new Chart(document.getElementById('chartPie'), {
+                    type: 'pie',
+                    data: { labels: ['WH Failure', 'Under MOQ'], datasets: [{ data: [totFail, totMoq], backgroundColor: ['#FF3B30', '#FF9500'] }] },
+                    options: { animation: false, responsive: true }
+                });
+
+                // Convert ke PDF
+                html2pdf().set({ margin: 10, filename: `FFI_Analytic_${new Date().getTime()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(container).save().then(() => {
+                    btn.innerHTML = origHtml; btn.classList.remove('opacity-50', 'pointer-events-none');
+                    container.innerHTML = ''; // Bersihkan div setelah di-download
+                    showToast("PDF Analytic Berhasil Diunduh!");
+                });
+            }, 500); // Wait for canvas render
+        }
+
+        function generateLogReport() {
+            if(activeLogData.length === 0) { showToast("Sync Data Log Dulu!", true); return; }
+            const monthVal = document.getElementById('report-month').value; // Format: YYYY-MM
+            if(!monthVal) { showToast("Pilih Bulan Dahulu!", true); return; }
+            
+            const btn = document.getElementById('btn-report-log'); const origHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`; btn.classList.add('opacity-50', 'pointer-events-none');
+
+            const [year, month] = monthVal.split('-');
+            const targetFormat = `${month}/${year}`; // Asumsi "Tanggal PO" format DD/MM/YYYY
+            
+            let filteredLog = activeLogData.filter(i => {
+                if(!i.ID || String(i["PO NKA"]).includes("BATAL")) return false;
+                const dateStr = i["Tanggal PO"] || ""; // ex: 15/04/2026
+                return dateStr.includes(targetFormat);
+            });
+
+            if(filteredLog.length === 0) {
+                showToast("Data Kosong di Bulan Ini", true);
+                btn.innerHTML = origHtml; btn.classList.remove('opacity-50', 'pointer-events-none'); return;
+            }
+
+            const container = document.getElementById('pdf-container');
+            let tableRows = '';
+            filteredLog.forEach(i => {
+                const poQty = Number(i["TOTAL PO ctn"]) || 0; const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0; const gap = i["GAP"] || 0;
+                tableRows += `<tr><td style="padding:8px; border:1px solid #CCC;">${i.ID}</td><td style="padding:8px; border:1px solid #CCC;">${i["Tanggal PO"]}</td><td style="padding:8px; border:1px solid #CCC;">${i.DC}</td><td style="padding:8px; border:1px solid #CCC; text-align:center;">${poQty}</td><td style="padding:8px; border:1px solid #CCC; text-align:center;">${salesQty}</td><td style="padding:8px; border:1px solid #CCC; text-align:center; color:${gap>0?'#FF3B30':'#34C759'};">${gap}</td></tr>`;
+            });
+
+            container.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h1 style="font-size: 20px; font-weight: bold; margin:0; color:#FF3B30;">LOG ORDER & SALES REPORT</h1>
+                    <p style="margin: 5px 0 0 0; color: #555;">Periode: ${monthVal}</p>
+                </div>
+                <table style="width:100%; border-collapse: collapse; font-size: 11px;">
+                    <thead><tr style="background:#F8F9FA;"><th style="padding:8px; border:1px solid #CCC; text-align:left;">ID PO</th><th style="padding:8px; border:1px solid #CCC; text-align:left;">TANGGAL</th><th style="padding:8px; border:1px solid #CCC; text-align:left;">DC</th><th style="padding:8px; border:1px solid #CCC; text-align:center;">PO (CTN)</th><th style="padding:8px; border:1px solid #CCC; text-align:center;">SALES</th><th style="padding:8px; border:1px solid #CCC; text-align:center;">GAP</th></tr></thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+            `;
+
+            setTimeout(() => {
+                html2pdf().set({ margin: 10, filename: `FFI_LogReport_${monthVal}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(container).save().then(() => {
+                    btn.innerHTML = origHtml; btn.classList.remove('opacity-50', 'pointer-events-none');
+                    container.innerHTML = ''; 
+                    showToast("PDF Log Berhasil Diunduh!");
+                });
+            }, 300);
         }
     </script>
 </body>
