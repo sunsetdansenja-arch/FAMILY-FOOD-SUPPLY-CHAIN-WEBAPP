@@ -94,6 +94,8 @@
         </div>
     </div>
 
+    <div id="pdf-container"></div>
+
     <div id="app" class="w-full max-w-md md:max-w-5xl bg-appbg min-h-screen relative overflow-x-hidden flex flex-col shadow-2xl mx-auto md:border-x border-white/5">
         
         <div id="view-login" class="flex flex-col h-screen p-9 justify-center items-center relative z-40 bg-[#000000]">
@@ -219,10 +221,15 @@
                     </div>
 
                     <div id="rep-view-log" class="hidden-tab space-y-6">
-                        <div class="flex gap-4 max-w-2xl mx-auto w-full">
-                            <input type="month" id="report-month" class="bg-appcard border border-white/10 text-white rounded-2xl flex-1 outline-none text-base text-center font-bold" required onchange="renderLogPreview()">
-                            <button onclick="downloadPDF('print-log', 'FFI_LogReport')" class="bg-appgreen text-black font-extrabold px-6 py-4 rounded-2xl btn-tactile shadow-[0_0_20px_rgba(52,199,89,0.3)] flex justify-center items-center gap-2 text-xs md:text-sm uppercase tracking-widest hover:scale-[0.98] transition-transform">
-                                <i class="fa-solid fa-download text-lg"></i>
+                        <div class="flex flex-col md:flex-row gap-3 md:gap-4 max-w-3xl mx-auto w-full">
+                            <div class="flex gap-3 flex-1">
+                                <input type="month" id="report-month" class="bg-appcard border border-white/10 text-white rounded-2xl flex-1 outline-none text-xs md:text-sm text-center font-bold px-3" required onchange="renderLogPreview()">
+                                <select id="report-dc" class="bg-appcard border border-white/10 text-white rounded-2xl flex-1 outline-none text-xs md:text-sm text-center font-bold font-apple uppercase tracking-widest cursor-pointer px-3" onchange="renderLogPreview()">
+                                    <option value="ALL">ALL DC</option>
+                                </select>
+                            </div>
+                            <button onclick="downloadPDF('print-log', 'FFI_LogReport')" class="w-full md:w-auto bg-appgreen text-black font-extrabold px-6 py-4 rounded-2xl btn-tactile shadow-[0_0_20px_rgba(52,199,89,0.3)] flex justify-center items-center gap-2 text-xs md:text-sm uppercase tracking-widest hover:scale-[0.98] transition-transform">
+                                <i class="fa-solid fa-download text-lg"></i> <span class="md:hidden ml-1">DOWNLOAD PDF</span>
                             </button>
                         </div>
                         <p class="text-[9px] md:text-xs text-gray-500 text-center uppercase tracking-widest font-bold">⬇️ Preview Laporan Asli ⬇️</p>
@@ -231,7 +238,7 @@
                             <div id="print-log" class="a4-paper">
                                 <div style="text-align: center; margin-bottom: 30px; border-bottom: 2px solid #E5E7EB; padding-bottom: 15px;">
                                     <h1 style="font-size: 24px; font-weight: 900; margin:0; color:#2B65F6; letter-spacing: 1px;">DATABASE LOG REPORT</h1>
-                                    <p style="margin: 5px 0 0 0; color: #6B7280; font-size: 14px;">Periode Pembukuan: <span id="rep-log-period">-</span></p>
+                                    <p style="margin: 5px 0 0 0; color: #6B7280; font-size: 14px;" id="rep-log-period">Periode Pembukuan: -</p>
                                 </div>
                                 <table style="width:100%; border-collapse: collapse; font-size: 12px; text-align: left;">
                                     <thead><tr style="background:#F9FAFB; color: #374151; font-weight: 900;"><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">ID PO</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">TANGGAL</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">DC</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">PO (CTN)</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">SALES</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">GAP</th></tr></thead>
@@ -246,9 +253,11 @@
                 </div>
 
                 <div id="tab-log" class="hidden-tab p-6 md:p-10 space-y-6 md:space-y-8 animate-fade-in-up">
-                    <div class="sticky top-[72px] md:top-[96px] bg-[#000000]/95 backdrop-blur-xl z-10 pt-2.5 pb-5 md:pb-6 border-b border-white/7 flex gap-3 md:gap-4 max-w-3xl mx-auto w-full">
-                        <input type="text" id="search-po" placeholder="Cari ID / DC..." class="text-base bg-appcard border border-white/10 flex-1 rounded-2xl px-5" onkeyup="filterLogLocal()">
-                        <button type="button" onclick="loadLogPO()" id="btn-sync-log" class="bg-appapplered text-white w-16 md:w-20 rounded-2xl flex justify-center items-center btn-tactile shadow-glow-redorange hover:scale-[0.96] transition-transform"><i class="fa-solid fa-rotate-right text-lg"></i></button>
+                    <div class="sticky top-[72px] md:top-[96px] bg-[#000000]/95 backdrop-blur-xl z-10 -mx-6 px-6 md:-mx-10 md:px-10 pt-2.5 pb-5 md:pb-6 border-b border-white/7">
+                        <div class="flex gap-3 md:gap-4 max-w-3xl mx-auto w-full">
+                            <input type="text" id="search-po" placeholder="Cari ID / DC..." class="text-base bg-appcard border border-white/10 flex-1 rounded-2xl px-5" onkeyup="filterLogLocal()">
+                            <button type="button" onclick="loadLogPO()" id="btn-sync-log" class="bg-appapplered text-white w-16 md:w-20 rounded-2xl flex justify-center items-center btn-tactile shadow-glow-redorange hover:scale-[0.96] transition-transform"><i class="fa-solid fa-rotate-right text-lg"></i></button>
+                        </div>
                     </div>
                     <div id="log-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"></div>
                 </div>
@@ -357,13 +366,21 @@
         window.onload = () => {
             const d = new Date(); const currMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
             document.getElementById('report-month').value = currMonth;
+            
             const savedUser = localStorage.getItem('ffi_user');
             if(savedUser) {
                 document.getElementById('view-login').classList.add('hidden-tab'); document.getElementById('view-main').classList.remove('hidden-tab');
                 document.getElementById('header-username').innerText = savedUser;
-                initDateRecommendations(); updateMonthHeaders(); initDCPicker(); loadAnalytics(); loadLogPO(); 
+                initDateRecommendations(); updateMonthHeaders(); initDCPicker(); initReportDCPicker(); loadAnalytics(); loadLogPO(); 
             }
         };
+
+        function initReportDCPicker() {
+            const sel = document.getElementById('report-dc');
+            if(sel && sel.options.length <= 1) {
+                DC_LIST.forEach(dc => { sel.innerHTML += `<option value="${dc}">${dc}</option>`; });
+            }
+        }
 
         function initDateRecommendations() {
             const dl = document.getElementById('date-recom'); if(!dl) return; dl.innerHTML = ''; const today = new Date();
@@ -421,7 +438,7 @@
             if (res && res.status === "success") {
                 localStorage.setItem('ffi_user', res.user_id || user); showToast("Akses Diberikan!");
                 document.getElementById('view-login').classList.add('hidden-tab'); document.getElementById('view-main').classList.remove('hidden-tab'); document.getElementById('header-username').innerText = res.user_id || user;
-                initDateRecommendations(); updateMonthHeaders(); initDCPicker(); loadAnalytics(); loadLogPO();
+                initDateRecommendations(); updateMonthHeaders(); initDCPicker(); initReportDCPicker(); loadAnalytics(); loadLogPO();
             } else showToast(res ? res.message : "Akses Ditolak", true);
         }
 
@@ -485,7 +502,7 @@
             const fCont = document.getElementById('forecast-container'); const dCont = document.getElementById('diagnosa-container'); const btn = document.getElementById('btn-sync-analytics'); const origText = btn.innerHTML;
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`; btn.classList.add('opacity-50', 'pointer-events-none');
             if(fCont) fCont.innerHTML = getSkeletonHTML(5, false); 
-            if(dCont) dCont.innerHTML = getSkeletonHTML(4, true); // Now rendered in grid
+            if(dCont) dCont.innerHTML = getSkeletonHTML(4, true);
             try {
                 const [reqBuffer, reqDiag] = await Promise.allSettled([ fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_buffer" }) }), fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_diagnose" }) }) ]);
                 if(fCont) fCont.innerHTML = ''; let skuCount = 0; globalForecastData = [];
@@ -511,7 +528,6 @@
                         const failCount = Number(row["WAREHOUSE FAILURE"] || row.col_3 || vals[2] || 0); const moqCount = Number(row["UNDER MOQ"] || row.col_5 || vals[4] || 0); const resStr = String(row["DIAGNOSE RESULTS (DR)"] || row.col_9 || vals[8] || "N/A").toUpperCase();
                         const total = failCount + moqCount; if(total > 0 || dcName !== "N/A") dcIssueCount++; const failPct = total > 0 ? Math.round((failCount / total) * 100) : 0; const moqPct = total > 0 ? Math.round((moqCount / total) * 100) : 0;
                         if(dcName !== "N/A") globalDiagnoseData.push({ dc: dcName, failPct: failPct, moqPct: moqPct, res: resStr });
-                        // Notice removal of mb-3.5 since we use grid gap-4 now
                         if(dCont) { dCont.innerHTML += `<div class="bg-appcard p-5 md:p-6 rounded-4xl border border-white/7 animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0"><div class="flex justify-between items-center mb-4 md:mb-5"><h4 class="text-sm md:text-base font-black text-white uppercase tracking-tight truncate w-32 md:w-48">${dcName}</h4><p class="text-[8px] md:text-[10px] font-bold ${resStr.includes('FAILURE') ? 'text-appred' : 'text-appappleorange'} tracking-widest bg-black px-3 py-1.5 rounded-md border border-white/7">⚠️ ${resStr}</p></div><div class="grid grid-cols-3 gap-1.5 text-center bg-black/50 p-3 md:p-4 rounded-2xl border border-white/7"><div class="border-r border-white/10"><p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">WH Failure</p><p class="text-xs md:text-sm font-black text-appred">${failPct}%</p></div><div class="border-r border-white/10"><p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">Under MOQ</p><p class="text-xs md:text-sm font-black text-appappleorange">${moqPct}%</p></div><div><p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">Above MOQ</p><p class="text-xs md:text-sm font-black text-appgreen">0%</p></div></div></div>`; }
                     });
                 } runTicker(document.getElementById('stat-dc'), dcIssueCount);
@@ -602,22 +618,29 @@
             });
         }
 
+        // ====== UPDATE: RENDER LOG PREVIEW DUAL FILTER ======
         function renderLogPreview() {
             const monthVal = document.getElementById('report-month').value; 
+            const dcVal = document.getElementById('report-dc').value; 
             if(!monthVal) return;
+            
             const [year, month] = monthVal.split('-');
             const targetFormat = `${month}/${year}`; 
             
-            document.getElementById('rep-log-period').innerText = `${month} / ${year}`;
+            // Ubah Header PDF sesuai pilihan
+            const dcHeader = dcVal === "ALL" ? "ALL DC" : dcVal;
+            document.getElementById('rep-log-period').innerHTML = `${month} / ${year} &nbsp;|&nbsp; AREA: <span style="color:#FF3B30;">${dcHeader}</span>`;
             
             let filteredLog = activeLogData.filter(i => {
                 if(!i.ID || String(i["PO NKA"]).includes("BATAL")) return false;
-                return (i["Tanggal PO"] || "").includes(targetFormat);
+                const matchMonth = (i["Tanggal PO"] || "").includes(targetFormat);
+                const matchDC = (dcVal === "ALL") || (i.DC === dcVal);
+                return matchMonth && matchDC;
             });
 
             const tbody = document.getElementById('rep-log-tbody');
             if(filteredLog.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color:#999;">Tidak ada data untuk bulan ini.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color:#999;">Tidak ada data untuk filter ini.</td></tr>`;
                 return;
             }
 
@@ -629,7 +652,7 @@
             tbody.innerHTML = tableRows;
         }
 
-        // ================= FIX DOWNLOAD PDF (ANTI CROP) =================
+        // ================= FIX DOWNLOAD PDF =================
         function downloadPDF(elementId, fileNamePrefix) {
             const element = document.getElementById(elementId);
             const wrapper = element.parentElement; 
@@ -637,7 +660,12 @@
             if(wrapper) { wrapper.style.overflowX = 'visible'; wrapper.scrollLeft = 0; }
             window.scrollTo(0,0);
 
-            const fileName = elementId === 'print-log' ? `${fileNamePrefix}_${document.getElementById('report-month').value}.pdf` : `${fileNamePrefix}_${new Date().getTime()}.pdf`;
+            let fileName = `${fileNamePrefix}_${new Date().getTime()}.pdf`;
+            if (elementId === 'print-log') {
+                const monthVal = document.getElementById('report-month').value;
+                const dcVal = document.getElementById('report-dc').value;
+                fileName = `FFI_LogReport_${dcVal}_${monthVal}.pdf`;
+            }
             
             const opt = {
                 margin:       [10, 0, 10, 0], 
