@@ -189,6 +189,7 @@
                 </div>
 
                 <div id="tab-report" class="hidden-tab p-6 md:p-10 space-y-6 md:space-y-8 animate-fade-in-up">
+                    
                     <div class="flex bg-appcard p-1.5 rounded-2xl border border-white/7 shadow-xl max-w-2xl mx-auto w-full">
                         <button type="button" onclick="switchReportView('analytic')" id="btn-rep-analytic" class="flex-1 py-3 md:py-4 rounded-xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appappleblue text-black shadow-glow-lightblue">Analytic Report</button>
                         <button type="button" onclick="switchReportView('log')" id="btn-rep-log" class="flex-1 py-3 md:py-4 rounded-xl text-xs md:text-sm font-extrabold uppercase transition-all text-gray-500 bg-transparent">Log PO Report</button>
@@ -289,12 +290,12 @@
 
                         <form id="form-po" onsubmit="submitAction(event, 'insert_po')" class="space-y-6 md:space-y-8 bg-appcard p-6 md:p-12 rounded-4xl border border-white/7 shadow-glow-redorange transition-shadow hover:shadow-[0_0_30px_rgba(255,59,48,0.4)]">
                             <div class="space-y-3.5 md:space-y-5">
-                                <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase bg-appbg w-full md:py-5 md:text-lg">
+                                <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase bg-appbg w-full h-14 md:h-[60px] md:text-lg px-6">
                                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3.5 md:gap-5">
-                                    <input type="text" id="po-tanggal" list="date-recom" autocomplete="off" placeholder="Tgl PO" required class="bg-appbg w-full md:py-5 md:text-lg">
-                                    <input type="text" id="po-exp" list="date-recom" autocomplete="off" placeholder="Tgl EXP" required class="bg-appbg w-full md:py-5 md:text-lg">
-                                    <div class="relative cursor-pointer btn-tactile col-span-2 md:col-span-1" onclick="openDCModal('po-dc')">
-                                        <input type="text" id="po-dc" placeholder="PILIH NAMA DC" required readonly class="pointer-events-none uppercase bg-appapplered/10 border border-appapplered/30 text-appapplered w-full h-full md:py-5 md:text-lg">
+                                    <input type="text" id="po-tanggal" list="date-recom" autocomplete="off" placeholder="Tgl PO" required class="bg-appbg w-full h-14 md:h-[60px] md:text-lg px-6">
+                                    <input type="text" id="po-exp" list="date-recom" autocomplete="off" placeholder="Tgl EXP" required class="bg-appbg w-full h-14 md:h-[60px] md:text-lg px-6">
+                                    <div class="relative cursor-pointer btn-tactile col-span-2 md:col-span-1 h-14 md:h-[60px]" onclick="openDCModal('po-dc')">
+                                        <input type="text" id="po-dc" placeholder="PILIH NAMA DC" required readonly class="pointer-events-none uppercase bg-appapplered/10 border border-appapplered/30 text-appapplered w-full h-full md:text-lg px-6">
                                         <div class="absolute right-5 top-1/2 -translate-y-1/2 text-appapplered text-xl">🔍</div>
                                     </div>
                                 </div>
@@ -329,7 +330,7 @@
 
                         <form id="form-sales" onsubmit="submitAction(event, 'insert_sales')" class="hidden-tab space-y-6 md:space-y-8 bg-appcard p-6 md:p-12 rounded-4xl border border-white/7 transition-shadow hover:shadow-[0_0_25px_rgba(173,216,230,0.2)]">
                             <div class="space-y-3.5 md:space-y-5">
-                                <input type="text" id="sls-id" list="recent-po-ids" autocomplete="off" placeholder="ID PO DATABASE" required class="uppercase bg-appbg w-full md:py-5 md:text-lg">
+                                <input type="text" id="sls-id" list="recent-po-ids" autocomplete="off" placeholder="ID PO DATABASE" required class="uppercase bg-appbg w-full h-14 md:h-[60px] md:text-lg px-6">
                             </div>
                             <div class="pt-6 md:pt-10 border-t border-white/7">
                                 <p class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mb-4 md:mb-6">Realisasi Sales (Ctn)</p>
@@ -361,7 +362,7 @@
 
                         <form id="form-stock" onsubmit="submitAction(event, 'insert_stock')" class="hidden-tab space-y-6 md:space-y-8 bg-appcard p-6 md:p-12 rounded-4xl border border-white/7 transition-shadow hover:shadow-[0_0_25px_rgba(52,199,89,0.2)]">
                             <div class="space-y-3.5 md:space-y-5">
-                                <input type="text" id="stk-tanggal" list="date-recom" autocomplete="off" placeholder="Tanggal (DD/MM/YYYY)" required class="bg-appbg w-full md:py-5 md:text-lg">
+                                <input type="text" id="stk-tanggal" list="date-recom" autocomplete="off" placeholder="Tanggal (DD/MM/YYYY)" required class="bg-appbg w-full h-14 md:h-[60px] md:text-lg px-6">
                             </div>
                             <div class="pt-6 md:pt-10 border-t border-white/7">
                                 <p class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mb-4 md:mb-6">Fisik Stock (Ctn)</p>
@@ -532,11 +533,14 @@
             } catch(e) { console.error(e); }
         }
 
+        // ================= FIX BUG JS DOUBLE FORM =================
         function switchForm(formType) {
             try {
-                ['form-po', 'form-sales', 'form-stock'].forEach(id => { const el = document.getElementById('form-' + id); if(el) el.classList.add('hidden-tab'); });
+                ['form-po', 'form-sales', 'form-stock'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden-tab'); });
                 const fTarget = document.getElementById('form-' + formType); if(fTarget) fTarget.classList.remove('hidden-tab');
+                
                 ['btn-form-po', 'btn-form-sales', 'btn-form-stock'].forEach(id => { const btn = document.getElementById(id); if(btn) btn.className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all text-gray-500 bg-transparent"; });
+                
                 const activeBtn = document.getElementById('btn-form-' + formType);
                 if(activeBtn) {
                     if(formType === 'po') activeBtn.className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appapplered text-white shadow-glow-redorange";
