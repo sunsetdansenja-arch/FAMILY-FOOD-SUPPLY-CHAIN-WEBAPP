@@ -248,17 +248,17 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
 
-                <div id="tab-log" class="hidden-tab p-6 md:p-10 space-y-6 md:space-y-8 animate-fade-in-up">
-                    <div class="sticky top-[72px] md:top-[96px] bg-[#000000]/95 backdrop-blur-xl z-10 -mx-6 px-6 md:-mx-10 md:px-10 pt-8 pb-5 md:pt-12 md:pb-6 border-b border-white/7">
-                        <div class="flex gap-3 md:gap-4 max-w-3xl mx-auto w-full">
-                            <input type="text" id="search-po" placeholder="Cari ID / DC..." class="text-base bg-appcard border border-white/10 flex-1 rounded-2xl px-5" onkeyup="filterLogLocal()">
-                            <button type="button" onclick="loadLogPO()" id="btn-sync-log" class="bg-appapplered text-white w-16 md:w-20 rounded-2xl flex justify-center items-center btn-tactile shadow-glow-redorange hover:scale-[0.96] transition-transform"><i class="fa-solid fa-rotate-right text-lg"></i></button>
+                <div id="tab-log" class="hidden-tab p-6 md:p-10 animate-fade-in-up flex flex-col gap-6 md:gap-8">
+                    <div class="sticky top-[72px] md:top-[96px] bg-[#000000]/95 backdrop-blur-xl z-10 -mx-6 px-6 md:-mx-10 md:px-10 py-6 md:py-8 border-b border-white/7">
+                        <div class="flex gap-3 md:gap-4 max-w-3xl mx-auto w-full items-stretch">
+                            <input type="text" id="search-po" placeholder="Cari ID / DC..." class="text-base bg-appcard border border-white/10 flex-1 rounded-2xl px-5 py-3.5 md:py-4 outline-none transition-colors focus:border-appapplered" onkeyup="filterLogLocal()">
+                            <button type="button" onclick="loadLogPO()" id="btn-sync-log" class="bg-appapplered text-white w-16 md:w-20 rounded-2xl flex justify-center items-center btn-tactile shadow-glow-redorange hover:scale-[0.96] transition-transform h-auto"><i class="fa-solid fa-rotate-right text-lg"></i></button>
                         </div>
                     </div>
-                    <div id="log-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6"></div>
+                    
+                    <div id="log-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 pb-10"></div>
                 </div>
 
                 <div id="tab-forms" class="hidden-tab p-6 md:p-10 animate-fade-in-up">
@@ -635,7 +635,6 @@
             });
         }
 
-        // ====== UPDATE: RENDER LOG PREVIEW (AUTO SUMMARY EXECUTIVE) ======
         function renderLogPreview() {
             const monthVal = document.getElementById('report-month').value; 
             const dcVal = document.getElementById('report-dc').value; 
@@ -664,7 +663,6 @@
                 return;
             }
 
-            // 1. Buat Tabel Detail (Akan selalu muncul di bawah/halaman berikutnya)
             let detailRows = '';
             filteredLog.forEach(i => {
                 const poQty = Number(i["TOTAL PO ctn"]) || 0; const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0; const gap = i["GAP"] || 0;
@@ -678,7 +676,6 @@
                 </table>
             `;
 
-            // 2. Buat Tabel Executive Summary HANYA JIKA "ALL DC"
             if (dcVal === "ALL") {
                 let summary = {};
                 filteredLog.forEach(i => {
@@ -686,7 +683,7 @@
                     const poQty = Number(i["TOTAL PO ctn"]) || 0;
                     const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0;
                     let gapQty = Number(i["GAP"]);
-                    if(isNaN(gapQty)) gapQty = poQty - salesQty; // Fallback jika kolom GAP kosong
+                    if(isNaN(gapQty)) gapQty = poQty - salesQty; 
 
                     if(!summary[dc]) summary[dc] = { po: 0, sales: 0, gap: 0 };
                     summary[dc].po += poQty;
@@ -718,16 +715,12 @@
                     </table>
                     <div style="page-break-after: always; margin-bottom: 40px;"></div>
                 `;
-
-                // Gabungkan: Summary di atas, Detail di bawah.
                 contentDiv.innerHTML = sumTable + detailTable;
             } else {
-                // Jika pilih DC spesifik, tampilkan Detail saja
                 contentDiv.innerHTML = detailTable;
             }
         }
 
-        // ================= FIX DOWNLOAD PDF =================
         function downloadPDF(elementId, fileNamePrefix) {
             const element = document.getElementById(elementId);
             const wrapper = element.parentElement; 
