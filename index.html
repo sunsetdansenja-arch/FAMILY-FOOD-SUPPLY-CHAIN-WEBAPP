@@ -244,12 +244,7 @@
                                     <h1 style="font-size: 24px; font-weight: 900; margin:0; color:#2B65F6; letter-spacing: 1px;">DATABASE LOG REPORT</h1>
                                     <p style="margin: 5px 0 0 0; color: #6B7280; font-size: 14px;" id="rep-log-period">Periode Pembukuan: -</p>
                                 </div>
-                                <table style="width:100%; border-collapse: collapse; font-size: 12px; text-align: left;">
-                                    <thead><tr style="background:#F9FAFB; color: #374151; font-weight: 900;"><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">ID PO</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">TANGGAL</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">DC</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">PO (CTN)</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">SALES</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">GAP</th></tr></thead>
-                                    <tbody id="rep-log-tbody">
-                                        <tr><td colspan="6" style="text-align:center; padding: 20px; color:#999;">Tidak ada data untuk bulan ini.</td></tr>
-                                    </tbody>
-                                </table>
+                                <div id="rep-log-content"></div>
                             </div>
                         </div>
                     </div>
@@ -257,7 +252,7 @@
                 </div>
 
                 <div id="tab-log" class="hidden-tab p-6 md:p-10 space-y-6 md:space-y-8 animate-fade-in-up">
-                    <div class="sticky top-[72px] md:top-[96px] bg-[#000000]/95 backdrop-blur-xl z-10 -mx-6 px-6 md:-mx-10 md:px-10 pt-2.5 pb-5 md:pb-6 border-b border-white/7">
+                    <div class="sticky top-[72px] md:top-[96px] bg-[#000000]/95 backdrop-blur-xl z-10 -mx-6 px-6 md:-mx-10 md:px-10 pt-8 pb-5 md:pt-12 md:pb-6 border-b border-white/7">
                         <div class="flex gap-3 md:gap-4 max-w-3xl mx-auto w-full">
                             <input type="text" id="search-po" placeholder="Cari ID / DC..." class="text-base bg-appcard border border-white/10 flex-1 rounded-2xl px-5" onkeyup="filterLogLocal()">
                             <button type="button" onclick="loadLogPO()" id="btn-sync-log" class="bg-appapplered text-white w-16 md:w-20 rounded-2xl flex justify-center items-center btn-tactile shadow-glow-redorange hover:scale-[0.96] transition-transform"><i class="fa-solid fa-rotate-right text-lg"></i></button>
@@ -583,7 +578,6 @@
             } catch(error) { showToast("Kesalahan Form Internal", true); }
         }
 
-        // ====== UPDATE: ANALYTIC HYBRID REPORT DENGAN DUAL NET FILTER ======
         function renderAnalyticPreview() {
             const monthVal = document.getElementById('analytic-month').value;
             let target1 = "", target2 = "", displayPeriod = "-";
@@ -591,20 +585,17 @@
             if(monthVal) {
                 const [year, monthStr] = monthVal.split('-');
                 const monthInt = parseInt(monthStr, 10); 
-                target1 = `${monthStr}/${year}`;    // Jaring 1: "01/2026"
-                target2 = `/${monthInt}/${year}`;   // Jaring 2: "/1/2026"
+                target1 = `${monthStr}/${year}`;    
+                target2 = `/${monthInt}/${year}`;   
                 displayPeriod = `Periode: ${monthStr} / ${year} (Histori) | Area: Inv. Real-Time`;
             }
             document.getElementById('report-date').innerText = displayPeriod;
 
-            // KALKULASI FULFILLMENT (Berdasarkan Bulan)
             let totPO = 0; let totSales = 0;
             activeLogData.forEach(i => { 
                 if(i.ID && !String(i["PO NKA"]).includes("BATAL")) { 
                     const tgl = i["Tanggal PO"] || "";
-                    // Filter Jaring Ganda
                     if(monthVal && !(tgl.includes(target1) || tgl.includes(target2))) return;
-                    
                     totPO += Number(i["TOTAL PO ctn"]||0); 
                     totSales += Number(i["Qty Terpenuhi (Kirim)"]||0); 
                 } 
@@ -613,7 +604,6 @@
             document.getElementById('rep-fulfill').innerText = `${fulfillPct}%`;
             document.getElementById('rep-fulfill').style.color = fulfillPct >= 80 ? '#34C759' : '#FF9500';
 
-            // KALKULASI INVENTORY & DEMAND (REAL-TIME KESELURUHAN)
             let totDemand = 0; let totPOForecast = 0; let countCrit = 0; let countSafe = 0;
             globalForecastData.forEach(i => { totDemand += i.demand; totPOForecast += i.po; if(i.status.includes("CRITICAL")) countCrit++; else countSafe++; });
             const demandVsProd = totDemand > 0 ? Math.round((totPOForecast/totDemand)*100) : 0;
@@ -645,16 +635,16 @@
             });
         }
 
-        // ====== UPDATE: LOG PREVIEW DENGAN DUAL NET FILTER ======
+        // ====== UPDATE: RENDER LOG PREVIEW (AUTO SUMMARY EXECUTIVE) ======
         function renderLogPreview() {
             const monthVal = document.getElementById('report-month').value; 
             const dcVal = document.getElementById('report-dc').value; 
+            const contentDiv = document.getElementById('rep-log-content');
             if(!monthVal) return;
             
             const [year, monthStr] = monthVal.split('-');
             const monthInt = parseInt(monthStr, 10); 
             
-            // Jaring Ganda diaktifkan
             const target1 = `${monthStr}/${year}`;    
             const target2 = `/${monthInt}/${year}`;   
             
@@ -664,24 +654,77 @@
             let filteredLog = activeLogData.filter(i => {
                 if(!i.ID || String(i["PO NKA"]).includes("BATAL")) return false;
                 const tgl = i["Tanggal PO"] || "";
-                // Cek apakah tembus di jaring 1 atau jaring 2
                 const matchMonth = tgl.includes(target1) || tgl.includes(target2);
                 const matchDC = (dcVal === "ALL") || (i.DC === dcVal);
                 return matchMonth && matchDC;
             });
 
-            const tbody = document.getElementById('rep-log-tbody');
             if(filteredLog.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color:#999;">Tidak ada data untuk filter ini.</td></tr>`;
+                contentDiv.innerHTML = `<p style="text-align:center; padding: 20px; color:#999;">Tidak ada data untuk filter ini.</p>`;
                 return;
             }
 
-            let tableRows = '';
+            // 1. Buat Tabel Detail (Akan selalu muncul di bawah/halaman berikutnya)
+            let detailRows = '';
             filteredLog.forEach(i => {
                 const poQty = Number(i["TOTAL PO ctn"]) || 0; const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0; const gap = i["GAP"] || 0;
-                tableRows += `<tr><td style="padding:10px; border-bottom:1px solid #E5E7EB; font-weight: bold;">${i.ID}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; color: #6B7280;">${i["Tanggal PO"]}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB;">${i.DC}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; text-align:center;">${poQty}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; text-align:center;">${salesQty}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; text-align:center; font-weight:bold; color:${gap>0?'#FF3B30':'#34C759'};">${gap}</td></tr>`;
+                detailRows += `<tr><td style="padding:10px; border-bottom:1px solid #E5E7EB; font-weight: bold;">${i.ID}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; color: #6B7280;">${i["Tanggal PO"]}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB;">${i.DC}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; text-align:center;">${poQty}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; text-align:center;">${salesQty}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; text-align:center; font-weight:bold; color:${gap>0?'#FF3B30':'#34C759'};">${gap}</td></tr>`;
             });
-            tbody.innerHTML = tableRows;
+            let detailTable = `
+                <h2 style="font-size:14px; font-weight:bold; margin-bottom:10px; color:#374151; text-transform:uppercase;">RINCIAN TRANSAKSI DETAIL</h2>
+                <table style="width:100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                    <thead><tr style="background:#F9FAFB; color: #374151; font-weight: 900;"><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">ID PO</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">TANGGAL</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">DC</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">PO (CTN)</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">SALES</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">GAP</th></tr></thead>
+                    <tbody>${detailRows}</tbody>
+                </table>
+            `;
+
+            // 2. Buat Tabel Executive Summary HANYA JIKA "ALL DC"
+            if (dcVal === "ALL") {
+                let summary = {};
+                filteredLog.forEach(i => {
+                    const dc = i.DC || "UNKNOWN";
+                    const poQty = Number(i["TOTAL PO ctn"]) || 0;
+                    const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0;
+                    let gapQty = Number(i["GAP"]);
+                    if(isNaN(gapQty)) gapQty = poQty - salesQty; // Fallback jika kolom GAP kosong
+
+                    if(!summary[dc]) summary[dc] = { po: 0, sales: 0, gap: 0 };
+                    summary[dc].po += poQty;
+                    summary[dc].sales += salesQty;
+                    summary[dc].gap += gapQty;
+                });
+
+                let sumRows = '';
+                for (let dc in summary) {
+                    const s = summary[dc];
+                    sumRows += `<tr>
+                        <td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; font-weight:bold; font-size:14px;">${dc}</td>
+                        <td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; text-align:center; font-size:14px;">${s.po}</td>
+                        <td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; text-align:center; font-size:14px;">${s.sales}</td>
+                        <td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; text-align:center; font-weight:bold; font-size:14px; color:${s.gap>0?'#FF3B30':'#34C759'};">${s.gap}</td>
+                    </tr>`;
+                }
+
+                let sumTable = `
+                    <h2 style="font-size:16px; font-weight:bold; margin-bottom:10px; color:#FF3B30; text-transform:uppercase;">EXECUTIVE SUMMARY PER DC</h2>
+                    <table style="width:100%; border-collapse: collapse; font-size: 12px; text-align: left; margin-bottom: 30px;">
+                        <thead><tr style="background:#F9FAFB; color: #374151; font-weight: 900;">
+                            <th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">NAMA DC</th>
+                            <th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">TOTAL PO (CTN)</th>
+                            <th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">TOTAL SALES</th>
+                            <th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">TOTAL GAP</th>
+                        </tr></thead>
+                        <tbody>${sumRows}</tbody>
+                    </table>
+                    <div style="page-break-after: always; margin-bottom: 40px;"></div>
+                `;
+
+                // Gabungkan: Summary di atas, Detail di bawah.
+                contentDiv.innerHTML = sumTable + detailTable;
+            } else {
+                // Jika pilih DC spesifik, tampilkan Detail saja
+                contentDiv.innerHTML = detailTable;
+            }
         }
 
         // ================= FIX DOWNLOAD PDF =================
