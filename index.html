@@ -73,8 +73,24 @@
         .a4-wrapper { overflow-x: auto; background-color: #1C1C1E; border-radius: 1rem; padding: 10px; border: 1px solid rgba(255,255,255,0.1); position: relative; }
         .a4-paper { width: 794px; min-height: 1122px; background: white; color: black; padding: 40px; font-family: Arial, sans-serif; box-sizing: border-box; position: relative; margin: 0 auto; }
 
-        /* FIX INPUT SKU AGAR TIDAK BENTROK PADDING GLOBAL */
-        .sku-input { padding: 0 !important; background: transparent !important; border: none !important; box-shadow: none !important; text-align: center; font-size: 1.25rem; font-weight: 900; height: 40px; }
+        /* HILANGKAN PANAH (SPINNER) PADA INPUT NUMBER DI DESKTOP CHROME/EDGE/SAFARI */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] { -moz-appearance: textfield; } /* FIREFOX */
+
+        /* FIX INPUT SKU AGAR TIDAK BENTROK PADDING GLOBAL DAN SELALU DI TENGAH */
+        .sku-input { 
+            padding: 0 !important; 
+            background: transparent !important; 
+            border: none !important; 
+            box-shadow: none !important; 
+            text-align: center; 
+            font-weight: 900; 
+            outline: none !important; 
+        }
     </style>
 </head>
 <body class="flex justify-center antialiased font-apple relative">
@@ -173,7 +189,6 @@
                 </div>
 
                 <div id="tab-report" class="hidden-tab p-6 md:p-10 space-y-6 md:space-y-8 animate-fade-in-up">
-                    
                     <div class="flex bg-appcard p-1.5 rounded-2xl border border-white/7 shadow-xl max-w-2xl mx-auto w-full">
                         <button type="button" onclick="switchReportView('analytic')" id="btn-rep-analytic" class="flex-1 py-3 md:py-4 rounded-xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appappleblue text-black shadow-glow-lightblue">Analytic Report</button>
                         <button type="button" onclick="switchReportView('log')" id="btn-rep-log" class="flex-1 py-3 md:py-4 rounded-xl text-xs md:text-sm font-extrabold uppercase transition-all text-gray-500 bg-transparent">Log PO Report</button>
@@ -272,106 +287,108 @@
                             <button type="button" onclick="switchForm('stock')" id="btn-form-stock" class="flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all text-gray-500 bg-transparent">Stock</button>
                         </div>
 
-                        <form id="form-po" onsubmit="submitAction(event, 'insert_po')" class="space-y-6 md:space-y-8 bg-appcard p-6 md:p-10 rounded-4xl border border-white/7 shadow-glow-redorange transition-shadow hover:shadow-[0_0_30px_rgba(255,59,48,0.4)]">
+                        <form id="form-po" onsubmit="submitAction(event, 'insert_po')" class="space-y-6 md:space-y-8 bg-appcard p-6 md:p-12 rounded-4xl border border-white/7 shadow-glow-redorange transition-shadow hover:shadow-[0_0_30px_rgba(255,59,48,0.4)]">
                             <div class="space-y-3.5 md:space-y-5">
-                                <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase bg-appbg md:h-16">
+                                <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase bg-appbg w-full md:py-5 md:text-lg">
                                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3.5 md:gap-5">
-                                    <input type="text" id="po-tanggal" list="date-recom" autocomplete="off" placeholder="Tgl PO" required class="bg-appbg md:h-16">
-                                    <input type="text" id="po-exp" list="date-recom" autocomplete="off" placeholder="Tgl EXP" required class="bg-appbg md:h-16">
+                                    <input type="text" id="po-tanggal" list="date-recom" autocomplete="off" placeholder="Tgl PO" required class="bg-appbg w-full md:py-5 md:text-lg">
+                                    <input type="text" id="po-exp" list="date-recom" autocomplete="off" placeholder="Tgl EXP" required class="bg-appbg w-full md:py-5 md:text-lg">
                                     <div class="relative cursor-pointer btn-tactile col-span-2 md:col-span-1" onclick="openDCModal('po-dc')">
-                                        <input type="text" id="po-dc" placeholder="PILIH NAMA DC" required readonly class="pointer-events-none uppercase bg-appapplered/10 border border-appapplered/30 text-appapplered md:h-16">
-                                        <div class="absolute right-5 top-1/2 -translate-y-1/2 text-appapplered text-lg">🔍</div>
+                                        <input type="text" id="po-dc" placeholder="PILIH NAMA DC" required readonly class="pointer-events-none uppercase bg-appapplered/10 border border-appapplered/30 text-appapplered w-full h-full md:py-5 md:text-lg">
+                                        <div class="absolute right-5 top-1/2 -translate-y-1/2 text-appapplered text-xl">🔍</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="pt-5 md:pt-8 border-t border-white/7">
-                                <p class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mb-3.5 md:mb-5">Kuantitas PO (Ctn)</p>
+                            <div class="pt-6 md:pt-10 border-t border-white/7">
+                                <p class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mb-4 md:mb-6">Kuantitas PO (Ctn)</p>
                                 <div class="grid grid-cols-2 md:grid-cols-5 gap-3.5 md:gap-5">
-                                    <div class="bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appapplered focus-within:shadow-[0_0_15px_rgba(255,59,48,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NKA</label>
-                                        <input type="number" id="po-nka" value="0" required class="sku-input w-full">
+                                    <div class="bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appapplered focus-within:shadow-[0_0_20px_rgba(255,59,48,0.35)] focus-within:bg-[#1A0505]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NKA</label>
+                                        <input type="number" id="po-nka" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
-                                    <div class="bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appapplered focus-within:shadow-[0_0_15px_rgba(255,59,48,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NDLH</label>
-                                        <input type="number" id="po-ndlh" value="0" required class="sku-input w-full">
+                                    <div class="bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appapplered focus-within:shadow-[0_0_20px_rgba(255,59,48,0.35)] focus-within:bg-[#1A0505]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NDLH</label>
+                                        <input type="number" id="po-ndlh" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
-                                    <div class="bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appapplered focus-within:shadow-[0_0_15px_rgba(255,59,48,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NRD</label>
-                                        <input type="number" id="po-nrd" value="0" required class="sku-input w-full">
+                                    <div class="bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appapplered focus-within:shadow-[0_0_20px_rgba(255,59,48,0.35)] focus-within:bg-[#1A0505]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NRD</label>
+                                        <input type="number" id="po-nrd" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
-                                    <div class="bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appapplered focus-within:shadow-[0_0_15px_rgba(255,59,48,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NARR</label>
-                                        <input type="number" id="po-narr" value="0" required class="sku-input w-full">
+                                    <div class="bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appapplered focus-within:shadow-[0_0_20px_rgba(255,59,48,0.35)] focus-within:bg-[#1A0505]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NARR</label>
+                                        <input type="number" id="po-narr" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
-                                    <div class="col-span-2 md:col-span-1 bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appapplered focus-within:shadow-[0_0_15px_rgba(255,59,48,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NKACH</label>
-                                        <input type="number" id="po-nkach" value="0" required class="sku-input w-full">
+                                    <div class="col-span-2 md:col-span-1 bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appapplered focus-within:shadow-[0_0_20px_rgba(255,59,48,0.35)] focus-within:bg-[#1A0505]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NKACH</label>
+                                        <input type="number" id="po-nkach" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="w-full bg-appapplered text-white font-extrabold py-4 md:py-5 rounded-2xl btn-tactile shadow-glow-redorange text-sm md:text-base tracking-widest mt-4">SUBMIT PO</button>
+                            <button type="submit" class="w-full bg-appapplered text-white font-extrabold py-4 md:py-5 rounded-2xl btn-tactile shadow-glow-redorange text-sm md:text-base tracking-widest mt-6 md:mt-8 hover:scale-[0.98] transition-transform">SUBMIT PO</button>
                         </form>
 
-                        <form id="form-sales" onsubmit="submitAction(event, 'insert_sales')" class="hidden-tab space-y-6 md:space-y-8 bg-appcard p-6 md:p-10 rounded-4xl border border-white/7 transition-shadow hover:shadow-[0_0_25px_rgba(173,216,230,0.2)]">
-                            <div class="space-y-3.5">
-                                <input type="text" id="sls-id" list="recent-po-ids" autocomplete="off" placeholder="ID PO DATABASE" required class="uppercase bg-appbg md:h-16">
+                        <form id="form-sales" onsubmit="submitAction(event, 'insert_sales')" class="hidden-tab space-y-6 md:space-y-8 bg-appcard p-6 md:p-12 rounded-4xl border border-white/7 transition-shadow hover:shadow-[0_0_25px_rgba(173,216,230,0.2)]">
+                            <div class="space-y-3.5 md:space-y-5">
+                                <input type="text" id="sls-id" list="recent-po-ids" autocomplete="off" placeholder="ID PO DATABASE" required class="uppercase bg-appbg w-full md:py-5 md:text-lg">
                             </div>
-                            <div class="pt-5 md:pt-8 border-t border-white/7">
-                                <p class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mb-3.5 md:mb-5">Realisasi Sales (Ctn)</p>
+                            <div class="pt-6 md:pt-10 border-t border-white/7">
+                                <p class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mb-4 md:mb-6">Realisasi Sales (Ctn)</p>
                                 <div class="grid grid-cols-2 md:grid-cols-5 gap-3.5 md:gap-5">
-                                    <div class="bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appappleblue focus-within:shadow-[0_0_15px_rgba(173,216,230,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NKA</label>
-                                        <input type="number" id="sls-nka" value="0" required class="sku-input w-full">
+                                    <div class="bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appappleblue focus-within:shadow-[0_0_20px_rgba(173,216,230,0.35)] focus-within:bg-[#05101A]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NKA</label>
+                                        <input type="number" id="sls-nka" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
-                                    <div class="bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appappleblue focus-within:shadow-[0_0_15px_rgba(173,216,230,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NDLH</label>
-                                        <input type="number" id="sls-ndlh" value="0" required class="sku-input w-full">
+                                    <div class="bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appappleblue focus-within:shadow-[0_0_20px_rgba(173,216,230,0.35)] focus-within:bg-[#05101A]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NDLH</label>
+                                        <input type="number" id="sls-ndlh" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
-                                    <div class="bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appappleblue focus-within:shadow-[0_0_15px_rgba(173,216,230,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NRD</label>
-                                        <input type="number" id="sls-nrd" value="0" required class="sku-input w-full">
+                                    <div class="bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appappleblue focus-within:shadow-[0_0_20px_rgba(173,216,230,0.35)] focus-within:bg-[#05101A]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NRD</label>
+                                        <input type="number" id="sls-nrd" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
-                                    <div class="bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appappleblue focus-within:shadow-[0_0_15px_rgba(173,216,230,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NARR</label>
-                                        <input type="number" id="sls-narr" value="0" required class="sku-input w-full">
+                                    <div class="bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appappleblue focus-within:shadow-[0_0_20px_rgba(173,216,230,0.35)] focus-within:bg-[#05101A]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NARR</label>
+                                        <input type="number" id="sls-narr" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
-                                    <div class="col-span-2 md:col-span-1 bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appappleblue focus-within:shadow-[0_0_15px_rgba(173,216,230,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NKACH</label>
-                                        <input type="number" id="sls-nkach" value="0" required class="sku-input w-full">
+                                    <div class="col-span-2 md:col-span-1 bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appappleblue focus-within:shadow-[0_0_20px_rgba(173,216,230,0.35)] focus-within:bg-[#05101A]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NKACH</label>
+                                        <input type="number" id="sls-nkach" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="w-full bg-appappleblue text-black font-extrabold py-4 md:py-5 rounded-2xl btn-tactile shadow-glow-lightblue text-sm md:text-base tracking-widest mt-4">UPDATE SALES</button>
+                            <button type="submit" class="w-full bg-appappleblue text-black font-extrabold py-4 md:py-5 rounded-2xl btn-tactile shadow-glow-lightblue text-sm md:text-base tracking-widest mt-6 md:mt-8 hover:scale-[0.98] transition-transform">UPDATE SALES</button>
                         </form>
 
-                        <form id="form-stock" onsubmit="submitAction(event, 'insert_stock')" class="hidden-tab space-y-6 md:space-y-8 bg-appcard p-6 md:p-10 rounded-4xl border border-white/7 transition-shadow hover:shadow-[0_0_25px_rgba(52,199,89,0.2)]">
-                            <input type="text" id="stk-tanggal" list="date-recom" autocomplete="off" placeholder="Tanggal (DD/MM/YYYY)" required class="bg-appbg md:h-16">
-                            <div class="pt-5 md:pt-8 border-t border-white/7 mt-2">
-                                <p class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mb-3.5 md:mb-5">Fisik Stock (Ctn)</p>
+                        <form id="form-stock" onsubmit="submitAction(event, 'insert_stock')" class="hidden-tab space-y-6 md:space-y-8 bg-appcard p-6 md:p-12 rounded-4xl border border-white/7 transition-shadow hover:shadow-[0_0_25px_rgba(52,199,89,0.2)]">
+                            <div class="space-y-3.5 md:space-y-5">
+                                <input type="text" id="stk-tanggal" list="date-recom" autocomplete="off" placeholder="Tanggal (DD/MM/YYYY)" required class="bg-appbg w-full md:py-5 md:text-lg">
+                            </div>
+                            <div class="pt-6 md:pt-10 border-t border-white/7">
+                                <p class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mb-4 md:mb-6">Fisik Stock (Ctn)</p>
                                 <div class="grid grid-cols-2 md:grid-cols-5 gap-3.5 md:gap-5">
-                                    <div class="bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appgreen focus-within:shadow-[0_0_15px_rgba(52,199,89,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NKA</label>
-                                        <input type="number" id="stk-nka" value="0" required class="sku-input w-full">
+                                    <div class="bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appgreen focus-within:shadow-[0_0_20px_rgba(52,199,89,0.35)] focus-within:bg-[#051A0A]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NKA</label>
+                                        <input type="number" id="stk-nka" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
-                                    <div class="bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appgreen focus-within:shadow-[0_0_15px_rgba(52,199,89,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NDLH</label>
-                                        <input type="number" id="stk-ndlh" value="0" required class="sku-input w-full">
+                                    <div class="bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appgreen focus-within:shadow-[0_0_20px_rgba(52,199,89,0.35)] focus-within:bg-[#051A0A]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NDLH</label>
+                                        <input type="number" id="stk-ndlh" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
-                                    <div class="bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appgreen focus-within:shadow-[0_0_15px_rgba(52,199,89,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NRD</label>
-                                        <input type="number" id="stk-nrd" value="0" required class="sku-input w-full">
+                                    <div class="bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appgreen focus-within:shadow-[0_0_20px_rgba(52,199,89,0.35)] focus-within:bg-[#051A0A]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NRD</label>
+                                        <input type="number" id="stk-nrd" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
-                                    <div class="bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appgreen focus-within:shadow-[0_0_15px_rgba(52,199,89,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NARR</label>
-                                        <input type="number" id="stk-narr" value="0" required class="sku-input w-full">
+                                    <div class="bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appgreen focus-within:shadow-[0_0_20px_rgba(52,199,89,0.35)] focus-within:bg-[#051A0A]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NARR</label>
+                                        <input type="number" id="stk-narr" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
-                                    <div class="col-span-2 md:col-span-1 bg-black/50 p-2.5 rounded-2xl border border-white/5 flex flex-col items-center transition-all focus-within:border-appgreen focus-within:shadow-[0_0_15px_rgba(52,199,89,0.3)]">
-                                        <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase mb-1">NKACH</label>
-                                        <input type="number" id="stk-nkach" value="0" required class="sku-input w-full">
+                                    <div class="col-span-2 md:col-span-1 bg-black/50 p-4 md:p-6 rounded-3xl border border-white/5 flex flex-col items-center justify-center transition-all focus-within:border-appgreen focus-within:shadow-[0_0_20px_rgba(52,199,89,0.35)] focus-within:bg-[#051A0A]">
+                                        <label class="text-[9px] md:text-[11px] text-gray-500 font-bold uppercase tracking-widest mb-1 md:mb-2 pointer-events-none">NKACH</label>
+                                        <input type="number" id="stk-nkach" value="0" required class="sku-input w-full text-3xl md:text-[2.5rem] leading-none text-white h-10 md:h-12">
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="w-full bg-appgreen text-black font-extrabold py-4 md:py-5 rounded-2xl btn-tactile shadow-[0_0_15px_rgba(52,199,89,0.2)] text-sm md:text-base tracking-widest mt-4">UPDATE STOCK</button>
+                            <button type="submit" class="w-full bg-appgreen text-black font-extrabold py-4 md:py-5 rounded-2xl btn-tactile shadow-[0_0_15px_rgba(52,199,89,0.2)] text-sm md:text-base tracking-widest mt-6 md:mt-8 hover:scale-[0.98] transition-transform">UPDATE STOCK</button>
                         </form>
                     </div>
                 </div>
@@ -517,7 +534,7 @@
 
         function switchForm(formType) {
             try {
-                ['form-po', 'form-sales', 'form-stock'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden-tab'); });
+                ['form-po', 'form-sales', 'form-stock'].forEach(id => { const el = document.getElementById('form-' + id); if(el) el.classList.add('hidden-tab'); });
                 const fTarget = document.getElementById('form-' + formType); if(fTarget) fTarget.classList.remove('hidden-tab');
                 ['btn-form-po', 'btn-form-sales', 'btn-form-stock'].forEach(id => { const btn = document.getElementById(id); if(btn) btn.className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all text-gray-500 bg-transparent"; });
                 const activeBtn = document.getElementById('btn-form-' + formType);
@@ -627,14 +644,16 @@
 
         function renderAnalyticPreview() {
             const monthVal = document.getElementById('analytic-month').value;
-            let target1 = "", target2 = "";
+            let target1 = "", target2 = "", displayPeriod = "-";
+            
             if(monthVal) {
                 const [year, monthStr] = monthVal.split('-');
                 const monthInt = parseInt(monthStr, 10); 
                 target1 = `${monthStr}/${year}`;    
                 target2 = `/${monthInt}/${year}`;   
-                document.getElementById('report-date').innerText = `Periode: ${monthStr} / ${year} (Histori) | Area: Inv. Real-Time`;
+                displayPeriod = `Periode: ${monthStr} / ${year} (Histori) | Area: Inv. Real-Time`;
             }
+            document.getElementById('report-date').innerText = displayPeriod;
 
             let totPO = 0; let totSales = 0;
             activeLogData.forEach(i => { 
@@ -685,16 +704,20 @@
             const dcVal = document.getElementById('report-dc').value; 
             const contentDiv = document.getElementById('rep-log-content');
             if(!monthVal) return;
+            
             const [year, monthStr] = monthVal.split('-');
             const monthInt = parseInt(monthStr, 10); 
+            
             const target1 = `${monthStr}/${year}`;    
             const target2 = `/${monthInt}/${year}`;   
+            
             const dcHeader = dcVal === "ALL" ? "ALL DC" : dcVal;
             document.getElementById('rep-log-period').innerHTML = `${monthStr} / ${year} &nbsp;|&nbsp; AREA: <span style="color:#FF3B30;">${dcHeader}</span>`;
             
             let filteredLog = activeLogData.filter(i => {
                 if(!i.ID || String(i["PO NKA"]).includes("BATAL")) return false;
-                const matchMonth = (i["Tanggal PO"] || "").includes(target1) || (i["Tanggal PO"] || "").includes(target2);
+                const tgl = i["Tanggal PO"] || "";
+                const matchMonth = tgl.includes(target1) || tgl.includes(target2);
                 const matchDC = (dcVal === "ALL") || (i.DC === dcVal);
                 return matchMonth && matchDC;
             });
@@ -714,7 +737,8 @@
                 <table style="width:100%; border-collapse: collapse; font-size: 12px; text-align: left;">
                     <thead><tr style="background:#F9FAFB; color: #374151; font-weight: 900;"><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">ID PO</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">TANGGAL</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">DC</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">PO (CTN)</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">SALES</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">GAP</th></tr></thead>
                     <tbody>${detailRows}</tbody>
-                </table>`;
+                </table>
+            `;
 
             if (dcVal === "ALL") {
                 let summary = {};
@@ -722,25 +746,39 @@
                     const dc = i.DC || "UNKNOWN";
                     const poQty = Number(i["TOTAL PO ctn"]) || 0;
                     const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0;
+                    let gapQty = Number(i["GAP"]);
+                    if(isNaN(gapQty)) gapQty = poQty - salesQty; 
+
                     if(!summary[dc]) summary[dc] = { po: 0, sales: 0, gap: 0 };
                     summary[dc].po += poQty;
                     summary[dc].sales += salesQty;
-                    summary[dc].gap += (poQty - salesQty);
+                    summary[dc].gap += gapQty;
                 });
 
                 let sumRows = '';
                 for (let dc in summary) {
                     const s = summary[dc];
-                    sumRows += `<tr><td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; font-weight:bold; font-size:14px;">${dc}</td><td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; text-align:center; font-size:14px;">${s.po}</td><td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; text-align:center; font-size:14px;">${s.sales}</td><td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; text-align:center; font-weight:bold; font-size:14px; color:${s.gap>0?'#FF3B30':'#34C759'};">${s.gap}</td></tr>`;
+                    sumRows += `<tr>
+                        <td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; font-weight:bold; font-size:14px;">${dc}</td>
+                        <td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; text-align:center; font-size:14px;">${s.po}</td>
+                        <td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; text-align:center; font-size:14px;">${s.sales}</td>
+                        <td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; text-align:center; font-weight:bold; font-size:14px; color:${s.gap>0?'#FF3B30':'#34C759'};">${s.gap}</td>
+                    </tr>`;
                 }
 
                 let sumTable = `
                     <h2 style="font-size:16px; font-weight:bold; margin-bottom:10px; color:#FF3B30; text-transform:uppercase;">EXECUTIVE SUMMARY PER DC</h2>
                     <table style="width:100%; border-collapse: collapse; font-size: 12px; text-align: left; margin-bottom: 30px;">
-                        <thead><tr style="background:#F9FAFB; color: #374151; font-weight: 900;"><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">NAMA DC</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">TOTAL PO (CTN)</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">TOTAL SALES</th><th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">TOTAL GAP</th></tr></thead>
+                        <thead><tr style="background:#F9FAFB; color: #374151; font-weight: 900;">
+                            <th style="padding:12px 10px; border-bottom:2px solid #D1D5DB;">NAMA DC</th>
+                            <th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">TOTAL PO (CTN)</th>
+                            <th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">TOTAL SALES</th>
+                            <th style="padding:12px 10px; border-bottom:2px solid #D1D5DB; text-align:center;">TOTAL GAP</th>
+                        </tr></thead>
                         <tbody>${sumRows}</tbody>
                     </table>
-                    <div style="page-break-after: always; margin-bottom: 40px;"></div>`;
+                    <div style="page-break-after: always; margin-bottom: 40px;"></div>
+                `;
                 contentDiv.innerHTML = sumTable + detailTable;
             } else {
                 contentDiv.innerHTML = detailTable;
@@ -750,12 +788,43 @@
         function downloadPDF(elementId, fileNamePrefix) {
             const element = document.getElementById(elementId);
             const wrapper = element.parentElement; 
+            
             if(wrapper) { wrapper.style.overflowX = 'visible'; wrapper.scrollLeft = 0; }
             window.scrollTo(0,0);
-            let fileName = elementId === 'print-log' ? `FFI_LogReport_${document.getElementById('report-dc').value}_${document.getElementById('report-month').value}.pdf` : `FFI_AnalyticReport_${document.getElementById('analytic-month').value}.pdf`;
-            const opt = { margin: [10, 0, 10, 0], filename: fileName, image: { type: 'jpeg', quality: 1 }, html2canvas: { scale: 2, useCORS: true, width: 794, windowWidth: 794, x: 0, y: 0, scrollX: 0, scrollY: 0 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+
+            let fileName = `${fileNamePrefix}_${new Date().getTime()}.pdf`;
+            if (elementId === 'print-log') {
+                const monthVal = document.getElementById('report-month').value;
+                const dcVal = document.getElementById('report-dc').value;
+                fileName = `FFI_LogReport_${dcVal}_${monthVal}.pdf`;
+            } else if (elementId === 'print-analytic') {
+                const monthVal = document.getElementById('analytic-month').value;
+                fileName = `FFI_AnalyticReport_${monthVal}.pdf`;
+            }
+            
+            const opt = {
+                margin:       [10, 0, 10, 0], 
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    width: 794,        
+                    windowWidth: 794,  
+                    x: 0,              
+                    y: 0,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
             showToast("Sedang mencetak A4...");
-            html2pdf().set(opt).from(element).save().then(() => { if(wrapper) wrapper.style.overflowX = 'auto'; showToast("PDF Berhasil Diunduh!"); });
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                if(wrapper) wrapper.style.overflowX = 'auto';
+                showToast("PDF Berhasil Diunduh!");
+            });
         }
     </script>
 </body>
