@@ -73,15 +73,15 @@
         .a4-wrapper { overflow-x: auto; background-color: #1C1C1E; border-radius: 1rem; padding: 10px; border: 1px solid rgba(255,255,255,0.1); position: relative; }
         .a4-paper { width: 794px; min-height: 1122px; background: white; color: black; padding: 40px; font-family: Arial, sans-serif; box-sizing: border-box; position: relative; margin: 0 auto; }
 
-        /* HILANGKAN PANAH (SPINNER) PADA INPUT NUMBER DI DESKTOP CHROME/EDGE/SAFARI */
+        /* HILANGKAN PANAH PADA INPUT NUMBER */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
-        input[type="number"] { -moz-appearance: textfield; } /* FIREFOX */
+        input[type="number"] { -moz-appearance: textfield; } 
 
-        /* FIX INPUT SKU AGAR TIDAK BENTROK PADDING GLOBAL DAN SELALU DI TENGAH */
+        /* RESET PADDING KHUSUS KOTAK SKU */
         .sku-input { 
             padding: 0 !important; 
             background: transparent !important; 
@@ -189,7 +189,6 @@
                 </div>
 
                 <div id="tab-report" class="hidden-tab p-6 md:p-10 space-y-6 md:space-y-8 animate-fade-in-up">
-                    
                     <div class="flex bg-appcard p-1.5 rounded-2xl border border-white/7 shadow-xl max-w-2xl mx-auto w-full">
                         <button type="button" onclick="switchReportView('analytic')" id="btn-rep-analytic" class="flex-1 py-3 md:py-4 rounded-xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appappleblue text-black shadow-glow-lightblue">Analytic Report</button>
                         <button type="button" onclick="switchReportView('log')" id="btn-rep-log" class="flex-1 py-3 md:py-4 rounded-xl text-xs md:text-sm font-extrabold uppercase transition-all text-gray-500 bg-transparent">Log PO Report</button>
@@ -536,10 +535,17 @@
         // ================= FIX BUG JS DOUBLE FORM =================
         function switchForm(formType) {
             try {
-                ['form-po', 'form-sales', 'form-stock'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.add('hidden-tab'); });
-                const fTarget = document.getElementById('form-' + formType); if(fTarget) fTarget.classList.remove('hidden-tab');
+                ['form-po', 'form-sales', 'form-stock'].forEach(id => { 
+                    const el = document.getElementById(id); 
+                    if(el) el.classList.add('hidden-tab'); 
+                });
+                const fTarget = document.getElementById('form-' + formType); 
+                if(fTarget) fTarget.classList.remove('hidden-tab');
                 
-                ['btn-form-po', 'btn-form-sales', 'btn-form-stock'].forEach(id => { const btn = document.getElementById(id); if(btn) btn.className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all text-gray-500 bg-transparent"; });
+                ['btn-form-po', 'btn-form-sales', 'btn-form-stock'].forEach(id => { 
+                    const btn = document.getElementById(id); 
+                    if(btn) btn.className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all text-gray-500 bg-transparent"; 
+                });
                 
                 const activeBtn = document.getElementById('btn-form-' + formType);
                 if(activeBtn) {
