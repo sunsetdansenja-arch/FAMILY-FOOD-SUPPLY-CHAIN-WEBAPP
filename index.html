@@ -424,7 +424,9 @@
         const WEBHOOK_URL = "https://n8n-mzbmiib3etk4.kangkung.sumopod.my.id/webhook/ff-indonesia-api";
         let activeLogData = []; let globalForecastData = []; let globalDiagnoseData = []; let targetDCInput = "";
         let chartBarInstance = null; let chartPieInstance = null;
-        const DC_LIST = ["BANDUNG", "BALARAJA", "BEKASI", "BOGOR", "BREBEK", "CIANJUR", "CILEUNGSI", "CIKOKOL", "CILACAP", "JEMBER", "KARAWANG", "KLATEN", "MADIUN", "MALANG", "PARUNG", "PLUMBON", "REMBANG", "SEMARANG", "SERANG", "SIDOARJO", "TEGAL", "BALI", "BANJARMASIN", "BATAM", "GORONTALO", "JAMBI", "SUKABUMI", "LAMPUNG", "LOMBOK", "LUWU", "MAKASSAR", "MANADO", "MEDAN", "PALEMBANG", "PEKANBARU", "PONTIANAK"];
+        
+        // DC LIST AUTO SORT A-Z DENGAN BANDUNG 1 & 2
+        const DC_LIST = ["BALARAJA", "BALI", "BANDUNG 1", "BANDUNG 2", "BANJARMASIN", "BATAM", "BEKASI", "BOGOR", "BREBEK", "CIANJUR", "CIKOKOL", "CILACAP", "CILEUNGSI", "GORONTALO", "JAMBI", "JEMBER", "KARAWANG", "KLATEN", "LAMPUNG", "LOMBOK", "LUWU", "MADIUN", "MAKASSAR", "MALANG", "MANADO", "MEDAN", "PALEMBANG", "PARUNG", "PEKANBARU", "PLUMBON", "PONTIANAK", "REMBANG", "SEMARANG", "SERANG", "SIDOARJO", "SUKABUMI", "TEGAL"].sort();
 
         window.onload = () => {
             const d = new Date(); const currMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
@@ -532,11 +534,10 @@
             } catch(e) { console.error(e); }
         }
 
-        // ================= FIX BUG JS DOUBLE FORM =================
         function switchForm(formType) {
             try {
                 ['form-po', 'form-sales', 'form-stock'].forEach(id => { 
-                    const el = document.getElementById(id); 
+                    const el = document.getElementById('form-' + id); 
                     if(el) el.classList.add('hidden-tab'); 
                 });
                 const fTarget = document.getElementById('form-' + formType); 
@@ -622,14 +623,67 @@
 
         function filterLogLocal() { const q = document.getElementById('search-po').value.toLowerCase(); renderLogs(activeLogData.filter(i => (i.ID && i.ID.toLowerCase().includes(q)) || (i.DC && i.DC.toLowerCase().includes(q)))); }
 
+        // ================= FIX BUG: KARTU VOID MERAH GELAP =================
         function renderLogs(data) {
             const cont = document.getElementById('log-container'); if(!cont) return; cont.innerHTML = '';
             data.forEach((item, idx) => {
-                if(!item.ID || String(item["PO NKA"]).includes("BATAL")) return;
-                const poQty = Number(item["TOTAL PO ctn"]) || 0; const salesQty = Number(item["Qty Terpenuhi (Kirim)"]) || 0;
+                if(!item.ID) return;
+                
+                const isBatalText = String(item["PO NKA"]).includes("BATAL");
+                const poQty = Number(item["TOTAL PO ctn"]) || 0; 
+                const salesQty = Number(item["Qty Terpenuhi (Kirim)"]) || 0;
+                
+                // Deteksi apabila Data Kosong/0 Keduanya (Dianggap Batal/Void)
+                const isCancelled = (poQty === 0 && salesQty === 0) || isBatalText;
+
                 let borderCol = "border-white/7", textCol = "text-appred", icon = "fa-circle-xmark", iconCol="text-appred";
-                if (salesQty >= (poQty * 0.85)) { borderCol = "border-appgreen/50"; textCol = "text-appgreen"; icon = "fa-circle-check"; iconCol="text-appgreen"; } else if (salesQty > 0) { borderCol = "border-appappleorange/50"; textCol = "text-appappleorange"; icon = "fa-clock-rotate-left"; iconCol="text-appappleorange"; }
-                cont.innerHTML += `<div class="bg-appcard rounded-4xl border ${borderCol} overflow-hidden transition-all duration-300 animate-fade-in-up" style="animation-delay: ${idx * 30}ms; opacity:0"><div class="p-6 flex items-center justify-between cursor-pointer btn-tactile hover:bg-white/5 transition-colors" onclick="toggleCard('${item.ID}')"><div class="flex items-center gap-5 w-2/3"><div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-black flex items-center justify-center border border-white/7 flex-shrink-0 ${iconCol}"><i class="fa-solid ${icon} text-xl md:text-2xl drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]"></i></div><div class="min-w-0"><h4 class="font-black text-sm md:text-base text-white uppercase tracking-tight truncate">${item.ID}</h4><p class="text-[10px] md:text-[11px] text-gray-500 font-extrabold uppercase tracking-widest mt-1.5 truncate">${item.DC} • ${item["Tanggal PO"]}</p></div></div><div class="text-right"><p class="text-[9px] md:text-[10px] text-gray-600 uppercase font-black tracking-widest mb-1">PO / SALES</p><p class="text-base md:text-lg font-black ${textCol} leading-none">${poQty} <span class="text-gray-600 mx-0.5">/</span> ${salesQty}</p></div></div><div id="det-${item.ID}" class="accordion-content bg-black/60 px-6 pb-6 pt-0"><div class="space-y-2 text-[11px] md:text-xs font-extrabold uppercase text-white pt-4"><div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-white/7"><span class="w-14 md:w-20 text-gray-400">NKA</span><span class="flex-1 text-center text-gray-300">${item["PO NKA"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NKA"] || 0}</span></div><div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-white/7"><span class="w-14 md:w-20 text-gray-400">NDLH</span><span class="flex-1 text-center text-gray-300">${item["PO NDLH"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NDLH"] || 0}</span></div><div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-white/7"><span class="w-14 md:w-20 text-gray-400">NRD</span><span class="flex-1 text-center text-gray-300">${item["PO NRD"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NRD"] || 0}</span></div><div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-white/7"><span class="w-14 md:w-20 text-gray-400">NARR</span><span class="flex-1 text-center text-gray-300">${item["PO NARR"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NARR"] || 0}</span></div><div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-appappleblue/30"><span class="w-14 md:w-20 text-gray-400">NKACH</span><span class="flex-1 text-center text-gray-300">${item["PO NKACH"] || 0}</span><span class="flex-1 text-center text-appgreen">${item["NKACH"] || 0}</span></div></div><div class="flex justify-between items-center border-t border-white/7 pt-5 mt-5"><div><p class="text-[9px] md:text-[10px] text-gray-500 font-extrabold uppercase tracking-widest mb-1">GAP Pengiriman</p><p class="text-base md:text-lg font-black ${item["GAP"] == 0 ? 'text-appgreen' : 'text-appred'}">${item["GAP"] || 0} CTN</p></div><button type="button" onclick="deletePO('${item.ID}')" class="bg-appred/10 text-appred border border-appred/30 font-extrabold text-[10px] md:text-xs py-3 px-6 rounded-xl btn-tactile hover:bg-appred hover:text-white transition-all uppercase tracking-widest"><i class="fa-solid fa-trash mr-2"></i>BATAL</button></div></div></div>`;
+                let cardBg = "bg-appcard";
+                let statusBadge = "";
+
+                if (isCancelled) {
+                    borderCol = "border-appred/80"; 
+                    cardBg = "bg-[#2A0505]"; 
+                    icon = "fa-ban"; 
+                    iconCol = "text-appred"; 
+                    textCol = "text-appred";
+                    statusBadge = `<div class="absolute top-3 right-3 bg-appapplered text-white text-[8px] font-black px-2 py-1 rounded-md tracking-widest shadow-glow-redorange z-10">VOID</div>`;
+                } else if (salesQty >= (poQty * 0.85)) { 
+                    borderCol = "border-appgreen/50"; textCol = "text-appgreen"; icon = "fa-circle-check"; iconCol="text-appgreen"; 
+                } else if (salesQty > 0) { 
+                    borderCol = "border-appappleorange/50"; textCol = "text-appappleorange"; icon = "fa-clock-rotate-left"; iconCol="text-appappleorange"; 
+                }
+
+                cont.innerHTML += `<div class="${cardBg} rounded-4xl border ${borderCol} overflow-hidden transition-all duration-300 animate-fade-in-up relative" style="animation-delay: ${idx * 30}ms; opacity:0">
+                    ${statusBadge}
+                    <div class="p-6 flex items-center justify-between cursor-pointer btn-tactile hover:bg-white/5 transition-colors" onclick="toggleCard('${item.ID}')">
+                        <div class="flex items-center gap-5 w-2/3">
+                            <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-black flex items-center justify-center border border-white/7 flex-shrink-0 ${iconCol}">
+                                <i class="fa-solid ${icon} text-xl md:text-2xl drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="font-black text-sm md:text-base ${isCancelled ? 'text-appred' : 'text-white'} uppercase tracking-tight truncate">${item.ID}</h4>
+                                <p class="text-[10px] md:text-[11px] text-gray-500 font-extrabold uppercase tracking-widest mt-1.5 truncate">${item.DC} • ${item["Tanggal PO"]}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] md:text-[10px] text-gray-600 uppercase font-black tracking-widest mb-1">PO / SALES</p>
+                            <p class="text-base md:text-lg font-black ${textCol} leading-none">${poQty} <span class="text-gray-600 mx-0.5">/</span> ${salesQty}</p>
+                        </div>
+                    </div>
+                    <div id="det-${item.ID}" class="accordion-content bg-black/60 px-6 pb-6 pt-0">
+                        <div class="space-y-2 text-[11px] md:text-xs font-extrabold uppercase text-white pt-4">
+                            <div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-white/7"><span class="w-14 md:w-20 text-gray-400">NKA</span><span class="flex-1 text-center text-gray-300">${item["PO NKA"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NKA"] || 0}</span></div>
+                            <div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-white/7"><span class="w-14 md:w-20 text-gray-400">NDLH</span><span class="flex-1 text-center text-gray-300">${item["PO NDLH"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NDLH"] || 0}</span></div>
+                            <div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-white/7"><span class="w-14 md:w-20 text-gray-400">NRD</span><span class="flex-1 text-center text-gray-300">${item["PO NRD"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NRD"] || 0}</span></div>
+                            <div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-white/7"><span class="w-14 md:w-20 text-gray-400">NARR</span><span class="flex-1 text-center text-gray-300">${item["PO NARR"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NARR"] || 0}</span></div>
+                            <div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-appappleblue/30"><span class="w-14 md:w-20 text-gray-400">NKACH</span><span class="flex-1 text-center text-gray-300">${item["PO NKACH"] || 0}</span><span class="flex-1 text-center text-appgreen">${item["NKACH"] || 0}</span></div>
+                        </div>
+                        <div class="flex justify-between items-center border-t border-white/7 pt-5 mt-5">
+                            <div><p class="text-[9px] md:text-[10px] text-gray-500 font-extrabold uppercase tracking-widest mb-1">GAP Pengiriman</p><p class="text-base md:text-lg font-black ${item["GAP"] == 0 ? 'text-appgreen' : 'text-appred'}">${item["GAP"] || 0} CTN</p></div>
+                            <button type="button" onclick="deletePO('${item.ID}')" class="bg-appred/10 text-appred border border-appred/30 font-extrabold text-[10px] md:text-xs py-3 px-6 rounded-xl btn-tactile hover:bg-appred hover:text-white transition-all uppercase tracking-widest ${isCancelled ? 'hidden-tab' : ''}"><i class="fa-solid fa-trash mr-2"></i>BATAL</button>
+                        </div>
+                    </div>
+                </div>`;
             });
         }
         function toggleCard(id) { const el = document.getElementById('det-' + id); if(el) el.classList.toggle('accordion-expanded'); }
@@ -667,11 +721,15 @@
 
             let totPO = 0; let totSales = 0;
             activeLogData.forEach(i => { 
-                if(i.ID && !String(i["PO NKA"]).includes("BATAL")) { 
+                const isBatalText = String(i["PO NKA"]).includes("BATAL");
+                const poQty = Number(i["TOTAL PO ctn"]) || 0; 
+                const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0;
+                // Exclude VOID from Analytic Sum
+                if(i.ID && !isBatalText && !(poQty === 0 && salesQty === 0)) { 
                     const tgl = i["Tanggal PO"] || "";
                     if(monthVal && !(tgl.includes(target1) || tgl.includes(target2))) return;
-                    totPO += Number(i["TOTAL PO ctn"]||0); 
-                    totSales += Number(i["Qty Terpenuhi (Kirim)"]||0); 
+                    totPO += poQty; 
+                    totSales += salesQty; 
                 } 
             });
             const fulfillPct = totPO > 0 ? Math.round((totSales/totPO)*100) : 0;
@@ -725,12 +783,22 @@
             document.getElementById('rep-log-period').innerHTML = `${monthStr} / ${year} &nbsp;|&nbsp; AREA: <span style="color:#FF3B30;">${dcHeader}</span>`;
             
             let filteredLog = activeLogData.filter(i => {
-                if(!i.ID || String(i["PO NKA"]).includes("BATAL")) return false;
+                if(!i.ID) return false;
+                const isBatalText = String(i["PO NKA"]).includes("BATAL");
+                const poQty = Number(i["TOTAL PO ctn"]) || 0; 
+                const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0;
+                
+                // Exclude VOID from Output Laporan Resmi
+                if (isBatalText || (poQty === 0 && salesQty === 0)) return false; 
+                
                 const tgl = i["Tanggal PO"] || "";
                 const matchMonth = tgl.includes(target1) || tgl.includes(target2);
                 const matchDC = (dcVal === "ALL") || (i.DC === dcVal);
                 return matchMonth && matchDC;
             });
+
+            // ================= FIX BUG: SORTING DATA A-Z PER DC =================
+            filteredLog.sort((a, b) => (a.DC || "").localeCompare(b.DC || ""));
 
             if(filteredLog.length === 0) {
                 contentDiv.innerHTML = `<p style="text-align:center; padding: 20px; color:#999;">Tidak ada data untuk filter ini.</p>`;
@@ -766,7 +834,8 @@
                 });
 
                 let sumRows = '';
-                for (let dc in summary) {
+                // ================= SORTING TABEL SUMMARY A-Z =================
+                Object.keys(summary).sort().forEach(dc => {
                     const s = summary[dc];
                     sumRows += `<tr>
                         <td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; font-weight:bold; font-size:14px;">${dc}</td>
@@ -774,7 +843,7 @@
                         <td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; text-align:center; font-size:14px;">${s.sales}</td>
                         <td style="padding:12px 10px; border-bottom:1px solid #E5E7EB; text-align:center; font-weight:bold; font-size:14px; color:${s.gap>0?'#FF3B30':'#34C759'};">${s.gap}</td>
                     </tr>`;
-                }
+                });
 
                 let sumTable = `
                     <h2 style="font-size:16px; font-weight:bold; margin-bottom:10px; color:#FF3B30; text-transform:uppercase;">EXECUTIVE SUMMARY PER DC</h2>
