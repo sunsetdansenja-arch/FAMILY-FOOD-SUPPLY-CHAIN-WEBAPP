@@ -425,8 +425,8 @@
         let activeLogData = []; let globalForecastData = []; let globalDiagnoseData = []; let targetDCInput = "";
         let chartBarInstance = null; let chartPieInstance = null;
         
-        // DC LIST AUTO SORT A-Z DENGAN BANDUNG 1 & 2
-        const DC_LIST = ["BALARAJA", "BALI", "BANDUNG 1", "BANDUNG 2", "BANJARMASIN", "BATAM", "BEKASI", "BOGOR", "BREBEK", "CIANJUR", "CIKOKOL", "CILACAP", "CILEUNGSI", "GORONTALO", "JAMBI", "JEMBER", "KARAWANG", "KLATEN", "LAMPUNG", "LOMBOK", "LUWU", "MADIUN", "MAKASSAR", "MALANG", "MANADO", "MEDAN", "PALEMBANG", "PARUNG", "PEKANBARU", "PLUMBON", "PONTIANAK", "REMBANG", "SEMARANG", "SERANG", "SIDOARJO", "SUKABUMI", "TEGAL"].sort();
+        // DC LIST AUTO SORT A-Z DENGAN BALARAJA DEPO, BALARAJA SAT, BANDUNG 1 & 2
+        const DC_LIST = ["BALARAJA DEPO", "BALARAJA SAT", "BALI", "BANDUNG 1", "BANDUNG 2", "BANJARMASIN", "BATAM", "BEKASI", "BOGOR", "BREBEK", "CIANJUR", "CIKOKOL", "CILACAP", "CILEUNGSI", "GORONTALO", "JAMBI", "JEMBER", "KARAWANG", "KLATEN", "LAMPUNG", "LOMBOK", "LUWU", "MADIUN", "MAKASSAR", "MALANG", "MANADO", "MEDAN", "PALEMBANG", "PARUNG", "PEKANBARU", "PLUMBON", "PONTIANAK", "REMBANG", "SEMARANG", "SERANG", "SIDOARJO", "SUKABUMI", "TEGAL"].sort();
 
         window.onload = () => {
             const d = new Date(); const currMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
