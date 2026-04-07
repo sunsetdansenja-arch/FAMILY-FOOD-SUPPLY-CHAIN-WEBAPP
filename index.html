@@ -593,62 +593,37 @@
                         if(fCont) { fCont.innerHTML += `<div class="grid grid-cols-5 gap-1.5 items-center py-3 border-b border-white/5 text-[10px] md:text-xs text-center animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0"><div class="font-extrabold text-left text-white px-1 uppercase truncate min-w-0">${skuName}</div><div class="text-gray-400 font-bold">${demandBulat}</div><div class="text-white font-black">${forecastBulat}</div><div class="text-white font-black">${bufferBulat}</div><div class="flex justify-center items-center">${dot}</div></div>`; }
                     });
                 } runTicker(document.getElementById('stat-sku'), skuCount);
-                
+
                 if(dCont) dCont.innerHTML = ''; let dcIssueCount = 0; globalDiagnoseData = [];
                 if(reqDiag.status === 'fulfilled') {
                     const textDiag = await reqDiag.value.text(); let rawDiag; try { rawDiag = JSON.parse(textDiag); } catch(e) { rawDiag = []; } if(rawDiag.data) rawDiag = rawDiag.data; 
                     const diagRows = Array.isArray(rawDiag) ? rawDiag : [rawDiag];
                     
                     diagRows.forEach((item, idx) => {
-                        const row = item.json ? item.json : item;
-                        const keys = Object.keys(row);
-                        const vals = Object.values(row);
+                        const row = item.json ? item.json : item; 
                         
-                        // Cari nama DC
-                        let dcKey = keys.find(k => k.toUpperCase().includes("DC")) || keys[0];
-                        let dcName = row[dcKey] || vals[1] || "";
-                        if(!dcName || String(dcName).toUpperCase() === "DC" || String(dcName).includes("col_")) return;
+                        // Ekstrak Nama DC yang presisi langsung dari col_2 (Sesuai JSON)
+                        const dcName = row.col_2 || "";
+                        if(!dcName || dcName === "DC" || String(dcName).toUpperCase().includes("DIAGNOSE")) return;
 
-                        // Variabel penampung
-                        let failCount = 0, moqCount = 0, aboveCount = 0, resStr = "TIDAK ADA DATA";
+                        // Ekstrak Nilai Persentase langsung dari col_4, col_6, col_8 
+                        // Gunakan ?? (nullish coalescing) agar 0 mutlak tidak diubah menjadi string DC Name
+                        const rawFail = row.col_4 ?? 0;
+                        const rawMoq = row.col_6 ?? 0;
+                        const rawAbove = row.col_8 ?? 0;
+                        const resStr = String(row.col_9 ?? "TIDAK ADA DATA").toUpperCase();
+
+                        // Ubah desimal n8n menjadi persen (0.909 -> 91)
+                        const failPct = Math.round(Number(rawFail) * 100) || 0;
+                        const moqPct = Math.round(Number(rawMoq) * 100) || 0;
+                        const abovePct = Math.round(Number(rawAbove) * 100) || 0;
+
+                        // Hitung isu DC (Hanya jika Failure atau Under MOQ ada isinya)
+                        if(failPct > 0 || moqPct > 0) dcIssueCount++; 
                         
-                        // Ekstrak angka aman (menghapus % jika ada)
-                        const safeNum = (val) => {
-                            if (!val) return 0;
-                            let s = String(val).replace('%', '').replace(',', '.').trim();
-                            return Number(s) || 0;
-                        };
-
-                        // Cek berdasarkan Key (Smart Scanner)
-                        let foundKeys = false;
-                        keys.forEach(k => {
-                            const kUpper = k.toUpperCase();
-                            if (kUpper.includes("FAILURE") || kUpper.includes("WH")) { failCount = safeNum(row[k]); foundKeys = true; }
-                            else if (kUpper.includes("UNDER")) { moqCount = safeNum(row[k]); foundKeys = true; }
-                            else if (kUpper.includes("ABOVE")) { aboveCount = safeNum(row[k]); foundKeys = true; }
-                            else if (kUpper.includes("DIAGNOSE") || kUpper.includes("RESULTS") || kUpper === "DR") { resStr = String(row[k]).toUpperCase(); foundKeys = true; }
-                        });
-
-                        // Fallback jika Google Sheets menyembunyikan header asli (col_3, col_5, dll)
-                        if (!foundKeys || (failCount === 0 && moqCount === 0 && aboveCount === 0 && resStr === "TIDAK ADA DATA")) {
-                            failCount = safeNum(row["WAREHOUSE FAILURE"] || row.col_3 || vals[2]);
-                            moqCount = safeNum(row["UNDER MOQ"] || row.col_5 || vals[4]);
-                            aboveCount = safeNum(row["ABOVE MOQ"] || row.col_7 || vals[6]);
-                            resStr = String(row["DIAGNOSE RESULTS (DR)"] || row.col_9 || vals[8] || "TIDAK ADA DATA").toUpperCase();
-                        }
-
-                        // Jika data dari google sheet itu angka RAW (cth: 5 order), kita jadikan persentase.
-                        // Jika data dari google sheet sudah persentase (cth: 80%), totalnya 100, hasil akhirnya tetap 80%.
-                        const total = failCount + moqCount + aboveCount;
-                        if(total > 0 || dcName !== "N/A") dcIssueCount++; 
-
-                        const failPct = total > 0 ? Math.round((failCount / total) * 100) : 0; 
-                        const moqPct = total > 0 ? Math.round((moqCount / total) * 100) : 0;
-                        const abovePct = total > 0 ? Math.round((aboveCount / total) * 100) : 0;
+                        globalDiagnoseData.push({ dc: dcName, failPct: failPct, moqPct: moqPct, abovePct: abovePct, res: resStr });
                         
-                        if(dcName !== "N/A") globalDiagnoseData.push({ dc: dcName, failPct: failPct, moqPct: moqPct, abovePct: abovePct, res: resStr });
-                        
-                        // Penentuan warna badge
+                        // Set Warna Badge Status
                         let badgeColor = "text-appappleorange";
                         if (resStr.includes("FAILURE")) badgeColor = "text-appred";
                         else if (resStr.includes("ABOVE") || resStr.includes("SAFE")) badgeColor = "text-appgreen";
@@ -831,9 +806,13 @@
                 options: { animation: false, responsive: true }
             });
 
-            // UPDATE: Memasukkan data ABOVE MOQ ke Pie Chart
+            // UPDATE: Memasukkan ketiga data ke Pie Chart Laporan
             let totFail = 0; let totMoq = 0; let totAbove = 0;
-            globalDiagnoseData.forEach(i => { totFail += i.failPct; totMoq += i.moqPct; totAbove += (i.abovePct || 0); });
+            globalDiagnoseData.forEach(i => { 
+                totFail += i.failPct; 
+                totMoq += i.moqPct; 
+                totAbove += (i.abovePct || 0); 
+            });
             chartPieInstance = new Chart(document.getElementById('chartPie'), {
                 type: 'pie',
                 data: { 
