@@ -593,17 +593,89 @@
                         if(fCont) { fCont.innerHTML += `<div class="grid grid-cols-5 gap-1.5 items-center py-3 border-b border-white/5 text-[10px] md:text-xs text-center animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0"><div class="font-extrabold text-left text-white px-1 uppercase truncate min-w-0">${skuName}</div><div class="text-gray-400 font-bold">${demandBulat}</div><div class="text-white font-black">${forecastBulat}</div><div class="text-white font-black">${bufferBulat}</div><div class="flex justify-center items-center">${dot}</div></div>`; }
                     });
                 } runTicker(document.getElementById('stat-sku'), skuCount);
+                
                 if(dCont) dCont.innerHTML = ''; let dcIssueCount = 0; globalDiagnoseData = [];
                 if(reqDiag.status === 'fulfilled') {
                     const textDiag = await reqDiag.value.text(); let rawDiag; try { rawDiag = JSON.parse(textDiag); } catch(e) { rawDiag = []; } if(rawDiag.data) rawDiag = rawDiag.data; 
                     const diagRows = Array.isArray(rawDiag) ? rawDiag : [rawDiag];
+                    
                     diagRows.forEach((item, idx) => {
-                        const row = item.json ? item.json : item; const vals = Object.values(row); let dcName = row["DC"] || row.col_2 || vals[1] || "";
+                        const row = item.json ? item.json : item;
+                        const keys = Object.keys(row);
+                        const vals = Object.values(row);
+                        
+                        // Cari nama DC
+                        let dcKey = keys.find(k => k.toUpperCase().includes("DC")) || keys[0];
+                        let dcName = row[dcKey] || vals[1] || "";
                         if(!dcName || String(dcName).toUpperCase() === "DC" || String(dcName).includes("col_")) return;
-                        const failCount = Number(row["WAREHOUSE FAILURE"] || row.col_3 || vals[2] || 0); const moqCount = Number(row["UNDER MOQ"] || row.col_5 || vals[4] || 0); const resStr = String(row["DIAGNOSE RESULTS (DR)"] || row.col_9 || vals[8] || "N/A").toUpperCase();
-                        const total = failCount + moqCount; if(total > 0 || dcName !== "N/A") dcIssueCount++; const failPct = total > 0 ? Math.round((failCount / total) * 100) : 0; const moqPct = total > 0 ? Math.round((moqCount / total) * 100) : 0;
-                        if(dcName !== "N/A") globalDiagnoseData.push({ dc: dcName, failPct: failPct, moqPct: moqPct, res: resStr });
-                        if(dCont) { dCont.innerHTML += `<div class="bg-appcard p-5 md:p-6 rounded-4xl border border-white/7 animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0"><div class="flex justify-between items-center mb-4 md:mb-5"><h4 class="text-sm md:text-base font-black text-white uppercase tracking-tight truncate w-32 md:w-48">${dcName}</h4><p class="text-[8px] md:text-[10px] font-bold ${resStr.includes('FAILURE') ? 'text-appred' : 'text-appappleorange'} tracking-widest bg-black px-3 py-1.5 rounded-md border border-white/7">⚠️ ${resStr}</p></div><div class="grid grid-cols-3 gap-1.5 text-center bg-black/50 p-3 md:p-4 rounded-2xl border border-white/7"><div class="border-r border-white/10"><p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">WH Failure</p><p class="text-xs md:text-sm font-black text-appred">${failPct}%</p></div><div class="border-r border-white/10"><p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">Under MOQ</p><p class="text-xs md:text-sm font-black text-appappleorange">${moqPct}%</p></div><div><p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">Above MOQ</p><p class="text-xs md:text-sm font-black text-appgreen">0%</p></div></div></div>`; }
+
+                        // Variabel penampung
+                        let failCount = 0, moqCount = 0, aboveCount = 0, resStr = "TIDAK ADA DATA";
+                        
+                        // Ekstrak angka aman (menghapus % jika ada)
+                        const safeNum = (val) => {
+                            if (!val) return 0;
+                            let s = String(val).replace('%', '').replace(',', '.').trim();
+                            return Number(s) || 0;
+                        };
+
+                        // Cek berdasarkan Key (Smart Scanner)
+                        let foundKeys = false;
+                        keys.forEach(k => {
+                            const kUpper = k.toUpperCase();
+                            if (kUpper.includes("FAILURE") || kUpper.includes("WH")) { failCount = safeNum(row[k]); foundKeys = true; }
+                            else if (kUpper.includes("UNDER")) { moqCount = safeNum(row[k]); foundKeys = true; }
+                            else if (kUpper.includes("ABOVE")) { aboveCount = safeNum(row[k]); foundKeys = true; }
+                            else if (kUpper.includes("DIAGNOSE") || kUpper.includes("RESULTS") || kUpper === "DR") { resStr = String(row[k]).toUpperCase(); foundKeys = true; }
+                        });
+
+                        // Fallback jika Google Sheets menyembunyikan header asli (col_3, col_5, dll)
+                        if (!foundKeys || (failCount === 0 && moqCount === 0 && aboveCount === 0 && resStr === "TIDAK ADA DATA")) {
+                            failCount = safeNum(row["WAREHOUSE FAILURE"] || row.col_3 || vals[2]);
+                            moqCount = safeNum(row["UNDER MOQ"] || row.col_5 || vals[4]);
+                            aboveCount = safeNum(row["ABOVE MOQ"] || row.col_7 || vals[6]);
+                            resStr = String(row["DIAGNOSE RESULTS (DR)"] || row.col_9 || vals[8] || "TIDAK ADA DATA").toUpperCase();
+                        }
+
+                        // Jika data dari google sheet itu angka RAW (cth: 5 order), kita jadikan persentase.
+                        // Jika data dari google sheet sudah persentase (cth: 80%), totalnya 100, hasil akhirnya tetap 80%.
+                        const total = failCount + moqCount + aboveCount;
+                        if(total > 0 || dcName !== "N/A") dcIssueCount++; 
+
+                        const failPct = total > 0 ? Math.round((failCount / total) * 100) : 0; 
+                        const moqPct = total > 0 ? Math.round((moqCount / total) * 100) : 0;
+                        const abovePct = total > 0 ? Math.round((aboveCount / total) * 100) : 0;
+                        
+                        if(dcName !== "N/A") globalDiagnoseData.push({ dc: dcName, failPct: failPct, moqPct: moqPct, abovePct: abovePct, res: resStr });
+                        
+                        // Penentuan warna badge
+                        let badgeColor = "text-appappleorange";
+                        if (resStr.includes("FAILURE")) badgeColor = "text-appred";
+                        else if (resStr.includes("ABOVE") || resStr.includes("SAFE")) badgeColor = "text-appgreen";
+                        else if (resStr === "TIDAK ADA DATA") badgeColor = "text-gray-500";
+
+                        if(dCont) { 
+                            dCont.innerHTML += `<div class="bg-appcard p-5 md:p-6 rounded-4xl border border-white/7 animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0">
+                                <div class="flex justify-between items-center mb-4 md:mb-5">
+                                    <h4 class="text-sm md:text-base font-black text-white uppercase tracking-tight truncate w-32 md:w-48">${dcName}</h4>
+                                    <p class="text-[8px] md:text-[10px] font-bold ${badgeColor} tracking-widest bg-black px-3 py-1.5 rounded-md border border-white/7">⚠️ ${resStr}</p>
+                                </div>
+                                <div class="grid grid-cols-3 gap-1.5 text-center bg-black/50 p-3 md:p-4 rounded-2xl border border-white/7">
+                                    <div class="border-r border-white/10">
+                                        <p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">WH Failure</p>
+                                        <p class="text-xs md:text-sm font-black text-appred">${failPct}%</p>
+                                    </div>
+                                    <div class="border-r border-white/10">
+                                        <p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">Under MOQ</p>
+                                        <p class="text-xs md:text-sm font-black text-appappleorange">${moqPct}%</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1.5">Above MOQ</p>
+                                        <p class="text-xs md:text-sm font-black text-appgreen">${abovePct}%</p>
+                                    </div>
+                                </div>
+                            </div>`; 
+                        }
                     });
                 } runTicker(document.getElementById('stat-dc'), dcIssueCount);
                 renderAnalyticPreview(); 
@@ -742,7 +814,6 @@
             document.getElementById('rep-alert').innerText = countCrit > 0 ? "⚠️ BUTUH PERHATIAN" : "✅ STOK AMAN";
             document.getElementById('rep-alert').style.color = countCrit > 0 ? '#FF3B30' : '#34C759';
             
-            // ================= FIX: LOGIKA & TAMPILAN VOLUME PO / SALES =================
             document.getElementById('rep-prod').innerHTML = `${totPO} <span style="font-size:16px; color:#9CA3AF;">/</span> ${totSales}`;
             
             document.getElementById('rep-inv-health').innerHTML = `<span style="color:#FF3B30;">${countCrit} Critical</span> <span style="color:#D1D5DB; margin: 0 10px;">|</span> <span style="color:#34C759;">${countSafe} Safe</span>`;
@@ -760,11 +831,15 @@
                 options: { animation: false, responsive: true }
             });
 
-            let totFail = 0; let totMoq = 0;
-            globalDiagnoseData.forEach(i => { totFail += i.failPct; totMoq += i.moqPct; });
+            // UPDATE: Memasukkan data ABOVE MOQ ke Pie Chart
+            let totFail = 0; let totMoq = 0; let totAbove = 0;
+            globalDiagnoseData.forEach(i => { totFail += i.failPct; totMoq += i.moqPct; totAbove += (i.abovePct || 0); });
             chartPieInstance = new Chart(document.getElementById('chartPie'), {
                 type: 'pie',
-                data: { labels: ['WH Failure', 'Under MOQ'], datasets: [{ data: [totFail, totMoq], backgroundColor: ['#FF3B30', '#FF9500'] }] },
+                data: { 
+                    labels: ['WH Failure', 'Under MOQ', 'Above MOQ'], 
+                    datasets: [{ data: [totFail, totMoq, totAbove], backgroundColor: ['#FF3B30', '#FF9500', '#34C759'] }] 
+                },
                 options: { animation: false, responsive: true }
             });
         }
