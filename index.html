@@ -536,7 +536,6 @@
 
         function switchForm(formType) {
             try {
-                // BUG FIX: Memanggil ID array yang benar tanpa dobel 'form-form-'
                 ['po', 'sales', 'stock'].forEach(id => { 
                     const el = document.getElementById('form-' + id); 
                     if(el) el.classList.add('hidden-tab'); 
@@ -582,9 +581,15 @@
             if(dCont) dCont.innerHTML = getSkeletonHTML(4, true);
             try {
                 const [reqBuffer, reqDiag] = await Promise.allSettled([ fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_buffer" }) }), fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_diagnose" }) }) ]);
+                
                 if(fCont) fCont.innerHTML = ''; let skuCount = 0; globalForecastData = [];
                 if(reqBuffer.status === 'fulfilled') {
-                    const textBuffer = await reqBuffer.value.text(); let rawBuffer; try { rawBuffer = JSON.parse(textBuffer); } catch(e) { rawBuffer = []; } if(rawBuffer.data) rawBuffer = rawBuffer.data; 
+                    const textBuffer = await reqBuffer.value.text(); let rawBuffer; try { rawBuffer = JSON.parse(textBuffer); } catch(e) { rawBuffer = []; } 
+                    
+                    // SMART PARSER: Membuka paketan dari n8n kalau bentuknya Array of Object
+                    if(Array.isArray(rawBuffer) && rawBuffer.length > 0 && rawBuffer[0].data) rawBuffer = rawBuffer[0].data;
+                    else if(rawBuffer && rawBuffer.data) rawBuffer = rawBuffer.data; 
+                    
                     const forecastRows = Array.isArray(rawBuffer) ? rawBuffer : [rawBuffer];
                     forecastRows.forEach((item, idx) => {
                         const row = item.json ? item.json : item; const vals = Object.values(row); let skuName = row.col_2 || row["Nama SKU"] || vals[1] || "";
@@ -598,13 +603,17 @@
 
                 if(dCont) dCont.innerHTML = ''; let dcIssueCount = 0; globalDiagnoseData = [];
                 if(reqDiag.status === 'fulfilled') {
-                    const textDiag = await reqDiag.value.text(); let rawDiag; try { rawDiag = JSON.parse(textDiag); } catch(e) { rawDiag = []; } if(rawDiag.data) rawDiag = rawDiag.data; 
+                    const textDiag = await reqDiag.value.text(); let rawDiag; try { rawDiag = JSON.parse(textDiag); } catch(e) { rawDiag = []; } 
+                    
+                    // SMART PARSER: Membuka paketan dari n8n kalau bentuknya Array of Object (Solusi Bug Blank!)
+                    if(Array.isArray(rawDiag) && rawDiag.length > 0 && rawDiag[0].data) rawDiag = rawDiag[0].data;
+                    else if(rawDiag && rawDiag.data) rawDiag = rawDiag.data; 
+                    
                     const diagRows = Array.isArray(rawDiag) ? rawDiag : [rawDiag];
                     
                     diagRows.forEach((item, idx) => {
                         const row = item.json ? item.json : item; 
                         
-                        // Menyesuaikan dengan format bersih dari backend Node (n8n Code)
                         const dcName = row.dc || row.DC || row.col_2 || "";
                         if(!dcName || dcName === "DC" || String(dcName).toUpperCase().includes("DIAGNOSE")) return;
 
@@ -613,12 +622,10 @@
                         const abovePct = row.abovePct !== undefined ? row.abovePct : (row.ABOVE_PCT !== undefined ? row.ABOVE_PCT : (Math.round(Number(row.col_8 || 0) * 100)));
                         const resStr = String(row.res || row["DIAGNOSE RESULTS (DR)"] || row.col_9 || "TIDAK ADA DATA").toUpperCase();
 
-                        // Hitung isu DC (Hanya jika Failure atau Under MOQ ada isinya)
                         if(failPct > 0 || moqPct > 0) dcIssueCount++; 
                         
                         globalDiagnoseData.push({ dc: dcName, failPct: failPct, moqPct: moqPct, abovePct: abovePct, res: resStr });
                         
-                        // Set Warna Badge Status
                         let badgeColor = "text-appappleorange";
                         if (resStr.includes("FAILURE")) badgeColor = "text-appred";
                         else if (resStr.includes("ABOVE") || resStr.includes("SAFE")) badgeColor = "text-appgreen";
