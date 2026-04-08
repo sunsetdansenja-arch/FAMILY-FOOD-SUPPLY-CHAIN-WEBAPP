@@ -536,10 +536,12 @@
 
         function switchForm(formType) {
             try {
-                ['form-po', 'form-sales', 'form-stock'].forEach(id => { 
+                // BUG FIX: Memanggil ID array yang benar tanpa dobel 'form-form-'
+                ['po', 'sales', 'stock'].forEach(id => { 
                     const el = document.getElementById('form-' + id); 
                     if(el) el.classList.add('hidden-tab'); 
                 });
+                
                 const fTarget = document.getElementById('form-' + formType); 
                 if(fTarget) fTarget.classList.remove('hidden-tab');
                 
@@ -602,21 +604,14 @@
                     diagRows.forEach((item, idx) => {
                         const row = item.json ? item.json : item; 
                         
-                        // Ekstrak Nama DC yang presisi langsung dari col_2 (Sesuai JSON)
-                        const dcName = row.col_2 || "";
+                        // Menyesuaikan dengan format bersih dari backend Node (n8n Code)
+                        const dcName = row.dc || row.DC || row.col_2 || "";
                         if(!dcName || dcName === "DC" || String(dcName).toUpperCase().includes("DIAGNOSE")) return;
 
-                        // Ekstrak Nilai Persentase langsung dari col_4, col_6, col_8 
-                        // Gunakan ?? (nullish coalescing) agar 0 mutlak tidak diubah menjadi string DC Name
-                        const rawFail = row.col_4 ?? 0;
-                        const rawMoq = row.col_6 ?? 0;
-                        const rawAbove = row.col_8 ?? 0;
-                        const resStr = String(row.col_9 ?? "TIDAK ADA DATA").toUpperCase();
-
-                        // Ubah desimal n8n menjadi persen (0.909 -> 91)
-                        const failPct = Math.round(Number(rawFail) * 100) || 0;
-                        const moqPct = Math.round(Number(rawMoq) * 100) || 0;
-                        const abovePct = Math.round(Number(rawAbove) * 100) || 0;
+                        const failPct = row.failPct !== undefined ? row.failPct : (row.FAIL_PCT !== undefined ? row.FAIL_PCT : (Math.round(Number(row.col_4 || 0) * 100)));
+                        const moqPct = row.moqPct !== undefined ? row.moqPct : (row.MOQ_PCT !== undefined ? row.MOQ_PCT : (Math.round(Number(row.col_6 || 0) * 100)));
+                        const abovePct = row.abovePct !== undefined ? row.abovePct : (row.ABOVE_PCT !== undefined ? row.ABOVE_PCT : (Math.round(Number(row.col_8 || 0) * 100)));
+                        const resStr = String(row.res || row["DIAGNOSE RESULTS (DR)"] || row.col_9 || "TIDAK ADA DATA").toUpperCase();
 
                         // Hitung isu DC (Hanya jika Failure atau Under MOQ ada isinya)
                         if(failPct > 0 || moqPct > 0) dcIssueCount++; 
