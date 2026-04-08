@@ -536,12 +536,10 @@
 
         function switchForm(formType) {
             try {
-                // BUG FIX: Memanggil ID array yang benar tanpa dobel 'form-form-'
-                ['po', 'sales', 'stock'].forEach(id => { 
+                ['form-po', 'form-sales', 'form-stock'].forEach(id => { 
                     const el = document.getElementById('form-' + id); 
                     if(el) el.classList.add('hidden-tab'); 
                 });
-                
                 const fTarget = document.getElementById('form-' + formType); 
                 if(fTarget) fTarget.classList.remove('hidden-tab');
                 
