@@ -680,7 +680,7 @@
                 
                 const isBatalText = String(item["PO NKA"]).includes("BATAL");
                 const poQty = Number(item["TOTAL PO ctn"]) || 0; 
-                const salesQty = Number(item["Qty Terpenuhi (Kirim)"]) || 0;
+                const salesQty = Number(item["Qty Terpenuhi (Kirim)"]) || Number(item["QTY TERPENUHI (KIRIM)"]) || (Number(item["NKA"]||0) + Number(item["NDLH"]||0) + Number(item["NRD"]||0) + Number(item["NARR"]||0) + Number(item["NKACH"]||0));
                 
                 // Deteksi apabila Data Kosong/0 Keduanya (Dianggap Batal/Void)
                 const isCancelled = (poQty === 0 && salesQty === 0) || isBatalText;
@@ -772,7 +772,7 @@
             activeLogData.forEach(i => { 
                 const isBatalText = String(i["PO NKA"]).includes("BATAL");
                 const poQty = Number(i["TOTAL PO ctn"]) || 0; 
-                const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0;
+                const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || Number(i["QTY TERPENUHI (KIRIM)"]) || (Number(i["NKA"]||0) + Number(i["NDLH"]||0) + Number(i["NRD"]||0) + Number(i["NARR"]||0) + Number(i["NKACH"]||0));
                 // Exclude VOID from Analytic Sum
                 if(i.ID && !isBatalText && !(poQty === 0 && salesQty === 0)) { 
                     const tgl = i["Tanggal PO"] || "";
@@ -844,7 +844,7 @@
                 if(!i.ID) return false;
                 const isBatalText = String(i["PO NKA"]).includes("BATAL");
                 const poQty = Number(i["TOTAL PO ctn"]) || 0; 
-                const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0;
+                const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || Number(i["QTY TERPENUHI (KIRIM)"]) || (Number(i["NKA"]||0) + Number(i["NDLH"]||0) + Number(i["NRD"]||0) + Number(i["NARR"]||0) + Number(i["NKACH"]||0));
                 
                 // Exclude VOID from Output Laporan Resmi
                 if (isBatalText || (poQty === 0 && salesQty === 0)) return false; 
@@ -865,7 +865,7 @@
 
             let detailRows = '';
             filteredLog.forEach(i => {
-                const poQty = Number(i["TOTAL PO ctn"]) || 0; const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0; const gap = i["GAP"] || 0;
+                const poQty = Number(i["TOTAL PO ctn"]) || 0; const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || Number(i["QTY TERPENUHI (KIRIM)"]) || (Number(i["NKA"]||0) + Number(i["NDLH"]||0) + Number(i["NRD"]||0) + Number(i["NARR"]||0) + Number(i["NKACH"]||0)); const gap = i["GAP"] || 0;
                 detailRows += `<tr><td style="padding:10px; border-bottom:1px solid #E5E7EB; font-weight: bold;">${i.ID}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; color: #6B7280;">${i["Tanggal PO"]}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB;">${i.DC}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; text-align:center;">${poQty}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; text-align:center;">${salesQty}</td><td style="padding:10px; border-bottom:1px solid #E5E7EB; text-align:center; font-weight:bold; color:${gap>0?'#FF3B30':'#34C759'};">${gap}</td></tr>`;
             });
             let detailTable = `
@@ -881,7 +881,7 @@
                 filteredLog.forEach(i => {
                     const dc = i.DC || "UNKNOWN";
                     const poQty = Number(i["TOTAL PO ctn"]) || 0;
-                    const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || 0;
+                    const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || Number(i["QTY TERPENUHI (KIRIM)"]) || (Number(i["NKA"]||0) + Number(i["NDLH"]||0) + Number(i["NRD"]||0) + Number(i["NARR"]||0) + Number(i["NKACH"]||0));
                     let gapQty = Number(i["GAP"]);
                     if(isNaN(gapQty)) gapQty = poQty - salesQty; 
 
