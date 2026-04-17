@@ -182,7 +182,33 @@
                         </div>
                     </div>
 
-                    <div class="space-y-4 pt-4">
+                    <div class="space-y-4 pt-6 border-t border-white/5 mt-6">
+                        <h4 class="text-xs md:text-sm font-black text-white uppercase tracking-[0.2em] px-3">🔬 BATCH AGE TRACKING (QC)</h4>
+                        
+                        <div class="grid grid-cols-4 gap-2 md:gap-3 px-1">
+                            <div class="bg-appcard border border-appgreen/30 p-2.5 md:p-3 rounded-2xl text-center shadow-[0_0_10px_rgba(52,199,89,0.1)]">
+                                <p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">Grade A</p>
+                                <p id="stat-grade-a" class="text-lg md:text-2xl font-black text-appgreen ticker">0</p>
+                            </div>
+                            <div class="bg-appcard border border-appappleblue/30 p-2.5 md:p-3 rounded-2xl text-center shadow-[0_0_10px_rgba(173,216,230,0.1)]">
+                                <p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">Grade B</p>
+                                <p id="stat-grade-b" class="text-lg md:text-2xl font-black text-appappleblue ticker">0</p>
+                            </div>
+                            <div class="bg-appcard border border-appappleorange/30 p-2.5 md:p-3 rounded-2xl text-center shadow-[0_0_10px_rgba(255,149,0,0.1)]">
+                                <p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">Grade C</p>
+                                <p id="stat-grade-c" class="text-lg md:text-2xl font-black text-appappleorange ticker">0</p>
+                            </div>
+                            <div class="bg-appcard border border-appred/30 p-2.5 md:p-3 rounded-2xl text-center shadow-[0_0_10px_rgba(255,59,48,0.15)]">
+                                <p class="text-[7px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">Expired</p>
+                                <p id="stat-grade-exp" class="text-lg md:text-2xl font-black text-appred ticker">0</p>
+                            </div>
+                        </div>
+
+                        <div id="batch-container" class="space-y-3 mt-4">
+                            </div>
+                    </div>
+
+                    <div class="space-y-4 pt-6 border-t border-white/5 mt-6">
                         <h4 class="text-xs md:text-sm font-black text-appappleblue uppercase tracking-[0.2em] px-3">DC Diagnose Results</h4>
                         <div id="diagnosa-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                     </div>
@@ -425,7 +451,7 @@
         let activeLogData = []; let globalForecastData = []; let globalDiagnoseData = []; let targetDCInput = "";
         let chartBarInstance = null; let chartPieInstance = null;
         
-        // DC LIST AUTO SORT A-Z UPDATE FINAL (Include Kotabumi, Palangkaraya & Revisi Berebek)
+        // DC LIST AUTO SORT A-Z UPDATE FINAL
         const DC_LIST = ["BALARAJA DEPO", "BALARAJA SAT", "BALI", "BANDUNG 1", "BANDUNG 2", "BANJARMASIN", "BATAM", "BEKASI", "BEREBEK", "BOGOR", "CIANJUR", "CIKOKOL", "CILACAP", "CILEUNGSI", "GORONTALO", "JAMBI", "JEMBER", "KARAWANG", "KLATEN", "KOTABUMI", "LAMPUNG", "LOMBOK", "LUWU", "MADIUN", "MAKASSAR", "MALANG", "MANADO", "MEDAN", "PALANGKARAYA", "PALEMBANG", "PARUNG", "PEKANBARU", "PLUMBON", "PONTIANAK", "REMBANG", "SEMARANG", "SERANG", "SIDOARJO", "TEGAL"].sort();
 
         window.onload = () => {
@@ -575,18 +601,29 @@
         }
 
         async function loadAnalytics() {
-            const fCont = document.getElementById('forecast-container'); const dCont = document.getElementById('diagnosa-container'); const btn = document.getElementById('btn-sync-analytics'); const origText = btn.innerHTML;
+            const fCont = document.getElementById('forecast-container'); 
+            const dCont = document.getElementById('diagnosa-container'); 
+            const bCont = document.getElementById('batch-container');
+            const btn = document.getElementById('btn-sync-analytics'); const origText = btn.innerHTML;
+            
             btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`; btn.classList.add('opacity-50', 'pointer-events-none');
+            
             if(fCont) fCont.innerHTML = getSkeletonHTML(5, false); 
             if(dCont) dCont.innerHTML = getSkeletonHTML(4, true);
+            if(bCont) bCont.innerHTML = getSkeletonHTML(3, true);
+            
             try {
-                const [reqBuffer, reqDiag] = await Promise.allSettled([ fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_buffer" }) }), fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_diagnose" }) }) ]);
+                // UPDATE: Menambah reqStock untuk menarik "get_db_stock"
+                const [reqBuffer, reqDiag, reqStock] = await Promise.allSettled([ 
+                    fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_buffer" }) }), 
+                    fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_diagnose" }) }),
+                    fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "get_db_stock" }) })
+                ]);
                 
+                // --- 1. RENDER FORECAST BUFFER ---
                 if(fCont) fCont.innerHTML = ''; let skuCount = 0; globalForecastData = [];
                 if(reqBuffer.status === 'fulfilled') {
                     const textBuffer = await reqBuffer.value.text(); let rawBuffer; try { rawBuffer = JSON.parse(textBuffer); } catch(e) { rawBuffer = []; } 
-                    
-                    // SMART PARSER: Membuka paketan dari n8n kalau bentuknya Array of Object
                     if(Array.isArray(rawBuffer) && rawBuffer.length > 0 && rawBuffer[0].data) rawBuffer = rawBuffer[0].data;
                     else if(rawBuffer && rawBuffer.data) rawBuffer = rawBuffer.data; 
                     
@@ -601,19 +638,114 @@
                     });
                 } runTicker(document.getElementById('stat-sku'), skuCount);
 
+                // --- 2. RENDER BATCH AGE TRACKING (NEW) ---
+                if(bCont) bCont.innerHTML = '';
+                let countA = 0, countB = 0, countC = 0, countExp = 0;
+                
+                if(reqStock.status === 'fulfilled') {
+                    const textStock = await reqStock.value.text(); 
+                    let rawStock; 
+                    try { rawStock = JSON.parse(textStock); } catch(e) { rawStock = []; }
+                    
+                    if(Array.isArray(rawStock) && rawStock.length > 0 && rawStock[0].data) rawStock = rawStock[0].data;
+                    else if(rawStock && rawStock.data) rawStock = rawStock.data;
+                    else if(Array.isArray(rawStock) && rawStock.length > 0 && rawStock[0].json) rawStock = rawStock.map(i => i.json);
+                    
+                    let stockRows = Array.isArray(rawStock) ? rawStock : [rawStock];
+                    const now = new Date();
+                    
+                    stockRows.forEach((item, idx) => {
+                        const row = item.json ? item.json : item;
+                        const batchDateStr = row.Tanggal || row.tanggal || row.col_1 || "";
+                        if(!batchDateStr || String(batchDateStr).toUpperCase() === 'TANGGAL') return; 
+                        
+                        let bDate = new Date();
+                        if(batchDateStr.includes('/')) {
+                            const parts = batchDateStr.split('/');
+                            if(parts.length === 3) bDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                            else bDate = new Date(batchDateStr);
+                        } else {
+                            bDate = new Date(batchDateStr);
+                        }
+                        
+                        let ageMonths = 0;
+                        if(!isNaN(bDate)) {
+                            ageMonths = (now.getFullYear() - bDate.getFullYear()) * 12;
+                            ageMonths -= bDate.getMonth();
+                            ageMonths += now.getMonth();
+                        }
+                        if(ageMonths < 0) ageMonths = 0;
+                        
+                        let grade = "", badgeClass = "", progressColor = "";
+                        let progressPct = Math.min((ageMonths / 12) * 100, 100);
+                        
+                        if(ageMonths <= 5) {
+                            grade = "GRADE A"; badgeClass = "text-appgreen border-appgreen"; progressColor = "bg-appgreen"; countA++;
+                        } else if(ageMonths >= 6 && ageMonths <= 8) {
+                            grade = "GRADE B"; badgeClass = "text-appappleblue border-appappleblue"; progressColor = "bg-appappleblue"; countB++;
+                        } else if(ageMonths >= 9 && ageMonths <= 11) {
+                            grade = "GRADE C"; badgeClass = "text-appappleorange border-appappleorange"; progressColor = "bg-appappleorange"; countC++;
+                        } else {
+                            grade = "EXPIRED"; badgeClass = "text-white bg-appred border-appred"; progressColor = "bg-appred"; countExp++;
+                        }
+                        
+                        const nka = Number(row.NKA) || 0;
+                        const ndlh = Number(row.NDLH) || 0;
+                        const nrd = Number(row.NRD) || 0;
+                        const narr = Number(row.NARR) || 0;
+                        const nkach = Number(row.NKACH) || 0;
+                        const totalFisik = nka + ndlh + nrd + narr + nkach;
+                        
+                        if(bCont) {
+                            bCont.innerHTML += `
+                                <div class="bg-appcard p-4 md:p-5 rounded-3xl border border-white/7 animate-fade-in-up" style="animation-delay: ${idx * 30}ms; opacity:0">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <div>
+                                            <h4 class="text-sm md:text-base font-black text-white uppercase tracking-wider">BATCH: ${batchDateStr}</h4>
+                                            <p class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Total Fisik: ${totalFisik} CTN</p>
+                                        </div>
+                                        <div class="px-3 py-1.5 rounded-lg border ${badgeClass} text-[9px] md:text-[10px] font-black uppercase tracking-widest bg-black/50 shadow-sm">
+                                            ${grade === 'EXPIRED' ? '☠️ ' : ''}${grade}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="flex justify-between items-end mb-1.5">
+                                            <span class="text-[8px] md:text-[9px] text-gray-400 font-bold uppercase tracking-widest">Umur Umur Batch</span>
+                                            <span class="text-[9px] md:text-[10px] text-white font-black">${ageMonths} Bulan</span>
+                                        </div>
+                                        <div class="w-full bg-black/60 rounded-full h-2 md:h-2.5 border border-white/5 overflow-hidden">
+                                            <div class="${progressColor} h-full rounded-full transition-all duration-1000 shadow-[0_0_10px_currentColor]" style="width: ${progressPct}%"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-5 gap-1.5 text-center bg-black/40 rounded-xl p-2 border border-white/5">
+                                        <div><p class="text-[7px] md:text-[8px] text-gray-500 uppercase font-bold mb-0.5">NKA</p><p class="text-[10px] md:text-xs font-black text-gray-300">${nka}</p></div>
+                                        <div><p class="text-[7px] md:text-[8px] text-gray-500 uppercase font-bold mb-0.5">NDLH</p><p class="text-[10px] md:text-xs font-black text-gray-300">${ndlh}</p></div>
+                                        <div><p class="text-[7px] md:text-[8px] text-gray-500 uppercase font-bold mb-0.5">NRD</p><p class="text-[10px] md:text-xs font-black text-gray-300">${nrd}</p></div>
+                                        <div><p class="text-[7px] md:text-[8px] text-gray-500 uppercase font-bold mb-0.5">NARR</p><p class="text-[10px] md:text-xs font-black text-gray-300">${narr}</p></div>
+                                        <div><p class="text-[7px] md:text-[8px] text-gray-500 uppercase font-bold mb-0.5">NKACH</p><p class="text-[10px] md:text-xs font-black text-gray-300">${nkach}</p></div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+                runTicker(document.getElementById('stat-grade-a'), countA);
+                runTicker(document.getElementById('stat-grade-b'), countB);
+                runTicker(document.getElementById('stat-grade-c'), countC);
+                runTicker(document.getElementById('stat-grade-exp'), countExp);
+
+                // --- 3. RENDER DIAGNOSE RESULTS ---
                 if(dCont) dCont.innerHTML = ''; let dcIssueCount = 0; globalDiagnoseData = [];
                 if(reqDiag.status === 'fulfilled') {
                     const textDiag = await reqDiag.value.text(); let rawDiag; try { rawDiag = JSON.parse(textDiag); } catch(e) { rawDiag = []; } 
-                    
-                    // SMART PARSER: Membuka paketan dari n8n kalau bentuknya Array of Object (Solusi Bug Blank!)
                     if(Array.isArray(rawDiag) && rawDiag.length > 0 && rawDiag[0].data) rawDiag = rawDiag[0].data;
                     else if(rawDiag && rawDiag.data) rawDiag = rawDiag.data; 
                     
                     const diagRows = Array.isArray(rawDiag) ? rawDiag : [rawDiag];
-                    
                     diagRows.forEach((item, idx) => {
                         const row = item.json ? item.json : item; 
-                        
                         const dcName = row.dc || row.DC || row.col_2 || "";
                         if(!dcName || dcName === "DC" || String(dcName).toUpperCase().includes("DIAGNOSE")) return;
 
@@ -623,7 +755,6 @@
                         const resStr = String(row.res || row["DIAGNOSE RESULTS (DR)"] || row.col_9 || "TIDAK ADA DATA").toUpperCase();
 
                         if(failPct > 0 || moqPct > 0) dcIssueCount++; 
-                        
                         globalDiagnoseData.push({ dc: dcName, failPct: failPct, moqPct: moqPct, abovePct: abovePct, res: resStr });
                         
                         let badgeColor = "text-appappleorange";
@@ -672,7 +803,6 @@
 
         function filterLogLocal() { const q = document.getElementById('search-po').value.toLowerCase(); renderLogs(activeLogData.filter(i => (i.ID && i.ID.toLowerCase().includes(q)) || (i.DC && i.DC.toLowerCase().includes(q)))); }
 
-        // ================= FIX BUG: KARTU VOID MERAH GELAP =================
         function renderLogs(data) {
             const cont = document.getElementById('log-container'); if(!cont) return; cont.innerHTML = '';
             data.forEach((item, idx) => {
@@ -682,7 +812,6 @@
                 const poQty = Number(item["TOTAL PO ctn"]) || 0; 
                 const salesQty = Number(item["Qty Terpenuhi (Kirim)"]) || Number(item["QTY TERPENUHI (KIRIM)"]) || (Number(item["NKA"]||0) + Number(item["NDLH"]||0) + Number(item["NRD"]||0) + Number(item["NARR"]||0) + Number(item["NKACH"]||0));
                 
-                // Deteksi apabila Data Kosong/0 Keduanya (Dianggap Batal/Void)
                 const isCancelled = (poQty === 0 && salesQty === 0) || isBatalText;
 
                 let borderCol = "border-white/7", textCol = "text-appred", icon = "fa-circle-xmark", iconCol="text-appred";
@@ -773,7 +902,6 @@
                 const isBatalText = String(i["PO NKA"]).includes("BATAL");
                 const poQty = Number(i["TOTAL PO ctn"]) || 0; 
                 const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || Number(i["QTY TERPENUHI (KIRIM)"]) || (Number(i["NKA"]||0) + Number(i["NDLH"]||0) + Number(i["NRD"]||0) + Number(i["NARR"]||0) + Number(i["NKACH"]||0));
-                // Exclude VOID from Analytic Sum
                 if(i.ID && !isBatalText && !(poQty === 0 && salesQty === 0)) { 
                     const tgl = i["Tanggal PO"] || "";
                     if(monthVal && !(tgl.includes(target1) || tgl.includes(target2))) return;
@@ -808,7 +936,6 @@
                 options: { animation: false, responsive: true }
             });
 
-            // UPDATE: Memasukkan ketiga data ke Pie Chart Laporan
             let totFail = 0; let totMoq = 0; let totAbove = 0;
             globalDiagnoseData.forEach(i => { 
                 totFail += i.failPct; 
@@ -846,7 +973,6 @@
                 const poQty = Number(i["TOTAL PO ctn"]) || 0; 
                 const salesQty = Number(i["Qty Terpenuhi (Kirim)"]) || Number(i["QTY TERPENUHI (KIRIM)"]) || (Number(i["NKA"]||0) + Number(i["NDLH"]||0) + Number(i["NRD"]||0) + Number(i["NARR"]||0) + Number(i["NKACH"]||0));
                 
-                // Exclude VOID from Output Laporan Resmi
                 if (isBatalText || (poQty === 0 && salesQty === 0)) return false; 
                 
                 const tgl = i["Tanggal PO"] || "";
@@ -855,7 +981,6 @@
                 return matchMonth && matchDC;
             });
 
-            // ================= FIX BUG: SORTING DATA A-Z PER DC =================
             filteredLog.sort((a, b) => (a.DC || "").localeCompare(b.DC || ""));
 
             if(filteredLog.length === 0) {
@@ -892,7 +1017,6 @@
                 });
 
                 let sumRows = '';
-                // ================= SORTING TABEL SUMMARY A-Z =================
                 Object.keys(summary).sort().forEach(dc => {
                     const s = summary[dc];
                     sumRows += `<tr>
