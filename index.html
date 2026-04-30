@@ -30,18 +30,6 @@
                     borderRadius: { '3xl': '1.5rem', '4xl': '2rem' },
                     fontFamily: {
                         'apple': ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
-                    },
-                    boxShadow: { 
-                        'glow-redorange': '0 0 25px rgba(255, 59, 48, 0.35)', 
-                        'glow-lightblue': '0 0 15px rgba(173, 216, 230, 0.25)' 
-                    },
-                    animation: {
-                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
-                        'shimmer': 'shimmer 1.5s infinite linear'
-                    },
-                    keyframes: {
-                        fadeInUp: { '0%': { opacity: 0, transform: 'translateY(15px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
-                        shimmer: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } }
                     }
                 }
             }
@@ -57,6 +45,11 @@
         input:focus, select:focus { border-color: #FF3B30; background-color: #1C1C1E; box-shadow: 0 0 15px rgba(255,59,48,0.25); }
         input::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; cursor: pointer; }
 
+        /* MULTI-SELECT BATCH STYLING */
+        select[multiple] { height: 120px; padding: 0.5rem; scrollbar-width: none; }
+        select[multiple] option { padding: 0.75rem 1rem; border-radius: 0.75rem; margin-bottom: 0.25rem; background-color: rgba(255,255,255,0.05); font-size: 0.85rem; font-weight: 800; cursor: pointer; }
+        select[multiple] option:checked { background-color: #FF3B30; color: white; }
+
         .btn-tactile { transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.8rem; }
         .btn-tactile:active { transform: scale(0.96); opacity: 0.92; }
         
@@ -68,29 +61,15 @@
         
         .skeleton-box { position: relative; overflow: hidden; background-color: #1C1C1E; }
         .skeleton-box::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
 
-        /* WADAH KERTAS A4 VIRTUAL */
-        .a4-wrapper { overflow-x: auto; background-color: #1C1C1E; border-radius: 1rem; padding: 10px; border: 1px solid rgba(255,255,255,0.1); position: relative; }
-        .a4-paper { width: 794px; min-height: 1122px; background: white; color: black; padding: 40px; font-family: Arial, sans-serif; box-sizing: border-box; position: relative; margin: 0 auto; }
+        .a4-wrapper { overflow-x: auto; background-color: #1C1C1E; border-radius: 1rem; padding: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .a4-paper { width: 794px; min-height: 1122px; background: white; color: black; padding: 40px; font-family: Arial, sans-serif; box-sizing: border-box; margin: 0 auto; }
 
-        /* HILANGKAN PANAH PADA INPUT NUMBER */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+        input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; } 
-
-        /* RESET PADDING KHUSUS KOTAK SKU */
-        .sku-input { 
-            padding: 0 !important; 
-            background: transparent !important; 
-            border: none !important; 
-            box-shadow: none !important; 
-            text-align: center; 
-            font-weight: 900; 
-            outline: none !important; 
-        }
+        .sku-input { padding: 0 !important; background: transparent !important; border: none !important; box-shadow: none !important; text-align: center; font-weight: 900; outline: none !important; }
     </style>
 </head>
 <body class="flex justify-center antialiased font-apple relative">
@@ -98,7 +77,7 @@
     <datalist id="date-recom"></datalist>
     <datalist id="recent-po-ids"></datalist>
 
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-appcard border-2 border-appapplered text-white px-7 py-3 rounded-full shadow-glow-redorange font-extrabold text-sm flex items-center gap-3 w-max max-w-[90%] pointer-events-none">
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-appcard border-2 border-appapplered text-white px-7 py-3 rounded-full font-extrabold text-sm flex items-center gap-3 w-max max-w-[90%] pointer-events-none">
         <span id="toast-icon">✅</span>
         <span id="toast-msg">Success</span>
     </div>
@@ -120,13 +99,13 @@
         <div id="view-login" class="flex flex-col h-screen p-9 justify-center items-center relative z-40 bg-[#000000]">
             <div class="w-full max-w-sm md:max-w-md space-y-12">
                 <div class="text-center space-y-4">
-                    <img src="./LOGO FFI.png" alt="Family Food Logo" onerror="this.src='https://via.placeholder.com/150/FF3B30/FFFFFF?text=FFI'" class="w-36 md:w-48 h-auto mx-auto mb-8 drop-shadow-[0_0_20px_rgba(255,59,48,0.4)] animate-fade-in-up">
+                    <img src="./LOGO FFI.png" alt="Family Food Logo" onerror="this.src='https://via.placeholder.com/150/FF3B30/FFFFFF?text=FFI'" class="w-36 md:w-48 h-auto mx-auto mb-8 drop-shadow-[0_0_20px_rgba(255,59,48,0.4)] animate-[fadeInUp_0.5s_ease-out_forwards]">
                     <p class="text-[11px] md:text-xs text-gray-500 uppercase tracking-[0.35em] font-extrabold">Secure Access Center</p>
                 </div>
                 <form id="form-login" onsubmit="handleLogin(event)" class="space-y-5">
                     <input type="text" id="login-user" placeholder="USER ID" required class="text-center font-black uppercase tracking-widest bg-appinput border-white/5 md:py-4">
                     <input type="password" id="login-pass" placeholder="PASSWORD" required class="text-center font-black tracking-widest bg-appinput border-white/5 md:py-4">
-                    <button type="submit" id="btn-login" class="w-full bg-appapplered text-white font-extrabold py-4.5 md:py-5 rounded-2xl shadow-glow-redorange mt-6 btn-tactile text-sm md:text-base">MASUK SISTEM</button>
+                    <button type="submit" id="btn-login" class="w-full bg-appapplered text-white font-extrabold py-4.5 md:py-5 rounded-2xl shadow-[0_0_25px_rgba(255,59,48,0.35)] mt-6 btn-tactile text-sm md:text-base">MASUK SISTEM</button>
                 </form>
             </div>
         </div>
@@ -146,9 +125,9 @@
 
             <div class="flex-1 overflow-y-auto pb-36 md:pb-40">
                 
-                <div id="tab-analytics" class="p-6 md:p-10 space-y-6 md:space-y-8 animate-fade-in-up">
+                <div id="tab-analytics" class="p-6 md:p-10 space-y-6 md:space-y-8 animate-[fadeInUp_0.5s_ease-out_forwards]">
                     <div class="flex flex-col md:flex-row gap-4 md:gap-6">
-                        <div class="flex-1 bg-appcard border border-white/7 p-6 rounded-4xl flex flex-col justify-between shadow-glow-lightblue transition-all hover:shadow-[0_0_20px_rgba(173,216,230,0.3)]">
+                        <div class="flex-1 bg-appcard border border-white/7 p-6 rounded-4xl flex flex-col justify-between shadow-[0_0_15px_rgba(173,216,230,0.25)] transition-all hover:shadow-[0_0_20px_rgba(173,216,230,0.3)]">
                             <p class="text-[10px] md:text-xs uppercase font-bold text-gray-500 tracking-widest">Total SKU</p>
                             <p id="stat-sku" class="text-5xl font-black text-white mt-2 ticker">0</p>
                         </div>
@@ -162,7 +141,7 @@
                         <i class="fa-solid fa-rotate-right" id="sync-icon"></i> SYNC DATA ANALYTIC
                     </button>
 
-                    <div class="bg-appcard rounded-4xl border border-appappleblue/25 shadow-glow-lightblue overflow-hidden">
+                    <div class="bg-appcard rounded-4xl border border-appappleblue/25 shadow-[0_0_15px_rgba(173,216,230,0.25)] overflow-hidden">
                         <div class="bg-appappleblue/10 px-6 py-5 md:px-8 border-b border-appappleblue/15">
                             <h4 class="text-sm md:text-base font-black text-appappleblue uppercase tracking-widest">📦 INVENTORY HEALTH</h4>
                         </div>
@@ -182,8 +161,11 @@
                         </div>
                     </div>
 
+                    <!-- FITUR BARU: BATCH AGE TRACKING & TRACEABILITY -->
                     <div class="space-y-4 pt-6 border-t border-white/5 mt-6">
-                        <h4 class="text-xs md:text-sm font-black text-white uppercase tracking-[0.2em] px-3">🔬 BATCH AGE TRACKING (QC)</h4>
+                        <div class="flex justify-between items-end px-3">
+                            <h4 class="text-xs md:text-sm font-black text-white uppercase tracking-[0.2em]">🔬 TRACEABILITY & AGE TRACKING</h4>
+                        </div>
                         
                         <div class="grid grid-cols-4 gap-2 md:gap-3 px-1">
                             <div class="bg-appcard border border-appgreen/30 p-2.5 md:p-3 rounded-2xl text-center shadow-[0_0_10px_rgba(52,199,89,0.1)]">
@@ -205,7 +187,8 @@
                         </div>
 
                         <div id="batch-container" class="space-y-3 mt-4">
-                            </div>
+                            <!-- Kartu Batch dinamis akan muncul di sini -->
+                        </div>
                     </div>
 
                     <div class="space-y-4 pt-6 border-t border-white/5 mt-6">
@@ -214,9 +197,9 @@
                     </div>
                 </div>
 
-                <div id="tab-report" class="hidden-tab p-6 md:p-10 space-y-6 md:space-y-8 animate-fade-in-up">
+                <div id="tab-report" class="hidden-tab p-6 md:p-10 space-y-6 md:space-y-8 animate-[fadeInUp_0.5s_ease-out_forwards]">
                     <div class="flex bg-appcard p-1.5 rounded-2xl border border-white/7 shadow-xl max-w-2xl mx-auto w-full">
-                        <button type="button" onclick="switchReportView('analytic')" id="btn-rep-analytic" class="flex-1 py-3 md:py-4 rounded-xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appappleblue text-black shadow-glow-lightblue">Analytic Report</button>
+                        <button type="button" onclick="switchReportView('analytic')" id="btn-rep-analytic" class="flex-1 py-3 md:py-4 rounded-xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appappleblue text-black shadow-[0_0_15px_rgba(173,216,230,0.25)]">Analytic Report</button>
                         <button type="button" onclick="switchReportView('log')" id="btn-rep-log" class="flex-1 py-3 md:py-4 rounded-xl text-xs md:text-sm font-extrabold uppercase transition-all text-gray-500 bg-transparent">Log PO Report</button>
                     </div>
 
@@ -294,26 +277,26 @@
                     </div>
                 </div>
 
-                <div id="tab-log" class="hidden-tab p-6 md:p-10 animate-fade-in-up">
+                <div id="tab-log" class="hidden-tab p-6 md:p-10 animate-[fadeInUp_0.5s_ease-out_forwards]">
                     <div class="flex flex-col gap-6 md:gap-8 max-w-4xl mx-auto w-full">
                         <div class="flex gap-3 md:gap-4 max-w-3xl mx-auto w-full items-stretch">
                             <input type="text" id="search-po" placeholder="Cari ID / DC..." class="text-base bg-appcard border border-white/10 flex-1 rounded-2xl px-5 py-3.5 md:py-4 outline-none transition-all focus:border-appapplered focus:shadow-[0_0_15px_rgba(255,59,48,0.2)]" onkeyup="filterLogLocal()">
-                            <button type="button" onclick="loadLogPO()" id="btn-sync-log" class="bg-appapplered text-white w-16 md:w-20 rounded-2xl flex justify-center items-center btn-tactile shadow-glow-redorange hover:scale-[0.96] transition-transform h-auto"><i class="fa-solid fa-rotate-right text-lg"></i></button>
+                            <button type="button" onclick="loadLogPO()" id="btn-sync-log" class="bg-appapplered text-white w-16 md:w-20 rounded-2xl flex justify-center items-center btn-tactile shadow-[0_0_25px_rgba(255,59,48,0.35)] hover:scale-[0.96] transition-transform h-auto"><i class="fa-solid fa-rotate-right text-lg"></i></button>
                         </div>
                         <div id="log-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 pb-20"></div>
                     </div>
                 </div>
 
-                <div id="tab-forms" class="hidden-tab p-6 md:p-10 animate-fade-in-up">
+                <div id="tab-forms" class="hidden-tab p-6 md:p-10 animate-[fadeInUp_0.5s_ease-out_forwards]">
                     <div class="max-w-4xl mx-auto w-full space-y-7 md:space-y-10">
                         
                         <div class="flex bg-appcard p-1.5 md:p-2 rounded-2xl md:rounded-3xl border border-white/7 shadow-xl">
-                            <button type="button" onclick="switchForm('po')" id="btn-form-po" class="flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appapplered text-white shadow-glow-redorange">New PO</button>
+                            <button type="button" onclick="switchForm('po')" id="btn-form-po" class="flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appapplered text-white shadow-[0_0_25px_rgba(255,59,48,0.35)]">New PO</button>
                             <button type="button" onclick="switchForm('sales')" id="btn-form-sales" class="flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all text-gray-500 bg-transparent">Sales</button>
                             <button type="button" onclick="switchForm('stock')" id="btn-form-stock" class="flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all text-gray-500 bg-transparent">Stock</button>
                         </div>
 
-                        <form id="form-po" onsubmit="submitAction(event, 'insert_po')" class="space-y-6 md:space-y-8 bg-appcard p-6 md:p-12 rounded-4xl border border-white/7 shadow-glow-redorange transition-shadow hover:shadow-[0_0_30px_rgba(255,59,48,0.4)]">
+                        <form id="form-po" onsubmit="submitAction(event, 'insert_po')" class="space-y-6 md:space-y-8 bg-appcard p-6 md:p-12 rounded-4xl border border-white/7 shadow-[0_0_25px_rgba(255,59,48,0.35)] transition-shadow hover:shadow-[0_0_30px_rgba(255,59,48,0.4)]">
                             <div class="space-y-3.5 md:space-y-5">
                                 <input type="text" id="po-id" placeholder="ID PO (CTH: JKT01...)" required class="uppercase bg-appbg w-full h-14 md:h-[60px] md:text-lg px-6">
                                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3.5 md:gap-5">
@@ -350,12 +333,22 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="w-full bg-appapplered text-white font-extrabold py-4 md:py-5 rounded-2xl btn-tactile shadow-glow-redorange text-sm md:text-base tracking-widest mt-6 md:mt-8 hover:scale-[0.98] transition-transform">SUBMIT PO</button>
+                            <button type="submit" class="w-full bg-appapplered text-white font-extrabold py-4 md:py-5 rounded-2xl btn-tactile shadow-[0_0_25px_rgba(255,59,48,0.35)] text-sm md:text-base tracking-widest mt-6 md:mt-8 hover:scale-[0.98] transition-transform">SUBMIT PO</button>
                         </form>
 
                         <form id="form-sales" onsubmit="submitAction(event, 'insert_sales')" class="hidden-tab space-y-6 md:space-y-8 bg-appcard p-6 md:p-12 rounded-4xl border border-white/7 transition-shadow hover:shadow-[0_0_25px_rgba(173,216,230,0.2)]">
                             <div class="space-y-3.5 md:space-y-5">
                                 <input type="text" id="sls-id" list="recent-po-ids" autocomplete="off" placeholder="ID PO DATABASE" required class="uppercase bg-appbg w-full h-14 md:h-[60px] md:text-lg px-6">
+                                
+                                <!-- FITUR BARU: MULTI-SELECT BATCH TAGGING -->
+                                <div class="bg-black/40 p-4 rounded-3xl border border-white/5">
+                                    <label class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-2 block">Pilih Tag Batch Pengiriman (Bisa > 1)</label>
+                                    <select id="sls-batches" multiple required class="bg-appbg w-full rounded-2xl border border-white/10 outline-none focus:border-appappleblue focus:shadow-[0_0_15px_rgba(173,216,230,0.25)]">
+                                        <!-- Opsi akan diisi otomatis dari STOCK SBY -->
+                                    </select>
+                                    <p class="text-[8px] md:text-[9px] text-gray-600 font-bold italic mt-2 text-center">*Tahan/Geser jari untuk memilih banyak batch</p>
+                                </div>
+
                             </div>
                             <div class="pt-6 md:pt-10 border-t border-white/7">
                                 <p class="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest mb-4 md:mb-6">Realisasi Sales (Ctn)</p>
@@ -382,7 +375,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="w-full bg-appappleblue text-black font-extrabold py-4 md:py-5 rounded-2xl btn-tactile shadow-glow-lightblue text-sm md:text-base tracking-widest mt-6 md:mt-8 hover:scale-[0.98] transition-transform">UPDATE SALES</button>
+                            <button type="submit" class="w-full bg-appappleblue text-black font-extrabold py-4 md:py-5 rounded-2xl btn-tactile shadow-[0_0_15px_rgba(173,216,230,0.25)] text-sm md:text-base tracking-widest mt-6 md:mt-8 hover:scale-[0.98] transition-transform">UPDATE SALES</button>
                         </form>
 
                         <form id="form-stock" onsubmit="submitAction(event, 'insert_stock')" class="hidden-tab space-y-6 md:space-y-8 bg-appcard p-6 md:p-12 rounded-4xl border border-white/7 transition-shadow hover:shadow-[0_0_25px_rgba(52,199,89,0.2)]">
@@ -429,7 +422,7 @@
                     <i class="fa-solid fa-file-pdf text-2xl group-hover:scale-110 transition-transform"></i>
                     <span class="text-[8px] md:text-[10px] mt-0.5 font-extrabold uppercase tracking-widest">Report</span>
                 </button>
-                <div class="relative -top-8 md:-top-5 animate-fade-in-up flex-shrink-0 px-2 md:px-6">
+                <div class="relative -top-8 md:-top-5 animate-[fadeInUp_0.5s_ease-out_forwards] flex-shrink-0 px-2 md:px-6">
                     <button type="button" onclick="switchMainTab('tab-forms', this)" class="nav-item bg-white text-black h-16 md:h-18 w-16 md:w-18 rounded-full flex justify-center items-center shadow-[0_0_25px_rgba(255,255,255,0.4)] btn-tactile border-[6px] md:border-[7px] border-[#000000] hover:scale-105 transition-transform">
                         <i class="fa-solid fa-plus text-2xl md:text-3xl"></i>
                     </button>
@@ -451,10 +444,9 @@
         let activeLogData = []; let globalForecastData = []; let globalDiagnoseData = []; let targetDCInput = "";
         let chartBarInstance = null; let chartPieInstance = null;
         
-        // DC LIST AUTO SORT A-Z UPDATE FINAL
         const DC_LIST = ["BALARAJA DEPO", "BALARAJA SAT", "BALI", "BANDUNG 1", "BANDUNG 2", "BANJARMASIN", "BATAM", "BEKASI", "BEREBEK", "BOGOR", "CIANJUR", "CIKOKOL", "CILACAP", "CILEUNGSI", "GORONTALO", "JAMBI", "JEMBER", "KARAWANG", "KLATEN", "KOTABUMI", "LAMPUNG", "LOMBOK", "LUWU", "MADIUN", "MAKASSAR", "MALANG", "MANADO", "MEDAN", "PALANGKARAYA", "PALEMBANG", "PARUNG", "PEKANBARU", "PLUMBON", "PONTIANAK", "REMBANG", "SEMARANG", "SERANG", "SIDOARJO", "TEGAL"].sort();
 
-        window.onload = () => {
+        window.onload = async () => {
             const d = new Date(); const currMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
             document.getElementById('report-month').value = currMonth;
             document.getElementById('analytic-month').value = currMonth;
@@ -463,7 +455,9 @@
             if(savedUser) {
                 document.getElementById('view-login').classList.add('hidden-tab'); document.getElementById('view-main').classList.remove('hidden-tab');
                 document.getElementById('header-username').innerText = savedUser;
-                initDateRecommendations(); updateMonthHeaders(); initDCPicker(); initReportDCPicker(); loadAnalytics(); loadLogPO(); 
+                initDateRecommendations(); updateMonthHeaders(); initDCPicker(); initReportDCPicker(); 
+                await loadLogPO(); 
+                loadAnalytics(); 
             }
         };
 
@@ -530,7 +524,9 @@
             if (res && res.status === "success") {
                 localStorage.setItem('ffi_user', res.user_id || user); showToast("Akses Diberikan!");
                 document.getElementById('view-login').classList.add('hidden-tab'); document.getElementById('view-main').classList.remove('hidden-tab'); document.getElementById('header-username').innerText = res.user_id || user;
-                initDateRecommendations(); updateMonthHeaders(); initDCPicker(); initReportDCPicker(); loadAnalytics(); loadLogPO();
+                initDateRecommendations(); updateMonthHeaders(); initDCPicker(); initReportDCPicker(); 
+                await loadLogPO();
+                loadAnalytics();
             } else showToast(res ? res.message : "Akses Ditolak", true);
         }
 
@@ -577,8 +573,8 @@
                 
                 const activeBtn = document.getElementById('btn-form-' + formType);
                 if(activeBtn) {
-                    if(formType === 'po') activeBtn.className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appapplered text-white shadow-glow-redorange";
-                    if(formType === 'sales') activeBtn.className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appappleblue text-black shadow-glow-lightblue";
+                    if(formType === 'po') activeBtn.className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appapplered text-white shadow-[0_0_25px_rgba(255,59,48,0.35)]";
+                    if(formType === 'sales') activeBtn.className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appappleblue text-black shadow-[0_0_15px_rgba(173,216,230,0.25)]";
                     if(formType === 'stock') activeBtn.className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appgreen text-black shadow-[0_0_15px_rgba(52,199,89,0.3)]";
                 }
             } catch(e) { console.error(e); }
@@ -591,7 +587,7 @@
             document.getElementById('btn-rep-log').className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all text-gray-500 bg-transparent";
             if(type === 'analytic') {
                 document.getElementById('rep-view-analytic').classList.remove('hidden-tab');
-                document.getElementById('btn-rep-analytic').className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appappleblue text-black shadow-glow-lightblue";
+                document.getElementById('btn-rep-analytic').className = "flex-1 py-3 md:py-4 rounded-xl md:rounded-2xl text-xs md:text-sm font-extrabold uppercase transition-all bg-appappleblue text-black shadow-[0_0_15px_rgba(173,216,230,0.25)]";
                 renderAnalyticPreview();
             } else {
                 document.getElementById('rep-view-log').classList.remove('hidden-tab');
@@ -613,7 +609,6 @@
             if(bCont) bCont.innerHTML = getSkeletonHTML(3, true);
             
             try {
-                // UPDATE: Menambah reqStock untuk menarik "get_db_stock"
                 const [reqBuffer, reqDiag, reqStock] = await Promise.allSettled([ 
                     fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_buffer" }) }), 
                     fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: "load_diagnose" }) }),
@@ -634,11 +629,11 @@
                         const demandBulat = Math.round(Number(row.col_3 || row["Avg. Demand 3 Bulanan"] || vals[2] || 0)); const forecastBulat = Math.round(Number(row.col_4 || row["FORECAST PO"] || vals[3] || 0)); const bufferBulat = Math.round(Number(row.col_5 || row["BUFFER"] || vals[4] || 0)); const statusText = String(row.col_6 || row["STATUS"] || vals[5] || "");
                         globalForecastData.push({ sku: skuName, demand: demandBulat, po: forecastBulat, buffer: bufferBulat, status: statusText });
                         skuCount++; const dot = statusText.includes("CRITICAL") ? '<span class="h-2.5 w-2.5 rounded-full bg-appred shadow-[0_0_8px_#FF3B30] inline-block animate-pulse"></span>' : '<span class="h-2.5 w-2.5 rounded-full bg-appgreen shadow-[0_0_8px_#34C759] inline-block"></span>';
-                        if(fCont) { fCont.innerHTML += `<div class="grid grid-cols-5 gap-1.5 items-center py-3 border-b border-white/5 text-[10px] md:text-xs text-center animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0"><div class="font-extrabold text-left text-white px-1 uppercase truncate min-w-0">${skuName}</div><div class="text-gray-400 font-bold">${demandBulat}</div><div class="text-white font-black">${forecastBulat}</div><div class="text-white font-black">${bufferBulat}</div><div class="flex justify-center items-center">${dot}</div></div>`; }
+                        if(fCont) { fCont.innerHTML += `<div class="grid grid-cols-5 gap-1.5 items-center py-3 border-b border-white/5 text-[10px] md:text-xs text-center animate-[fadeInUp_0.5s_ease-out_forwards]" style="animation-delay: ${idx * 40}ms; opacity:0"><div class="font-extrabold text-left text-white px-1 uppercase truncate min-w-0">${skuName}</div><div class="text-gray-400 font-bold">${demandBulat}</div><div class="text-white font-black">${forecastBulat}</div><div class="text-white font-black">${bufferBulat}</div><div class="flex justify-center items-center">${dot}</div></div>`; }
                     });
                 } runTicker(document.getElementById('stat-sku'), skuCount);
 
-                // --- 2. RENDER BATCH AGE TRACKING (NEW) ---
+                // --- 2. RENDER BATCH AGE TRACKING & TRACEABILITY ---
                 if(bCont) bCont.innerHTML = '';
                 let countA = 0, countB = 0, countC = 0, countExp = 0;
                 
@@ -654,10 +649,19 @@
                     let stockRows = Array.isArray(rawStock) ? rawStock : [rawStock];
                     const now = new Date();
                     
+                    // UPDATE: Mengisi pilihan di Select Form Sales
+                    const selBatches = document.getElementById('sls-batches');
+                    if(selBatches) selBatches.innerHTML = '';
+                    
                     stockRows.forEach((item, idx) => {
                         const row = item.json ? item.json : item;
                         const batchDateStr = row.Tanggal || row.tanggal || row.col_1 || "";
                         if(!batchDateStr || String(batchDateStr).toUpperCase() === 'TANGGAL') return; 
+                        
+                        // Menambahkan pilihan ke Form Sales
+                        if(selBatches) {
+                            selBatches.innerHTML += `<option value="${batchDateStr}">${batchDateStr}</option>`;
+                        }
                         
                         let bDate = new Date();
                         if(batchDateStr.includes('/')) {
@@ -689,29 +693,37 @@
                             grade = "EXPIRED"; badgeClass = "text-white bg-appred border-appred"; progressColor = "bg-appred"; countExp++;
                         }
                         
-                        const nka = Number(row.NKA) || 0;
-                        const ndlh = Number(row.NDLH) || 0;
-                        const nrd = Number(row.NRD) || 0;
-                        const narr = Number(row.NARR) || 0;
-                        const nkach = Number(row.NKACH) || 0;
-                        const totalFisik = nka + ndlh + nrd + narr + nkach;
+                        // TRACEABILITY LOGIC: Cari DC mana saja yang memegang batch ini
+                        let dcLocations = [];
+                        activeLogData.forEach(log => {
+                            const logBatches = log.BATCHES || log.batches || "";
+                            if(logBatches.includes(batchDateStr) && log.DC) {
+                                if(!dcLocations.includes(log.DC)) dcLocations.push(log.DC);
+                            }
+                        });
                         
+                        let locHtml = '<p class="text-[9px] md:text-[10px] text-gray-500 font-extrabold italic uppercase tracking-widest mt-3 mb-1">📍 Sebaran DC:</p>';
+                        if(dcLocations.length > 0) {
+                            locHtml += `<div class="flex flex-wrap gap-1.5">`;
+                            dcLocations.forEach(dc => { locHtml += `<span class="bg-black/80 text-white text-[8px] md:text-[9px] px-2 py-1 rounded-md border border-white/10 font-bold tracking-widest">${dc}</span>`; });
+                            locHtml += `</div>`;
+                        } else {
+                            locHtml += `<p class="text-[8px] md:text-[9px] text-gray-600 font-bold uppercase tracking-widest bg-black/40 px-2 py-1 rounded-md w-max border border-white/5">Belum ada sebaran</p>`;
+                        }
+
                         if(bCont) {
                             bCont.innerHTML += `
-                                <div class="bg-appcard p-4 md:p-5 rounded-3xl border border-white/7 animate-fade-in-up" style="animation-delay: ${idx * 30}ms; opacity:0">
+                                <div class="bg-appcard p-4 md:p-5 rounded-3xl border border-white/7 animate-[fadeInUp_0.5s_ease-out_forwards]" style="animation-delay: ${idx * 30}ms; opacity:0">
                                     <div class="flex justify-between items-center mb-3">
-                                        <div>
-                                            <h4 class="text-sm md:text-base font-black text-white uppercase tracking-wider">BATCH: ${batchDateStr}</h4>
-                                            <p class="text-[9px] md:text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-0.5">Total Fisik: ${totalFisik} CTN</p>
-                                        </div>
+                                        <h4 class="text-sm md:text-base font-black text-white uppercase tracking-wider">BATCH: <span class="text-appappleblue">${batchDateStr}</span></h4>
                                         <div class="px-3 py-1.5 rounded-lg border ${badgeClass} text-[9px] md:text-[10px] font-black uppercase tracking-widest bg-black/50 shadow-sm">
                                             ${grade === 'EXPIRED' ? '☠️ ' : ''}${grade}
                                         </div>
                                     </div>
                                     
-                                    <div class="mb-3">
+                                    <div class="mb-2">
                                         <div class="flex justify-between items-end mb-1.5">
-                                            <span class="text-[8px] md:text-[9px] text-gray-400 font-bold uppercase tracking-widest">Umur Umur Batch</span>
+                                            <span class="text-[8px] md:text-[9px] text-gray-400 font-bold uppercase tracking-widest">Umur Batch</span>
                                             <span class="text-[9px] md:text-[10px] text-white font-black">${ageMonths} Bulan</span>
                                         </div>
                                         <div class="w-full bg-black/60 rounded-full h-2 md:h-2.5 border border-white/5 overflow-hidden">
@@ -719,13 +731,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="grid grid-cols-5 gap-1.5 text-center bg-black/40 rounded-xl p-2 border border-white/5">
-                                        <div><p class="text-[7px] md:text-[8px] text-gray-500 uppercase font-bold mb-0.5">NKA</p><p class="text-[10px] md:text-xs font-black text-gray-300">${nka}</p></div>
-                                        <div><p class="text-[7px] md:text-[8px] text-gray-500 uppercase font-bold mb-0.5">NDLH</p><p class="text-[10px] md:text-xs font-black text-gray-300">${ndlh}</p></div>
-                                        <div><p class="text-[7px] md:text-[8px] text-gray-500 uppercase font-bold mb-0.5">NRD</p><p class="text-[10px] md:text-xs font-black text-gray-300">${nrd}</p></div>
-                                        <div><p class="text-[7px] md:text-[8px] text-gray-500 uppercase font-bold mb-0.5">NARR</p><p class="text-[10px] md:text-xs font-black text-gray-300">${narr}</p></div>
-                                        <div><p class="text-[7px] md:text-[8px] text-gray-500 uppercase font-bold mb-0.5">NKACH</p><p class="text-[10px] md:text-xs font-black text-gray-300">${nkach}</p></div>
-                                    </div>
+                                    ${locHtml}
                                 </div>
                             `;
                         }
@@ -763,7 +769,7 @@
                         else if (resStr === "TIDAK ADA DATA") badgeColor = "text-gray-500";
 
                         if(dCont) { 
-                            dCont.innerHTML += `<div class="bg-appcard p-5 md:p-6 rounded-4xl border border-white/7 animate-fade-in-up" style="animation-delay: ${idx * 40}ms; opacity:0">
+                            dCont.innerHTML += `<div class="bg-appcard p-5 md:p-6 rounded-4xl border border-white/7 animate-[fadeInUp_0.5s_ease-out_forwards]" style="animation-delay: ${idx * 40}ms; opacity:0">
                                 <div class="flex justify-between items-center mb-4 md:mb-5">
                                     <h4 class="text-sm md:text-base font-black text-white uppercase tracking-tight truncate w-32 md:w-48">${dcName}</h4>
                                     <p class="text-[8px] md:text-[10px] font-bold ${badgeColor} tracking-widest bg-black px-3 py-1.5 rounded-md border border-white/7">⚠️ ${resStr}</p>
@@ -824,14 +830,17 @@
                     icon = "fa-ban"; 
                     iconCol = "text-appred"; 
                     textCol = "text-appred";
-                    statusBadge = `<div class="absolute top-3 right-3 bg-appapplered text-white text-[8px] font-black px-2 py-1 rounded-md tracking-widest shadow-glow-redorange z-10">VOID</div>`;
+                    statusBadge = `<div class="absolute top-3 right-3 bg-appapplered text-white text-[8px] font-black px-2 py-1 rounded-md tracking-widest shadow-[0_0_25px_rgba(255,59,48,0.35)] z-10">VOID</div>`;
                 } else if (salesQty >= (poQty * 0.85)) { 
                     borderCol = "border-appgreen/50"; textCol = "text-appgreen"; icon = "fa-circle-check"; iconCol="text-appgreen"; 
                 } else if (salesQty > 0) { 
                     borderCol = "border-appappleorange/50"; textCol = "text-appappleorange"; icon = "fa-clock-rotate-left"; iconCol="text-appappleorange"; 
                 }
 
-                cont.innerHTML += `<div class="${cardBg} rounded-4xl border ${borderCol} overflow-hidden transition-all duration-300 animate-fade-in-up relative" style="animation-delay: ${idx * 30}ms; opacity:0">
+                // Ambil info Batch dari database log
+                const batchInfo = item.BATCHES || item.batches || "-";
+
+                cont.innerHTML += `<div class="${cardBg} rounded-4xl border ${borderCol} overflow-hidden transition-all duration-300 animate-[fadeInUp_0.5s_ease-out_forwards] relative" style="animation-delay: ${idx * 30}ms; opacity:0">
                     ${statusBadge}
                     <div class="p-6 flex items-center justify-between cursor-pointer btn-tactile hover:bg-white/5 transition-colors" onclick="toggleCard('${item.ID}')">
                         <div class="flex items-center gap-5 w-2/3">
@@ -849,7 +858,11 @@
                         </div>
                     </div>
                     <div id="det-${item.ID}" class="accordion-content bg-black/60 px-6 pb-6 pt-0">
-                        <div class="space-y-2 text-[11px] md:text-xs font-extrabold uppercase text-white pt-4">
+                        <div class="bg-black/50 p-3 rounded-xl border border-white/5 mb-4 text-center">
+                            <p class="text-[8px] md:text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-1">Tag Batch Pengiriman</p>
+                            <p class="text-[10px] md:text-xs text-appappleblue font-black uppercase tracking-widest">${batchInfo}</p>
+                        </div>
+                        <div class="space-y-2 text-[11px] md:text-xs font-extrabold uppercase text-white">
                             <div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-white/7"><span class="w-14 md:w-20 text-gray-400">NKA</span><span class="flex-1 text-center text-gray-300">${item["PO NKA"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NKA"] || 0}</span></div>
                             <div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-white/7"><span class="w-14 md:w-20 text-gray-400">NDLH</span><span class="flex-1 text-center text-gray-300">${item["PO NDLH"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NDLH"] || 0}</span></div>
                             <div class="flex items-center justify-between bg-white/5 py-3 px-5 rounded-xl border border-white/7"><span class="w-14 md:w-20 text-gray-400">NRD</span><span class="flex-1 text-center text-gray-300">${item["PO NRD"] || 0}</span><span class="flex-1 text-center text-appappleblue">${item["NRD"] || 0}</span></div>
@@ -875,10 +888,30 @@
         async function submitAction(e, act) {
             e.preventDefault();
             try {
-                const btn = e.target.querySelector('button[type="submit"]'); let payload = { action: act }; const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
-                if(act === 'insert_po') { payload = { ...payload, id: getVal('po-id').toUpperCase(), tanggal_po: getVal('po-tanggal'), tanggal_exp: getVal('po-exp'), dc: getVal('po-dc').toUpperCase(), po_nka: getVal('po-nka'), po_ndlh: getVal('po-ndlh'), po_nrd: getVal('po-nrd'), po_narr: getVal('po-narr'), po_nkach: getVal('po-nkach') }; } 
-                else if(act === 'insert_sales') { payload = { ...payload, id: getVal('sls-id').toUpperCase(), nka: getVal('sls-nka'), ndlh: getVal('sls-ndlh'), nrd: getVal('sls-nrd'), narr: getVal('sls-narr'), nkach: getVal('sls-nkach') }; }
-                else if(act === 'insert_stock') { payload = { ...payload, tanggal: getVal('stk-tanggal'), nka: getVal('stk-nka'), ndlh: getVal('stk-ndlh'), nrd: getVal('stk-nrd'), narr: getVal('stk-narr'), nkach: getVal('stk-nkach') }; }
+                const btn = e.target.querySelector('button[type="submit"]'); 
+                let payload = { action: act }; 
+                const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
+                
+                if(act === 'insert_po') { 
+                    payload = { ...payload, id: getVal('po-id').toUpperCase(), tanggal_po: getVal('po-tanggal'), tanggal_exp: getVal('po-exp'), dc: getVal('po-dc').toUpperCase(), po_nka: getVal('po-nka'), po_ndlh: getVal('po-ndlh'), po_nrd: getVal('po-nrd'), po_narr: getVal('po-narr'), po_nkach: getVal('po-nkach') }; 
+                } 
+                else if(act === 'insert_sales') { 
+                    // AMBIL BATCH MULTI-SELECT
+                    const selBatches = document.getElementById('sls-batches');
+                    let selectedBatches = [];
+                    if(selBatches) {
+                        for (let option of selBatches.options) {
+                            if (option.selected) selectedBatches.push(option.value);
+                        }
+                    }
+                    const batchString = selectedBatches.length > 0 ? selectedBatches.join(", ") : "-";
+
+                    payload = { ...payload, id: getVal('sls-id').toUpperCase(), nka: getVal('sls-nka'), ndlh: getVal('sls-ndlh'), nrd: getVal('sls-nrd'), narr: getVal('sls-narr'), nkach: getVal('sls-nkach'), batches: batchString }; 
+                }
+                else if(act === 'insert_stock') { 
+                    payload = { ...payload, tanggal: getVal('stk-tanggal'), nka: getVal('stk-nka'), ndlh: getVal('stk-ndlh'), nrd: getVal('stk-nrd'), narr: getVal('stk-narr'), nkach: getVal('stk-nkach') }; 
+                }
+                
                 const res = await sendApi(payload, btn, btn.innerText);
                 if(res && res.status === "success") { showToast("Data Tersimpan!"); e.target.reset(); loadLogPO(); } else showToast("Gagal menyimpan data", true);
             } catch(error) { showToast("Kesalahan Form Internal", true); }
